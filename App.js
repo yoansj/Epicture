@@ -1,17 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import { gallery } from './imgur';
+import { StyleSheet, View} from 'react-native';
+import Search from './Components/Search';
 
 export default function App() {
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-      <Button
-        title="Yes" 
-        onPress={() => {gallery();}} 
-      />
+      <Search />
     </View>
   );
 }
@@ -23,4 +18,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  image: {
+    width: 300,
+    height: 300,
+  },
+  tinyLogo: {
+    width: 50,
+    height: 50,
+  },
 });
+
+/*
+      <Text>Open up App.js to start working on your app!</Text>
+      <StatusBar style="auto" />
+      <Button
+        title="Yes" 
+        onPress={() => {gallery();}} 
+      />
+      <Button
+        title="Search" 
+        onPress={() => {setPressed(true)}} 
+      />
+      <Text>{test !== "" && test.data[0].link}</Text>
+      <Image style={styles.image} source={{uri: test !== "" && test.data[0].images[0].link}} />
+      <Image source={{uri: "https://imgur.com/a/sMfA6yg"}} />
+      <Image
+        style={styles.tinyLogo}
+        source={{
+          uri: 'https://reactnative.dev/img/tiny_logo.png',
+        }}
+      />
+
+*/
