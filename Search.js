@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { imgurSearch } from './imgur';
-import { StyleSheet, Text, View, Button, Image, TextInput } from 'react-native';
+import { StyleSheet, ScrollView, Text, View, Button, Image, TextInput } from 'react-native';
 
 function Search() {
     
@@ -39,7 +39,7 @@ function Search() {
                     )
                 } else {
                     return (
-                        <View>
+                        <View key={element.description}>
                         </View>
                     )
                 }
@@ -48,7 +48,7 @@ function Search() {
     }
 
     return (
-        <View style={styles.mainView}>
+        <ScrollView style={styles.mainView}>
             <TextInput
                 value={searchText}
                 onChangeText={text => setSearchText(text)}
@@ -62,7 +62,7 @@ function Search() {
             <View style={styles.imagesView}>
                 {showImages()}
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     mainView: {
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center',
     },
     searchInput: {
         height: 50,
