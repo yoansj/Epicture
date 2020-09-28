@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { imgurSearch } from './imgur';
+import { imgurSearch } from '../imgur.js';
 import { StyleSheet, ScrollView, Text, View, Button, Image, TextInput } from 'react-native';
 
 function Search() {

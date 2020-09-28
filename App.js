@@ -1,13 +1,22 @@
 import React from 'react';
 import { StyleSheet, View} from 'react-native';
-import Search from './Search.js';
+import Search from './Components/Search.jsx';
+import Auth from './Components/Auth.jsx';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
 
   return (
-    <View style={styles.container}>
-      <Search />
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator initialRouteName="Search">
+        <Tab.Screen name="Search" component={Search} />
+        <Tab.Screen name="Auth" component={Auth} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 

@@ -1,7 +1,7 @@
 
-const CLIENT_ID = "a508c5347923263"
-const CLIENT_SECRET = "b84797001e81d9bc98fc59f893c6459d994d0dd7"
-const REFRESH = "037982602bb806c9dcfc843a87f259642bdefa15"
+export const CLIENT_ID = "a508c5347923263"
+export const CLIENT_SECRET = "b84797001e81d9bc98fc59f893c6459d994d0dd7"
+export const REFRESH = "037982602bb806c9dcfc843a87f259642bdefa15"
 
 export function gallery() {
     var myHeaders = new Headers();
