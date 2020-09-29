@@ -24,7 +24,7 @@ const getUserData = async () => {
 }
 
   function getToken(navState) {
-    const url = navState.url + '&'; //Add & to the url so that the last regex doesnt fail
+    const url = navState.url + '&'; // Add & to the url so that the last regex doesnt fail
 
     if (
       url.search("state=93") !== -1 &&
@@ -38,15 +38,18 @@ const getUserData = async () => {
       var id_re = /account_id=(.*?)&/;
 
       console.log("Token found !");
-      var userData = {
-        acess_token: acess_token_re.exec(url)[1],
-        expiration_token: expiration_re.exec(url)[1],
-        refresh_token: refresh_token_re.exec(url)[1],
-        username: username_re.exec(url)[1],
-        id: id_re.exec(url)[1]
-      };
-      storeData('zebi le test');
-      console.log(userData);
+      // if added so that expo doesnt generate warning beacause url is null
+      if (url !== null) {
+        var userData = {
+          acess_token: acess_token_re.exec(url)[1],
+          expiration_token: expiration_re.exec(url)[1],
+          refresh_token: refresh_token_re.exec(url)[1],
+          username: username_re.exec(url)[1],
+          id: id_re.exec(url)[1]
+        };
+        saveUserData(userData);
+        console.log(userData);
+    }
     }
   }
 
