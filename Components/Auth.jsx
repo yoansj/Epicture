@@ -2,8 +2,27 @@ import React from "react";
 import { View } from "react-native";
 import { WebView, WebViewNavigation } from "react-native-webview";
 import { CLIENT_ID } from "../imgur.js";
+import AsyncStorage from '@react-native-community/async-storage';
 
 function Auth() {
+  const saveUserData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('user_data', jsonValue)
+    } catch (e) {
+      console.error("Error encountered while saving user data");
+    }
+  }
+
+const getUserData = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('user_data')
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch(e) {
+    console.error("Error encountered while reading user data");
+  }
+}
+
   function getToken(navState) {
     const url = navState.url + '&'; //Add & to the url so that the last regex doesnt fail
 
@@ -26,6 +45,7 @@ function Auth() {
         username: username_re.exec(url)[1],
         id: id_re.exec(url)[1]
       };
+      storeData('zebi le test');
       console.log(userData);
     }
   }
