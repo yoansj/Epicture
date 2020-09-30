@@ -47,3 +47,7 @@ export async function imgurSearch(sort = 'time', window = 'all', page = 0, text 
     console.log("After request", rep, data);
     return (data);
 }
+
+export async function imgurFavorites() {
+    
+}

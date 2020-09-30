@@ -8,9 +8,6 @@ import {
 } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import SearchIcon from "@material-ui/icons/Search";
-import PersonIcon from "@material-ui/icons/Person";
-
 import SearchPage from "./Pages/Search/SearchPage.jsx";
 import Auth from "./Components/Auth.jsx";
 import FavoritesPage from "./Pages/Favorites/FavoritesPage.jsx";
@@ -57,19 +54,3 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: 300,
-    height: 300,
-  },
-  tinyLogo: {
-    width: 50,
-    height: 50,
-  },
-});
