@@ -6,15 +6,21 @@ import Paper from '@material-ui/core/Paper';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
+import Checkbox from '@material-ui/core/Checkbox';
 import Select from '@material-ui/core/Select';
 import Box from '@material-ui/core/Box';
 
 export default function SearchPage() {
   return (
     <View>
-      <Grid item xs={3}> </Grid>
-      <Grid item xs={3}> k </Grid>
-      <Grid item xs={3}> z </Grid>
+      <Text>Card displayer</Text>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Text>xs=12</Text>
+        </Grid>
+      </Grid>
+
     </View>
   );
 }
