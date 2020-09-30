@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import { Container } from "@material-ui/core";
 import Grid from '@material-ui/core/Grid';
 
