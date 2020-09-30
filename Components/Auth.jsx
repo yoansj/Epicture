@@ -59,16 +59,16 @@ function Auth() {
 
   return (
     <View>
-      {userData === null &&
+      {userData === null ?
             <WebView
             onNavigationStateChange={(navState) => getToken(navState)}
             source={{
               uri: `https://api.imgur.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&state=93`,
             }}
-          />
+          /> : []
       }
-      {userData !== null &&
-        <Text>Welcome to your profile !</Text>
+      {userData !== null ?
+        <Text>Welcome to your profile !</Text> : []
       }
     </View>
   );

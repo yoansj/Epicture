@@ -37,7 +37,7 @@ export default function App() {
                 return <MaterialIcons name="favorite-border" size={size} color={color} />;
             } else if (route.name === 'Upload') {
               if (focused)
-              return <Ionicons name="ios-add-circle" size={size} color={color} />;
+                return <Ionicons name="ios-add-circle" size={size} color={color} />;
               else
                 return <Ionicons name="ios-add-circle-outline" size={size} color={color} />;
             }
