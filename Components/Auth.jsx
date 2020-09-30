@@ -1,27 +1,30 @@
-import React from "react";
-import { View } from "react-native";
+import React, { useState } from "react";
+import { View, Text } from "react-native";
 import { WebView, WebViewNavigation } from "react-native-webview";
 import { CLIENT_ID } from "../imgur.js";
 import AsyncStorage from '@react-native-community/async-storage';
 
-function Auth() {
-  const saveUserData = async (value) => {
-    try {
-      const jsonValue = JSON.stringify(value)
-      await AsyncStorage.setItem('user_data', jsonValue)
-    } catch (e) {
-      console.error("Error encountered while saving user data");
-    }
-  }
-
-const getUserData = async () => {
+export const saveUserData = async (value) => {
   try {
-    const jsonValue = await AsyncStorage.getItem('user_data')
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch(e) {
-    console.error("Error encountered while reading user data");
+    const jsonValue = JSON.stringify(value)
+    await AsyncStorage.setItem('user_data', jsonValue)
+  } catch (e) {
+    console.error("Error encountered while saving user data");
   }
 }
+
+export const getUserData = async () => {
+try {
+  const jsonValue = await AsyncStorage.getItem('user_data')
+  return jsonValue != null ? JSON.parse(jsonValue) : null;
+} catch(e) {
+  console.error("Error encountered while reading user data");
+}
+}
+
+function Auth() {
+
+  const [userData, setUserData] = useState(null);
 
   function getToken(navState) {
     const url = navState.url + '&'; // Add & to the url so that the last regex doesnt fail
@@ -49,17 +52,25 @@ const getUserData = async () => {
         };
         saveUserData(userData);
         console.log(userData);
+        setUserData(userData);
     }
     }
   }
 
   return (
-    <WebView
-      onNavigationStateChange={(navState) => getToken(navState)}
-      source={{
-        uri: `https://api.imgur.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&state=93`,
-      }}
-    />
+    <View>
+      {userData === null &&
+            <WebView
+            onNavigationStateChange={(navState) => getToken(navState)}
+            source={{
+              uri: `https://api.imgur.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&state=93`,
+            }}
+          />
+      }
+      {userData !== null &&
+        <Text>Welcome to your profile !</Text>
+      }
+    </View>
   );
 }
 

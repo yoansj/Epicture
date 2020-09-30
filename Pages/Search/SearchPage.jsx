@@ -5,12 +5,9 @@ import Grid from '@material-ui/core/Grid';
 
 export default function SearchPage() {
   return (
-    <Container style={{backgroundColor: "grey", height: "10%", textAlign: 'center'}}>
-      <Text><br/>bar de recherche<br/></Text>
-      <Button title="Most viral"></Button>
-      <Button title="User submitted"></Button>
-      <Button title="Hightest Scoring"></Button>
-    </Container>
+    <View>
+      <Text>Card displayer</Text>
+    </View>
   );
 }
 
