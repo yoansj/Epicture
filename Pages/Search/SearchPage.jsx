@@ -1,25 +1,28 @@
 import React from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import { Container } from "@material-ui/core";
+import InputAdornment from '@material-ui/core/InputAdornment';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import Grid from '@material-ui/core/Grid';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import Box from '@material-ui/core/Box';
 
 export default function SearchPage() {
   return (
-    <Container style={{backgroundColor: "grey", height: "10%", textAlign: 'center'}}>
-      <Text><br/>bar de recherche<br/></Text>
-      <Button title="Most viral"></Button>
-      <Button title="User submitted"></Button>
-      <Button title="Hightest Scoring"></Button>
-    </Container>
+    <View>
+      <Grid item xs={3}> </Grid>
+      <Grid item xs={3}> k </Grid>
+      <Grid item xs={3}> z </Grid>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+  myTop: {
+    backgroundColor: "grey",
+    width: "100%",
   },
   image: {
     width: 300,
