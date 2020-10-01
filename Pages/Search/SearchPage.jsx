@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { TextInput } from 'react-native';
 import { Col, Grid } from 'react-native-easy-grid';
 import { Container, Header} from 'native-base';
-import { Picker } from "native-base";
+import { Picker , Item, Icon, Button, Text, Input} from "native-base";
 
 export default function SearchPage() {
 
@@ -13,29 +13,39 @@ export default function SearchPage() {
   const [searchText, setSearchText] = useState("League of legends")
 
   return (
-
-    <View style={{ flexWrap: "wrap", alignContent: "flex-start" }}>
-      <Container>
-        <Header rounded>
-        </Header>
-      </Container>
+    <Container>
+      <Header searchBar rounded>
+        <Item>
+          <Icon name="ios-search" />
+          <Input placeholder="Search"
+          onChangeText={(text) => setSearchText(text)}
+          value={searchText}/>
+        </Item>
+        <Button transparent>
+          <Text>Search</Text>
+        </Button>
+      </Header>
       <Grid>
-
-
-        <Col style={{ height: 100, marginTop: 25 }}>
-          <Picker mode="dropdown" style={{ width: undefined }}
-          selectedValue={leftPicker}
-          onValueChange={(value) => setLeftPicker(value)}>
+        <Col style={{ height: 50}}>
+          <Picker
+            mode="dropdown"
+            style={{ width: undefined }}
+            selectedValue={leftPicker}
+            onValueChange={(value) => setLeftPicker(value)}
+          >
             <Picker.Item label="Most Viral" value="key_left0" />
             <Picker.Item label="User Submitted" value="key_left1" />
             <Picker.Item label="Hightest Scoring" value="key_left2" />
           </Picker>
         </Col>
 
-        <Col style={{ height: 100, marginTop: 25 }}>
-          <Picker mode="dropdown" style={{ width: undefined }}
-          selectedValue={rightPicker}
-          onValueChange={(value) => setRightPicker(value)}>
+        <Col style={{ height: 50}}>
+          <Picker
+            mode="dropdown"
+            style={{ width: undefined }}
+            selectedValue={rightPicker}
+            onValueChange={(value) => setRightPicker(value)}
+          >
             <Picker.Item label="Popular" value="key_right0" />
             <Picker.Item label="Newest" value="key_right1" />
             <Picker.Item label="Best" value="key_right2" />
@@ -43,11 +53,7 @@ export default function SearchPage() {
           </Picker>
         </Col>
       </Grid>
-
-      <TextInput placeholder="League of Legends" value={searchText}
-      onChangeText={(text) => setSearchText(text)} />
-
-    </View>
+    </Container>
   );
 }
 
