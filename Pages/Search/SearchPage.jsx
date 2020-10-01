@@ -1,31 +1,44 @@
 import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
-import {Picker} from '@react-native-community/picker';
+import { View, StyleSheet } from "react-native";
+//import {Picker} from '@react-native-community/picker';
 import { TextInput } from 'react-native';
+import * as Font from 'expo-font';
+import { Col, Row, Grid } from 'react-native-easy-grid';
+import { Container, Header, Item, Input, Icon, Button, Text } from 'native-base';
+import { Title, Right, Body, Left, Picker, Form ,Card, CardItem, Thumbnail, Image} from "native-base";
 
 export default function SearchPage() {
   return (
-    <View>
-      <View style={styles.myTop}>
-
-
-      <TextInput style={styles.myBar}/>
-
-          <Picker selectedValue={"Most Scoring"}
-          style={styles.scrolLeft} >
-            <Picker.Item label="Most Scoring" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
+    <View style={{ flexWrap: "wrap", alignContent: "flex-start" }}>
+      <Container>
+        <Header searchBar rounded>
+          <Item>
+            <Icon name="ios-search" />
+            <Input placeholder="Search" />
+          </Item>
+          <Button transparent>
+            <Text>Search</Text>
+          </Button>
+        </Header>
+      </Container>
+      <Grid>
+        <Col style={{ height: 100, marginTop: 25 }}>
+          <Picker mode="dropdown" style={{ width: undefined }}>
+            <Picker.Item label="Most Viral" value="key_left0" />
+            <Picker.Item label="User Submitted" value="key_left1" />
+            <Picker.Item label="Hightest Scoring" value="key_left2" />
           </Picker>
-
-          <Picker selectedValue={"Random"}
-          style={styles.scrolLeft} >
-            <Picker.Item label="Random" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
+        </Col>
+        <Col style={{ height: 100, marginTop: 25 }}>
+          <Picker mode="dropdown" style={{ width: undefined }}>
+            <Picker.Item label="Popular" value="key_right0" />
+            <Picker.Item label="Newest" value="key_right1" />
+            <Picker.Item label="Best" value="key_right2" />
+            <Picker.Item label="Random" value="key_right3" />
           </Picker>
-      </View>
+        </Col>
+      </Grid>
 
-
-      <Text>print les images</Text>
     </View>
   );
 }
