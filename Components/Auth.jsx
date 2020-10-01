@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { WebView, WebViewNavigation } from "react-native-webview";
+import { WebView } from "react-native-webview";
 import { CLIENT_ID } from "../imgur.js";
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -42,7 +42,7 @@ function Auth() {
 
       console.log("Token found !");
       // if added so that expo doesnt generate warning beacause url is null
-      if (url !== null) {
+      if (url !== null && url !== "") {
         var userData = {
           acess_token: acess_token_re.exec(url)[1],
           expiration_token: expiration_re.exec(url)[1],
@@ -68,7 +68,7 @@ function Auth() {
           /> : []
       }
       {userData !== null ?
-        <Text>Welcome to your profile !</Text> : []
+        <Text>Welcome to your profilee !</Text> : []
       }
     </View>
   );
