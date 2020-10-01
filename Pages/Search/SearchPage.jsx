@@ -1,12 +1,9 @@
 import React, {useState} from "react";
 import { View, StyleSheet } from "react-native";
-//import {Picker} from '@react-native-community/picker';
 import { TextInput } from 'react-native';
-import * as Font from 'expo-font';
-import { Col, Row, Grid } from 'react-native-easy-grid';
-import { Container, Header, Item, Input, Icon, Button, Text } from 'native-base';
-import { Title, Right, Body, Left, Picker, Form ,Card, CardItem, Thumbnail, Image} from "native-base";
-import { onChange } from "react-native-reanimated";
+import { Col, Grid } from 'react-native-easy-grid';
+import { Container, Header} from 'native-base';
+import { Picker } from "native-base";
 
 export default function SearchPage() {
 
