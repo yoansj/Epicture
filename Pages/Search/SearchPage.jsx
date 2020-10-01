@@ -1,9 +1,8 @@
 import React, {useState} from "react";
-import { View, StyleSheet } from "react-native";
-import { TextInput } from 'react-native';
+import { StyleSheet, ScrollView } from "react-native";
 import { Col, Grid } from 'react-native-easy-grid';
-import { Container, Header} from 'native-base';
-import { Picker , Item, Icon, Button, Text, Input} from "native-base";
+import { Picker , Item, Icon, Button, Text, Input, Container, Header} from "native-base";
+import CardDisplayer from "./CardDisplayer";
 
 export default function SearchPage() {
 
@@ -12,8 +11,9 @@ export default function SearchPage() {
 
   const [searchText, setSearchText] = useState("League of legends")
 
-  return (
-    <Container>
+  function SearchBar() {
+    return (
+      <Container>
       <Header searchBar rounded>
         <Item>
           <Icon name="ios-search" />
@@ -38,7 +38,6 @@ export default function SearchPage() {
             <Picker.Item label="Hightest Scoring" value="key_left2" />
           </Picker>
         </Col>
-
         <Col style={{ height: 50}}>
           <Picker
             mode="dropdown"
@@ -53,6 +52,17 @@ export default function SearchPage() {
           </Picker>
         </Col>
       </Grid>
+      <ScrollView automaticallyAdjustContentInsets={false} contentContainerStyle={{flexGrow: 1, flexDirection: 'column'}} style={{paddingVertical: 55}}>
+        <CardDisplayer />
+        <CardDisplayer />
+      </ScrollView>
+    </Container>
+    )
+  }
+
+  return (
+    <Container>
+      <SearchBar />
     </Container>
   );
 }
