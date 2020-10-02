@@ -4,7 +4,7 @@ import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Ic
 
 export default function CardDisplayer(props) {
   return (
-    <Card>
+    <Card style={props.style}>
       <CardItem listItemPadding={0}>
         <Left>
           <Thumbnail
@@ -14,7 +14,7 @@ export default function CardDisplayer(props) {
             }}
           />
           <Body>
-            <Text>NativeBase</Text>
+            <Text>{props.title}</Text>
             <Text note>GeekyAnts</Text>
           </Body>
         </Left>
@@ -22,8 +22,7 @@ export default function CardDisplayer(props) {
       <CardItem cardBody>
         <Image
           source={{
-            uri:
-              "https://www.presse-citron.net/wordpress_prod/wp-content/uploads/2017/11/Epitech-Experience-2017-projets-innovants.jpg",
+            uri: props.image,
           }}
           style={{ height: 200, width: null, flex: 1 }}
         />
@@ -32,7 +31,7 @@ export default function CardDisplayer(props) {
         <Left>
           <Button transparent>
             <Icon active name="thumbs-up" />
-            <Text>12 Likes</Text>
+            <Text>{props.ups}</Text>
           </Button>
         </Left>
         <Body>
@@ -48,3 +47,25 @@ export default function CardDisplayer(props) {
     </Card>
   );
 }
+
+export function cardRenderer(data) {
+  if (data === null) {
+    return <Text>Please do a search</Text>;
+  } else {
+    return data.map((image, id) => {
+      return (<CardDisplayer
+        title={image.title}
+        ups={image.ups}
+        views={image.views}
+        downs={image.downs}
+        image={image.images ? image.images[0].link : image.link}
+        key={id}
+      />);
+    });
+  }
+}
+
+// title = titre
+// ups = upvotes
+// views = nb vues
+// downs = downvotes

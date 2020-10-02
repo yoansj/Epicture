@@ -2,30 +2,49 @@ import React, {useState} from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import { Col, Grid } from 'react-native-easy-grid';
 import { Picker , Item, Icon, Button, Text, Input, Container, Header} from "native-base";
-import CardDisplayer from "./CardDisplayer";
+import CardDisplayer, { cardRenderer } from "./CardDisplayer";
+import { imgurSearch } from "../../imgur";
 
 export default function SearchPage() {
 
   const [leftPicker, setLeftPicker] = useState("Most Viral");
   const [rightPicker, setRightPicker] = useState("Popular");
+  const [searchText, setSearchText] = useState("League of legends");
+  const [imgurData, setImgurData] = useState(null);
 
-  const [searchText, setSearchText] = useState("League of legends")
+  function doSearch(text) {
+    imgurSearch().then(value => {setImgurData(value.data); console.log(JSON.stringify(value));});
+  }
 
   function SearchBar() {
     return (
       <Container>
-      <Header searchBar rounded>
+      <Header style={{flexDirection: 'column', height: 100}} searchBar rounded>
         <Item>
           <Icon name="ios-search" />
           <Input placeholder="Search"
           onChangeText={(text) => setSearchText(text)}
-          value={searchText}/>
+          value={searchText}
+          onSubmitEditing={(event) => doSearch(event.nativeEvent.text)}
+          />
         </Item>
         <Button transparent>
           <Text>Search</Text>
         </Button>
-      </Header>
       <Grid>
+      <Col style={{ height: 50}}>
+          <Picker
+            mode="dropdown"
+            style={{ width: undefined }}
+            selectedValue={rightPicker}
+            onValueChange={(value) => setRightPicker(value)}
+            placeholder="Search"
+          >
+            <Picker.Item label="Pictures" value="pictures" />
+            <Picker.Item label="Albums" value="albums" />
+            <Picker.Item label="Users" value="users" />
+          </Picker>
+        </Col>
         <Col style={{ height: 50}}>
           <Picker
             mode="dropdown"
@@ -52,9 +71,9 @@ export default function SearchPage() {
           </Picker>
         </Col>
       </Grid>
-      <ScrollView automaticallyAdjustContentInsets={false} contentContainerStyle={{flexGrow: 1, flexDirection: 'column'}} style={{paddingVertical: 55}}>
-        <CardDisplayer />
-        <CardDisplayer />
+      </Header>
+      <ScrollView automaticallyAdjustContentInsets={false} contentContainerStyle={{flexGrow: 1, flexDirection: 'column'}} style={{paddingVertical: 0}}>
+        {cardRenderer(imgurData)}
       </ScrollView>
     </Container>
     )
