@@ -5,17 +5,17 @@ import { Container, Card, Icon, Header, Left, Right, Button} from 'native-base';
 
 export default function FavoritesPage() {
   return (
-    <Container>
-      <Header rounded>
-        <Text style={{marginTop: 17}}>Favorites </Text>
+    <Container style={styles.myBlack}>
+      <Header rounded style={styles.myGreen}>
+        <Text style={{marginTop: 17, color:'rgb(18,18,18)'}}>Favorites </Text>
       </Header>
       <Card style={styles.myWarning}>
         <Text>Log In please </Text>
       </Card>
       <Container style={styles.myMiddle}>
-        <Icon name="flask" />
-        <Text>Wow !</Text>
-        <Text>There is some space here</Text>
+        <Icon style={styles.myBlack} name="flask" />
+        <Text style={styles.myBlack}>Wow !</Text>
+        <Text style={styles.myBlack}>There is some space here</Text>
       </Container>
     </Container>
   );
@@ -25,12 +25,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white"
+    backgroundColor: "rgb(18,18,18)",
   },
   myWarning: {
     backgroundColor: 'red',
     alignItems: 'center',
     height: 60,
     justifyContent: "center"
+  },
+  myGreen:{
+    backgroundColor: 'rgb(27,183,110)'
+  },
+  myBlack: {
+    backgroundColor: 'rgb(18,18,18)',
+    color: 'rgb(27,183,110)'
   }
 });
