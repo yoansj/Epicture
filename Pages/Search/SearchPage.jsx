@@ -31,13 +31,14 @@ export default function SearchPage() {
 
   function SearchBar() {
     return (
-      <Container>
+      <Container style={styles.myBlack}>
         <Header
-          style={{ flexDirection: "column", height: 100 }}
+          androidStatusBarColor='rgb(1,1,1)'
+          style={{ flexDirection: "column", height: 100 , backgroundColor: 'rgb(1,1,1)'}}
           searchBar
           rounded
         >
-          <Item>
+          <Item style={styles.myGreen}>
             <Icon name="ios-search" />
             <Input
               placeholder="Search"
@@ -53,7 +54,7 @@ export default function SearchPage() {
             <Col style={{ height: 50 }}>
               <Picker
                 mode="dropdown"
-                style={{ width: undefined }}
+                style={styles.myPickerGreen}
                 selectedValue={searchPicker}
                 onValueChange={(value) => setSearchPicker(value)}
                 placeholder="Search"
@@ -67,7 +68,7 @@ export default function SearchPage() {
               <Col>
                 <Picker
                 mode="dropdown"
-                style={{ width: undefined }}
+                style={styles.myPickerGreen}
                 selectedValue={leftPicker}
                 onValueChange={(value) => setLeftPicker(value)}
               >
@@ -81,7 +82,7 @@ export default function SearchPage() {
             <Col style={{ height: 50 }}>
               <Picker
                 mode="dropdown"
-                style={{ width: undefined }}
+                style={styles.myPickerGreen}
                 selectedValue={leftPicker}
                 onValueChange={(value) => setLeftPicker(value)}
               >
@@ -93,10 +94,10 @@ export default function SearchPage() {
             <Col style={{ height: 50 }}>
               <Picker
                 mode="dropdown"
-                style={{ width: undefined }}
+                style={styles.myPickerGreen}
                 selectedValue={sortPicker}
                 onValueChange={(value) => setSortPicker(value)}
-              >
+              > 
                 <Picker.Item label="Popular" value="viral" />
                 <Picker.Item label="Newest" value="time" />
                 <Picker.Item label="Best" value="top" />
@@ -132,6 +133,17 @@ const styles = StyleSheet.create({
     height: 20,
     width: 175,
   },
+  myPickerGreen:{
+    color: 'rgb(27,183,110)',
+    width: undefined
+  },
+  myGreen:{
+    backgroundColor: 'rgb(27,183,110)'
+  },
+  myBlack: {
+    backgroundColor: 'rgb(18,18,18)',
+    color: 'rgb(27,183,110)'
+  },
   myBar: {
     marginLeft: 80,
     marginTop: 60,
@@ -145,5 +157,5 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 7,
     borderWidth: 1,
     alignSelf: "center",
-  },
+  }
 });

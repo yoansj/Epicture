@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet } from "react-native";
 import { FlatList, SafeAreaView, Image } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 
@@ -57,7 +58,7 @@ export default function CardDisplayer(props) {
 
 export const renderPicture = ({ item }) => {
   const { title, account_url, ups, views, downs, link, images, id, comment_count } = item;
-  
+
   return (
     <CardDisplayer
       title={title}
@@ -74,7 +75,12 @@ export const renderPicture = ({ item }) => {
 
 export function renderCards(data) {
   if (data === null) {
-    return <Text>Please do a search</Text>;
+    return (
+      <Container style={styles.myMiddle}>
+        <Icon style={styles.myBlack} name="flask" />
+        <Text style={styles.myBlack}>Do a research</Text>
+      </Container>
+    )
   } else {
   return (
     <SafeAreaView>
@@ -84,6 +90,18 @@ export function renderCards(data) {
   }
 }
 
+const styles = StyleSheet.create({
+  myMiddle: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgb(18,18,18)",
+  },
+  myBlack: {
+    backgroundColor: 'rgb(18,18,18)',
+    color: 'rgb(27,183,110)'
+  }
+});
 
 // title = titre
 // ups = upvotes
