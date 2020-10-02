@@ -1,80 +1,113 @@
-import React, {useState} from "react";
-import { StyleSheet, ScrollView } from "react-native";
-import { Col, Grid } from 'react-native-easy-grid';
-import { Picker , Item, Icon, Button, Text, Input, Container, Header} from "native-base";
-import CardDisplayer, { cardRenderer, renderCards } from "./CardDisplayer";
+import React, { useState } from "react";
+import { StyleSheet } from "react-native";
+import { Col, Grid } from "react-native-easy-grid";
+import {
+  Picker,
+  Item,
+  Icon,
+  Button,
+  Text,
+  Input,
+  Container,
+  Header,
+} from "native-base";
+import { renderCards } from "./CardDisplayer";
 import { imgurSearch } from "../../imgur";
 
 export default function SearchPage() {
+  const [searchPicker, setSearchPicker] = useState("pictures");
+  const [sortPicker, setSortPicker] = useState("random");
 
   const [leftPicker, setLeftPicker] = useState("Most Viral");
-  const [rightPicker, setRightPicker] = useState("Popular");
   const [searchText, setSearchText] = useState("League of legends");
   const [imgurData, setImgurData] = useState(null);
 
   function doSearch(text) {
-    imgurSearch().then(value => {setImgurData(value.data); console.log(JSON.stringify(value));});
+    imgurSearch().then((value) => {
+      setImgurData(value.data);
+      console.log(JSON.stringify(value));
+    });
   }
 
   function SearchBar() {
     return (
       <Container>
-      <Header style={{flexDirection: 'column', height: 100}} searchBar rounded>
-        <Item>
-          <Icon name="ios-search" />
-          <Input placeholder="Search"
-          onChangeText={(text) => setSearchText(text)}
-          value={searchText}
-          onSubmitEditing={(event) => doSearch(event.nativeEvent.text)}
-          />
-        </Item>
-        <Button transparent>
-          <Text>Search</Text>
-        </Button>
-      <Grid>
-      <Col style={{ height: 50}}>
-          <Picker
-            mode="dropdown"
-            style={{ width: undefined }}
-            selectedValue={rightPicker}
-            onValueChange={(value) => setRightPicker(value)}
-            placeholder="Search"
-          >
-            <Picker.Item label="Pictures" value="pictures" />
-            <Picker.Item label="Albums" value="albums" />
-            <Picker.Item label="Users" value="users" />
-          </Picker>
-        </Col>
-        <Col style={{ height: 50}}>
-          <Picker
-            mode="dropdown"
-            style={{ width: undefined }}
-            selectedValue={leftPicker}
-            onValueChange={(value) => setLeftPicker(value)}
-          >
-            <Picker.Item label="Most Viral" value="key_left0" />
-            <Picker.Item label="User Submitted" value="key_left1" />
-            <Picker.Item label="Hightest Scoring" value="key_left2" />
-          </Picker>
-        </Col>
-        <Col style={{ height: 50}}>
-          <Picker
-            mode="dropdown"
-            style={{ width: undefined }}
-            selectedValue={rightPicker}
-            onValueChange={(value) => setRightPicker(value)}
-          >
-            <Picker.Item label="Popular" value="key_right0" />
-            <Picker.Item label="Newest" value="key_right1" />
-            <Picker.Item label="Best" value="key_right2" />
-            <Picker.Item label="Random" value="key_right3" />
-          </Picker>
-        </Col>
-      </Grid>
-      </Header>
-      {renderCards(imgurData)}
-    </Container>
-    )
+        <Header
+          style={{ flexDirection: "column", height: 100 }}
+          searchBar
+          rounded
+        >
+          <Item>
+            <Icon name="ios-search" />
+            <Input
+              placeholder="Search"
+              onChangeText={(text) => setSearchText(text)}
+              value={searchText}
+              onSubmitEditing={(event) => doSearch(event.nativeEvent.text)}
+            />
+          </Item>
+          <Button transparent>
+            <Text>Search</Text>
+          </Button>
+          <Grid>
+            <Col style={{ height: 50 }}>
+              <Picker
+                mode="dropdown"
+                style={{ width: undefined }}
+                selectedValue={searchPicker}
+                onValueChange={(value) => setSearchPicker(value)}
+                placeholder="Search"
+              >
+                <Picker.Item label="Pictures" value="pictures" />
+                <Picker.Item label="Albums" value="albums" />
+                <Picker.Item label="Users" value="users" />
+              </Picker>
+            </Col>
+            {searchPicker === "pictures" ?
+              <Col>
+                <Picker
+                mode="dropdown"
+                style={{ width: undefined }}
+                selectedValue={leftPicker}
+                onValueChange={(value) => setLeftPicker(value)}
+              >
+                <Picker.Item label="Most Viral" value="key_left0" />
+                <Picker.Item label="User Submitted" value="key_left1" />
+                <Picker.Item label="Hightest Scoring" value="key_left2" />
+              </Picker>
+              </Col>
+              : []
+            }
+            <Col style={{ height: 50 }}>
+              <Picker
+                mode="dropdown"
+                style={{ width: undefined }}
+                selectedValue={leftPicker}
+                onValueChange={(value) => setLeftPicker(value)}
+              >
+                <Picker.Item label="Most Viral" value="key_left0" />
+                <Picker.Item label="User Submitted" value="key_left1" />
+                <Picker.Item label="Hightest Scoring" value="key_left2" />
+              </Picker>
+            </Col>
+            <Col style={{ height: 50 }}>
+              <Picker
+                mode="dropdown"
+                style={{ width: undefined }}
+                selectedValue={sortPicker}
+                onValueChange={(value) => setSortPicker(value)}
+              >
+                <Picker.Item label="Popular" value="viral" />
+                <Picker.Item label="Newest" value="time" />
+                <Picker.Item label="Best" value="top" />
+                <Picker.Item label="Random" value="random" />
+              </Picker>
+            </Col>
+          </Grid>
+        </Header>
+        {renderCards(imgurData)}
+      </Container>
+    );
   }
 
   return (
@@ -92,7 +125,7 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
     backgroundColor: "#566573",
     width: "100%",
-    height: "45%"
+    height: "45%",
   },
   scrolLeft: {
     textAlign: "center",
@@ -104,12 +137,13 @@ const styles = StyleSheet.create({
     marginTop: 60,
     width: 200,
     height: 40,
-    borderColor: 'black',
+    borderColor: "black",
     backgroundColor: "#808B96",
     borderTopLeftRadius: 7,
     borderTopRightRadius: 7,
     borderBottomRightRadius: 7,
     borderBottomLeftRadius: 7,
-    borderWidth: 1 , alignSelf: "center"
+    borderWidth: 1,
+    alignSelf: "center",
   },
 });
