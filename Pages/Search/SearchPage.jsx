@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import { Col, Grid } from 'react-native-easy-grid';
 import { Picker , Item, Icon, Button, Text, Input, Container, Header} from "native-base";
-import CardDisplayer, { cardRenderer } from "./CardDisplayer";
+import CardDisplayer, { cardRenderer, renderCards } from "./CardDisplayer";
 import { imgurSearch } from "../../imgur";
 
 export default function SearchPage() {
@@ -72,9 +72,7 @@ export default function SearchPage() {
         </Col>
       </Grid>
       </Header>
-      <ScrollView automaticallyAdjustContentInsets={false} contentContainerStyle={{flexGrow: 1, flexDirection: 'column'}} style={{paddingVertical: 0}}>
-        {cardRenderer(imgurData)}
-      </ScrollView>
+      {renderCards(imgurData)}
     </Container>
     )
   }

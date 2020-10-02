@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { FlatList, SafeAreaView, Image } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 
 export default function CardDisplayer(props) {
@@ -64,6 +64,27 @@ export function cardRenderer(data) {
     });
   }
 }
+
+export const renderPicture = ({ item }) => {
+  const { title, ups, views, downs, link, images, id } = item;
+  console.log(title);
+  return (
+  <CardDisplayer title={title} ups={ups} views={views} downs={downs} image={images ? images[0].link : link} key={id} />
+  );
+}
+
+export function renderCards(data) {
+  if (data === null) {
+    return <Text>Please do a search</Text>;
+  } else {
+  return (
+    <SafeAreaView>
+      <FlatList data={data} renderItem={renderPicture} />
+    </SafeAreaView>
+  );
+  }
+}
+
 
 // title = titre
 // ups = upvotes
