@@ -15,7 +15,7 @@ export default function CardDisplayer(props) {
           />
           <Body>
             <Text>{props.title}</Text>
-            <Text note>GeekyAnts</Text>
+            <Text note>{props.author}</Text>
           </Body>
         </Left>
       </CardItem>
@@ -34,42 +34,41 @@ export default function CardDisplayer(props) {
             <Text>{props.ups}</Text>
           </Button>
         </Left>
-        <Body>
+        <Left>
           <Button transparent>
-            <Icon active name="chatbubbles" />
-            <Text>4 Comments</Text>
+            <Icon style={{color: 'red'}} icon active name="thumbs-down" />
+            <Text style={{color: 'red'}}>{props.downs}</Text>
           </Button>
-        </Body>
+        </Left>
         <Right>
-          <Text>11h ago</Text>
+          <Button transparent>
+            <Icon active name="eye" />
+            <Text>{props.views}</Text>
+          </Button>
+        </Right>
+        <Right>
+          <Icon name="chatbubbles" style={{color: 'black'}} />
+          <Text>{props.comment_count}</Text>
         </Right>
       </CardItem>
     </Card>
   );
 }
 
-export function cardRenderer(data) {
-  if (data === null) {
-    return <Text>Please do a search</Text>;
-  } else {
-    return data.map((image, id) => {
-      return (<CardDisplayer
-        title={image.title}
-        ups={image.ups}
-        views={image.views}
-        downs={image.downs}
-        image={image.images ? image.images[0].link : image.link}
-        key={id}
-      />);
-    });
-  }
-}
-
 export const renderPicture = ({ item }) => {
-  const { title, ups, views, downs, link, images, id } = item;
-  console.log(title);
+  const { title, account_url, ups, views, downs, link, images, id, comment_count } = item;
+  
   return (
-  <CardDisplayer title={title} ups={ups} views={views} downs={downs} image={images ? images[0].link : link} key={id} />
+    <CardDisplayer
+      title={title}
+      author={account_url}
+      ups={ups}
+      views={views}
+      downs={downs}
+      comment_count={comment_count}
+      image={images ? images[0].link : link}
+      key={id}
+    />
   );
 }
 
