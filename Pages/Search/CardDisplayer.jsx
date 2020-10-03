@@ -46,14 +46,14 @@ export default function CardDisplayer(props) {
         </Left>
         <Right>
           <Button transparent>
-            <Icon active name="eye" style={{color: greenFont}}/>
-            <Text style={{color: greyFont}}>{props.views}</Text>
+            <Icon name="chatbubbles" style={{color: greenFont}} />
+            <Text style={{color: greyFont}}>{props.comment_count}</Text>
           </Button>
         </Right>
         <Right>
           <Button transparent>
-            <Icon name="chatbubbles" style={{color: greenFont}} />
-            <Text style={{color: greyFont}}>{props.comment_count}</Text>
+            <Icon active name="eye" style={{color: greenFont}}/>
+            <Text style={{color: greyFont}}>{props.views}</Text>
           </Button>
         </Right>
       </CardItem>

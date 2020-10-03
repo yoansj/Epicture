@@ -14,7 +14,10 @@ export default class App extends React.Component {
     await Font.loadAsync({
       Roboto: require('native-base/Fonts/Roboto.ttf'),
       Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
-    });
+    }).catch(function(error) {
+      console.log("Font loading error ! " + error.message);
+      throw error;
+    })
     this.setState({ loading: false });
   }
 

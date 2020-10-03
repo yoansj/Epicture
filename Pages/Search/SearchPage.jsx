@@ -15,18 +15,22 @@ import { renderCards } from "./CardDisplayer";
 import { imgurSearch } from "../../imgur";
 
 export default function SearchPage() {
-  const [searchPicker, setSearchPicker] = useState("pictures");
-  const [sortPicker, setSortPicker] = useState("random");
 
-  const [leftPicker, setLeftPicker] = useState("Most Viral");
-  const [searchText, setSearchText] = useState("League of legends");
+  // Can be pictures || albums || users
+  const [searchPicker, setSearchPicker] = useState("pictures");
+  // Can be time || viral || top || random
+  const [sortPicker, setSortPicker] = useState("time");
+  // Can be day || week || month || year || all
+  const [windowPicker, setwindowPicker] = useState("all");
+  // Data from imgur API
   const [imgurData, setImgurData] = useState(null);
 
   function doSearch(text) {
-    imgurSearch().then((value) => {
-      setImgurData(value.data);
-      console.log(JSON.stringify(value));
-    });
+    if (searchPicker === "pictures") {
+      imgurSearch(sortPicker, windowPicker, 0, text).then((value) => {
+        setImgurData(value.data);
+      });
+    }
   }
 
   function SearchBar() {
@@ -42,8 +46,6 @@ export default function SearchPage() {
             <Icon name="ios-search" />
             <Input
               placeholder="Search"
-              onChangeText={(text) => setSearchText(text)}
-              value={searchText}
               onSubmitEditing={(event) => doSearch(event.nativeEvent.text)}
             />
           </Item>
@@ -67,43 +69,36 @@ export default function SearchPage() {
             {searchPicker === "pictures" ?
               <Col>
                 <Picker
-                mode="dropdown"
-                style={styles.myPickerGreen}
-                selectedValue={leftPicker}
-                onValueChange={(value) => setLeftPicker(value)}
-              >
-                <Picker.Item label="Most Viral" value="key_left0" />
-                <Picker.Item label="User Submitted" value="key_left1" />
-                <Picker.Item label="Hightest Scoring" value="key_left2" />
-              </Picker>
+                  mode="dropdown"
+                  style={styles.myPickerGreen}
+                  selectedValue={sortPicker}
+                  onValueChange={(value) => setSortPicker(value)}
+                >
+                  <Picker.Item label="Most Viral" value="viral" />
+                  <Picker.Item label="By date" value="time" />
+                  <Picker.Item label="Hightest Scoring" value="top" />
+                  <Picker.Item label="Random" value="random" />
+                </Picker>
               </Col>
               : []
             }
-            <Col style={{ height: 50 }}>
-              <Picker
-                mode="dropdown"
-                style={styles.myPickerGreen}
-                selectedValue={leftPicker}
-                onValueChange={(value) => setLeftPicker(value)}
-              >
-                <Picker.Item label="Most Viral" value="key_left0" />
-                <Picker.Item label="User Submitted" value="key_left1" />
-                <Picker.Item label="Hightest Scoring" value="key_left2" />
-              </Picker>
-            </Col>
-            <Col style={{ height: 50 }}>
-              <Picker
-                mode="dropdown"
-                style={styles.myPickerGreen}
-                selectedValue={sortPicker}
-                onValueChange={(value) => setSortPicker(value)}
-              > 
-                <Picker.Item label="Popular" value="viral" />
-                <Picker.Item label="Newest" value="time" />
-                <Picker.Item label="Best" value="top" />
-                <Picker.Item label="Random" value="random" />
-              </Picker>
-            </Col>
+            {sortPicker === "top" && searchPicker === "pictures" ?
+              <Col style={{ height: 50 }}>
+                <Picker
+                  mode="dropdown"
+                  style={styles.myPickerGreen}
+                  selectedValue={windowPicker}
+                  onValueChange={(value) => setwindowPicker(value)}
+                >
+                  <Picker.Item label="Day" value="day" />
+                  <Picker.Item label="Week" value="week" />
+                  <Picker.Item label="Month" value="month" />
+                  <Picker.Item label="Year" value="year" />
+                  <Picker.Item label="All Time" value="all" />
+                </Picker>
+              </Col>
+              : []
+            }
           </Grid>
         </Header>
         {renderCards(imgurData)}
