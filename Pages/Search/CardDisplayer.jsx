@@ -3,10 +3,13 @@ import { StyleSheet } from "react-native";
 import { FlatList, SafeAreaView, Image } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 
+const greenFont = "rgb(27,183,110)";
+const greyFont = "#a7a7a7";
+
 export default function CardDisplayer(props) {
   return (
     <Card style={props.style}>
-      <CardItem listItemPadding={0}>
+      <CardItem listItemPadding={0} style={styles.myBlack}>
         <Left>
           <Thumbnail
             source={{
@@ -15,7 +18,7 @@ export default function CardDisplayer(props) {
             }}
           />
           <Body>
-            <Text>{props.title}</Text>
+            <Text style={{color: greenFont}}>{props.title}</Text>
             <Text note>{props.author}</Text>
           </Body>
         </Left>
@@ -28,28 +31,30 @@ export default function CardDisplayer(props) {
           style={{ height: 200, width: null, flex: 1 }}
         />
       </CardItem>
-      <CardItem>
+      <CardItem style={styles.myBlack}>
         <Left>
           <Button transparent>
-            <Icon active name="thumbs-up" />
-            <Text>{props.ups}</Text>
+            <Icon active name="thumbs-up" style={{color: greenFont}}/>
+            <Text  style={{color: greyFont}}>{props.ups}</Text>
           </Button>
         </Left>
         <Left>
           <Button transparent>
-            <Icon style={{color: 'red'}} icon active name="thumbs-down" />
-            <Text style={{color: 'red'}}>{props.downs}</Text>
+            <Icon style={{color: greenFont}} icon active name="thumbs-down" />
+            <Text style={{color: greyFont}}>{props.downs}</Text>
           </Button>
         </Left>
         <Right>
           <Button transparent>
-            <Icon active name="eye" />
-            <Text>{props.views}</Text>
+            <Icon active name="eye" style={{color: greenFont}}/>
+            <Text style={{color: greyFont}}>{props.views}</Text>
           </Button>
         </Right>
         <Right>
-          <Icon name="chatbubbles" style={{color: 'black'}} />
-          <Text>{props.comment_count}</Text>
+          <Button transparent>
+            <Icon name="chatbubbles" style={{color: greenFont}} />
+            <Text style={{color: greyFont}}>{props.comment_count}</Text>
+          </Button>
         </Right>
       </CardItem>
     </Card>
@@ -96,6 +101,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgb(18,18,18)",
+  },
+  myGreen:{
+    backgroundColor: 'rgb(27,183,110)'
   },
   myBlack: {
     backgroundColor: 'rgb(18,18,18)',
