@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   NavigationContainer,
@@ -7,13 +7,13 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import SearchPage from "./Pages/Search/SearchPage.jsx";
-import Auth from "./Components/Auth.jsx";
 import FavoritesPage from "./Pages/Favorites/FavoritesPage.jsx";
 import UploadPage from "./Pages/Upload/UploadPage.jsx";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ProfilePage from "./Pages/Profile/ProfilePage.jsx";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,7 +28,7 @@ const MyDarkGreen = {
   },
 };
 
-export default function AppContainer() {
+export default function AppContainer(props) {
   return (
     <NavigationContainer theme={MyDarkGreen}>
       <Tab.Navigator
@@ -78,7 +78,7 @@ export default function AppContainer() {
         <Tab.Screen name="Search" component={SearchPage} />
         <Tab.Screen name="Favorites" component={FavoritesPage} />
         <Tab.Screen name="Upload" component={UploadPage} />
-        <Tab.Screen name="Profile" component={Auth} />
+        <Tab.Screen name="Profile" component={ProfilePage} initialParams={{disconnect: props.disconnect}} />
       </Tab.Navigator>
     </NavigationContainer>
   );

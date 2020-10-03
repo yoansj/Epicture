@@ -35,7 +35,7 @@ export default function CardDisplayer(props) {
         <Left>
           <Button transparent>
             <Icon active name="thumbs-up" style={{color: greenFont}}/>
-            <Text  style={{color: greyFont}}>{props.ups}</Text>
+            <Text style={{color: greyFont}}>{props.ups}</Text>
           </Button>
         </Left>
         <Left>
