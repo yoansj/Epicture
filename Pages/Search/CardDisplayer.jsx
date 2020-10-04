@@ -1,22 +1,34 @@
-import React from 'react';
-import { StyleSheet } from "react-native";
-import { FlatList, SafeAreaView, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+
+import { imgurAlbumVote } from '../../imgur';
+import { getUserData } from '../Authentification/AuthPage';
 
 const greenFont = "rgb(27,183,110)";
 const greyFont = "#a7a7a7";
 
 export default function CardDisplayer(props) {
+
+  const [hasUpvote, setHasUpvote] = useState(false);
+  const [hasDownvote, setHasDownvote] = useState(false);
+
+  function vote(vote) {
+    getUserData().then((value) =>
+      imgurAlbumVote(value.acess_token, props.id, vote).then((value) => {
+        if (value.ok === true) {
+          if (vote == "up") setHasUpvote(true);
+          if (vote == "down") setHasDownvote(true);
+          console.log("Vote worked ! ", vote);
+        }
+      })
+    );
+  }
+
   return (
     <Card style={props.style}>
       <CardItem listItemPadding={0} style={styles.myBlack}>
         <Left>
-          <Thumbnail
-            source={{
-              uri:
-                "https://vignette.wikia.nocookie.net/epita/images/2/2d/Epitech.png/revision/latest?cb=20190211235039&path-prefix=fr",
-            }}
-          />
           <Body>
             <Text style={{color: greenFont}}>{props.title}</Text>
             <Text note>{props.author}</Text>
@@ -33,14 +45,14 @@ export default function CardDisplayer(props) {
       </CardItem>
       <CardItem style={styles.myBlack}>
         <Left>
-          <Button transparent>
-            <Icon active name="thumbs-up" style={{color: greenFont}}/>
+          <Button onPress={() => vote("up")} transparent>
+            <Icon active name="thumbs-up" style={{color: (hasUpvote ? '#1D2CB5' : greenFont)}}/>
             <Text style={{color: greyFont}}>{props.ups}</Text>
           </Button>
         </Left>
         <Left>
-          <Button transparent>
-            <Icon style={{color: greenFont}} icon active name="thumbs-down" />
+          <Button onPress={() => vote("down")} transparent>
+            <Icon style={{color: (hasDownvote ? '#FF0000' : greenFont)}} icon active name="thumbs-down" />
             <Text style={{color: greyFont}}>{props.downs}</Text>
           </Button>
         </Left>
@@ -73,6 +85,7 @@ export const renderPicture = ({ item }) => {
       downs={downs}
       comment_count={comment_count}
       image={images ? images[0].link : link}
+      id={id}
       key={id}
     />
   );

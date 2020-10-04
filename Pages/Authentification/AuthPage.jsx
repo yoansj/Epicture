@@ -45,13 +45,13 @@ function AuthPage(props) {
 
       // if added so that expo doesnt generate warning beacause url is null
       if (url !== null && url !== undefined) {
-        var acess_token_re = /access_token=(.*?)&/;
-        var expiration_re = /expires_in=(.*?)&/;
-        var refresh_token_re = /refresh_token=(.*?)&/;
-        var username_re = /account_username=(.*?)&/;
-        var id_re = /account_id=(.*?)&/;
+        let acess_token_re = /access_token=(.*?)&/;
+        let expiration_re = /expires_in=(.*?)&/;
+        let refresh_token_re = /refresh_token=(.*?)&/;
+        let username_re = /account_username=(.*?)&/;
+        let id_re = /account_id=(.*?)&/;
 
-        var userData = {
+        let userData = {
           acess_token: acess_token_re.exec(url)[1],
           expiration_token: expiration_re.exec(url)[1],
           refresh_token: refresh_token_re.exec(url)[1],

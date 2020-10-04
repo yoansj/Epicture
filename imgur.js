@@ -23,8 +23,22 @@ export async function imgurSearch(sort = 'time', window = 'all', page = 0, text 
     return (data);
 }
 
-export async function imgurFavorites() {
-    
+// GET Account Favorites
+export async function imgurFavorites(acessToken, username, page = 0, sort = "newest") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("GET Account Favorites");
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}/favorites/${page}/${sort}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep));
+    return (data);
 }
 
 // GET Gallery
@@ -38,10 +52,28 @@ export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', 
         redirect: 'follow'
     }
 
-    console.log("Pre request");
+    console.log("GET Gallery");
     const rep = await fetch(`https://api.imgur.com/3/gallery/${section}/` + (section === "user" ? `${sort}/` : '') +
     (section === "top" ? `${window}/` : '') + `${page}?showViral=${showViral}&mature=${showMature}&albumPreviews=true`, requestOptions);
     const data = await rep.json();
-    console.log(rep);
+    console.log(JSON.stringify(rep));
     return (data);
+}
+
+// POST Album / Image Voting
+export async function imgurAlbumVote(acessToken, id, vote = "up") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("POST Album / Image Voting");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/${id}/vote/${vote}`, requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (rep);
 }
