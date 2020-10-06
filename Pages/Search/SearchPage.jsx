@@ -13,6 +13,7 @@ import {
 } from "native-base";
 import { renderCards } from "./CardDisplayer";
 import { imgurSearch } from "../../imgur";
+import { getUserData } from "../Authentification/AuthPage";
 
 export default function SearchPage() {
 
@@ -27,8 +28,12 @@ export default function SearchPage() {
 
   function doSearch(text) {
     if (searchPicker === "pictures") {
-      imgurSearch(sortPicker, windowPicker, 0, text).then((value) => {
-        setImgurData(value.data);
+      getUserData().then((value) => {
+        imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
       });
     }
   }

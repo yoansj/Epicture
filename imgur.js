@@ -5,9 +5,9 @@ export const REFRESH = "037982602bb806c9dcfc843a87f259642bdefa15"
 
 
 // GET Gallery Search
-export async function imgurSearch(sort = 'time', window = 'all', page = 0, text = "cats") {
+export async function imgurSearch(acessToken, sort = 'time', window = 'all', page = 0, text = "cats") {
     var myHeaders = new Headers();
-    myHeaders.append("Authorization", `Client-ID ${CLIENT_ID}`);
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
 
     var requestOptions = {
         method: 'GET',

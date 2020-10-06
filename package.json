@@ -5,7 +5,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "doc": "./node_modules/.bin/esdoc && open ./docs/index.html"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.0",
@@ -30,7 +31,9 @@
     "react-native-webview": "10.7.0"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0"
+    "@babel/core": "~7.9.0",
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0"
   },
   "private": true
 }

@@ -1,0 +1,7 @@
+{
+    "source": "./Pages/",
+    "destination": "./docs",
+    "plugins": [
+      {"name": "esdoc-standard-plugin"}
+    ]
+  }

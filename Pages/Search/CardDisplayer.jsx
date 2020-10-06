@@ -4,25 +4,29 @@ import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Ic
 
 import { imgurAlbumVote } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
+import { set } from 'react-native-reanimated';
 
 const greenFont = "rgb(27,183,110)";
 const greyFont = "#a7a7a7";
 
+/**
+ * CardDisplayer component to display Images, Profiles and Galleries
+ * @param {} props
+ * @example
+ * return (<CardDisplayer title={title} author={account_url} ups={ups} views={views} image={images ? images[0].link : link} id={id} key={id} />); 
+ */
 export default function CardDisplayer(props) {
 
-  const [hasUpvote, setHasUpvote] = useState(false);
-  const [hasDownvote, setHasDownvote] = useState(false);
+  const [vote, setVote] = useState(props.vote);
 
-  function vote(vote) {
-    getUserData().then((value) =>
-      imgurAlbumVote(value.acess_token, props.id, vote).then((value) => {
-        if (value.ok === true) {
-          if (vote == "up") setHasUpvote(true);
-          if (vote == "down") setHasDownvote(true);
-          console.log("Vote worked ! ", vote);
-        }
-      })
-    );
+  function doVote(user_vote) {
+    getUserData().then((value) => {
+      if (vote === user_vote) {
+        imgurAlbumVote(value.acess_token, props.id, "veto").then(value => {console.log("Veto worked !"); setVote(null)})
+      } else {
+        imgurAlbumVote(value.acess_token, props.id, user_vote).then(value => {console.log(`Vote ${user_vote} worked !`); setVote(user_vote)})
+      }
+    });
   }
 
   return (
@@ -45,15 +49,15 @@ export default function CardDisplayer(props) {
       </CardItem>
       <CardItem style={styles.myBlack}>
         <Left>
-          <Button onPress={() => vote("up")} transparent>
-            <Icon active name="thumbs-up" style={{color: (hasUpvote ? '#1D2CB5' : greenFont)}}/>
-            <Text style={{color: greyFont}}>{props.ups}</Text>
+          <Button onPress={() => doVote("up")} transparent>
+            <Icon active name="thumbs-up" style={{color: (vote === "up" ? '#1D2CB5' : greenFont)}}/>
+            <Text style={{color: (vote === "up" ? '#1D2CB5' : greyFont)}}>{props.ups + (vote === "up" ? 1 : 0)}</Text>
           </Button>
         </Left>
         <Left>
-          <Button onPress={() => vote("down")} transparent>
-            <Icon style={{color: (hasDownvote ? '#FF0000' : greenFont)}} icon active name="thumbs-down" />
-            <Text style={{color: greyFont}}>{props.downs}</Text>
+          <Button onPress={() => doVote("down")} transparent>
+            <Icon style={{color: (vote === "down" ? '#FF0000' : greenFont)}} icon active name="thumbs-down" />
+            <Text style={{color: (vote === "down" ? '#FF0000' : greyFont)}}>{props.downs + (vote === "down" ? 1 : 0)}</Text>
           </Button>
         </Left>
         <Right>
@@ -73,8 +77,13 @@ export default function CardDisplayer(props) {
   );
 }
 
+/**
+ * This function is used by the renderCards FlatList component
+ * 
+ * @param {*} item
+ */
 export const renderPicture = ({ item }) => {
-  const { title, account_url, ups, views, downs, link, images, id, comment_count } = item;
+  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote } = item;
 
   return (
     <CardDisplayer
@@ -86,6 +95,7 @@ export const renderPicture = ({ item }) => {
       comment_count={comment_count}
       image={images ? images[0].link : link}
       id={id}
+      vote={vote}
       key={id}
     />
   );
