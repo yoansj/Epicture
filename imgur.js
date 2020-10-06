@@ -77,3 +77,20 @@ export async function imgurAlbumVote(acessToken, id, vote = "up") {
     //console.log(JSON.stringify(rep), JSON.stringify(data));
     return (rep);
 }
+
+//POST ACCOUNT BASE
+export async function imgurProfileBase(acessToken, username = "Mamouki") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
+    const data = await rep.json();
+    return (data)
+}
