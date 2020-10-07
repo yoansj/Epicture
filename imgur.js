@@ -91,6 +91,7 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
         redirect: "follow",
     };
 
+    console.log("POST ACCOUNT BASE");
     const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
     const data = await rep.json();
     console.log(JSON.stringify(data));
@@ -108,7 +109,37 @@ export async function imgurAlbumFavorite(acessToken, id) {
         redirect: "follow",
     };
 
+    console.log("POST Favorite Album");
     const rep = await fetch(`https://api.imgur.com/3/album/${id}/favorite`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (data);
+}
+
+//POST Image Upload
+export async function imgurImageUpload(acessToken, image, video, album, type, name, title, description, disable_audio) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+    if (image) formdata.append("image", image);
+    if (video) formdata.append("video", video);
+    if (album) formdata.append("album", album);
+    if (type) formdata.append("type", type);
+    if (name) formdata.append("name", name);
+    if (title) formdata.append("title", title);
+    if (description) formdata.append("description", description);
+    if (disable_audio) formdata.append("disable_audio", 1);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow",
+    };
+
+    console.log("POST Image Upload");
+    const rep = await fetch("https://api.imgur.com/3/image", requestOptions);
     const data = await rep.json();
     console.log(JSON.stringify(rep), JSON.stringify(data));
     return (data);
