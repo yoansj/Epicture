@@ -1,7 +1,7 @@
 
-export const CLIENT_ID = "a508c5347923263"
-export const CLIENT_SECRET = "b84797001e81d9bc98fc59f893c6459d994d0dd7"
-export const REFRESH = "037982602bb806c9dcfc843a87f259642bdefa15"
+export const CLIENT_ID = "350a4b0450465d9"
+export const CLIENT_SECRET = "3cd9f8af74e1c40abbf9abbb5da334fefcdd075b"
+export const REFRESH = "fecba479d2891084b4426d0fc9594c17b37f60f3"
 
 
 // GET Gallery Search
@@ -93,6 +93,7 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
 
     const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
     const data = await rep.json();
+    console.log(JSON.stringify(data));
     return (data)
 }
 
