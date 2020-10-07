@@ -94,3 +94,20 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
     const data = await rep.json();
     return (data)
 }
+
+//POST Favorite Album
+export async function imgurAlbumFavorite(acessToken, id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    const rep = await fetch(`https://api.imgur.com/3/album/${id}/favorite`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (data);
+}

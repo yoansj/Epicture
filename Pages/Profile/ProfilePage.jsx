@@ -18,7 +18,7 @@ export default function ProfilePage({route}) {
         setProfile(value)
       );
     });
-  });
+  }, []);
 
   return (
     <View>

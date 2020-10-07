@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 
-import { imgurAlbumVote } from '../../imgur';
+import { imgurAlbumVote, imgurAlbumFavorite } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
-import { set } from 'react-native-reanimated';
 
 const greenFont = "rgb(27,183,110)";
 const greyFont = "#a7a7a7";
@@ -18,6 +17,7 @@ const greyFont = "#a7a7a7";
 export default function CardDisplayer(props) {
 
   const [vote, setVote] = useState(props.vote);
+  const [favorite, setFavorite] = useState(props.favorite);
 
   function doVote(user_vote) {
     getUserData().then((value) => {
@@ -27,6 +27,15 @@ export default function CardDisplayer(props) {
         imgurAlbumVote(value.acess_token, props.id, user_vote).then(value => {console.log(`Vote ${user_vote} worked !`); setVote(user_vote)})
       }
     });
+  }
+
+  function doFavorite() {
+    getUserData().then((value) =>
+      imgurAlbumFavorite(value.acess_token, props.id).then((value) => {
+        setFavorite(true);
+        console.log("Favorite worked !");
+      })
+    );
   }
 
   return (
@@ -60,6 +69,11 @@ export default function CardDisplayer(props) {
             <Text style={{color: (vote === "down" ? '#FF0000' : greyFont)}}>{props.downs + (vote === "down" ? 1 : 0)}</Text>
           </Button>
         </Left>
+        <Content>
+          <Button transparent onPress={() => doFavorite()} >
+            <Icon style={{fontSize: 25, color: greenFont}} icon active name={(favorite === false ? "md-heart-empty" : "md-heart")} />
+          </Button>
+        </Content>
         <Right>
           <Button transparent>
             <Icon name="chatbubbles" style={{color: greenFont}} />
@@ -83,7 +97,7 @@ export default function CardDisplayer(props) {
  * @param {*} item
  */
 export const renderPicture = ({ item }) => {
-  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote } = item;
+  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite } = item;
 
   return (
     <CardDisplayer
@@ -96,6 +110,7 @@ export const renderPicture = ({ item }) => {
       image={images ? images[0].link : link}
       id={id}
       vote={vote}
+      favorite={favorite}
       key={id}
     />
   );
