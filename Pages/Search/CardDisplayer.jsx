@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Video } from 'expo-av';
 
 import { imgurAlbumVote, imgurAlbumFavorite } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
@@ -47,14 +48,28 @@ export default function CardDisplayer(props) {
             <Text note>{props.author}</Text>
           </Body>
         </Left>
+        <Right>
+          <Content>
+            {props.images_count > 1 ? <Icon active name="albums" style={{color:greenFont}}/> : []}
+            {props.images && props.images[0].type === "video/mp4" ? <Icon active name="videocam" style={{color:greenFont}}/> : [] }
+          </Content>
+        </Right>
       </CardItem>
       <CardItem cardBody>
-        <Image
+        {props.images && props.images[0].type === "video/mp4" ?
+          <Button onPress={() => console.log("Video pressed !")} transparent style={{ width: 355, height: 280 }}>
+            <Container style={{ width: 355, height: 280 }}>
+              <Video source={{uri: props.images[0].link}} rate={1.0} volume={1.0} isLooping shouldPlay style={{ width: 355, height: 280 }} resizeMode="cover" />
+            </Container>
+          </Button>
+          :
+          <Image
           source={{
             uri: props.image,
           }}
           style={{ height: 200, width: null, flex: 1 }}
         />
+        }
       </CardItem>
       <CardItem style={styles.myBlack}>
         <Left>
@@ -81,10 +96,8 @@ export default function CardDisplayer(props) {
           </Button>
         </Right>
         <Right>
-          <Button transparent>
-            <Icon active name="eye" style={{color: greenFont}}/>
-            <Text style={{color: greyFont}}>{props.views}</Text>
-          </Button>
+          <Icon active name="eye" style={{color: greenFont}}/>
+          <Text style={{color: greyFont, fontSize: 15}}>{props.views}</Text>
         </Right>
       </CardItem>
     </Card>
@@ -97,7 +110,7 @@ export default function CardDisplayer(props) {
  * @param {*} item
  */
 export const renderPicture = ({ item }) => {
-  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite } = item;
+  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count } = item;
 
   return (
     <CardDisplayer
@@ -108,9 +121,11 @@ export const renderPicture = ({ item }) => {
       downs={downs}
       comment_count={comment_count}
       image={images ? images[0].link : link}
+      images={images}
       id={id}
       vote={vote}
       favorite={favorite}
+      images_count={images_count}
       key={id}
     />
   );
