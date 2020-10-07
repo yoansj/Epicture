@@ -17,8 +17,12 @@ const greyFont = "#a7a7a7";
  */
 export default function CardDisplayer(props) {
 
+  // vote (upvote or downvote)
   const [vote, setVote] = useState(props.vote);
+  // favorite (know if user has favorited post)
   const [favorite, setFavorite] = useState(props.favorite);
+  // is video playing
+  const [playing, setPlaying] = useState(false);
 
   function doVote(user_vote) {
     getUserData().then((value) => {
@@ -57,9 +61,9 @@ export default function CardDisplayer(props) {
       </CardItem>
       <CardItem cardBody>
         {props.images && props.images[0].type === "video/mp4" ?
-          <Button onPress={() => console.log("Video pressed !")} transparent style={{ width: 355, height: 280 }}>
+          <Button onPress={() => setPlaying(!playing)} transparent style={{ width: 355, height: 280 }}>
             <Container style={{ width: 355, height: 280 }}>
-              <Video source={{uri: props.images[0].link}} rate={1.0} volume={1.0} isLooping shouldPlay style={{ width: 355, height: 280 }} resizeMode="cover" />
+              <Video source={{uri: props.images[0].link}} rate={1.0} volume={playing ? 1.0 : 0.0} isLooping shouldPlay={playing} style={{ width: 355, height: 280 }} resizeMode="cover" />
             </Container>
           </Button>
           :

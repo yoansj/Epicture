@@ -17,7 +17,7 @@ export default function ProfilePage({route}) {
   useEffect(() => {
     getUserData().then((value) => {
       setUserData(value);
-      imgurProfileBase(value.acess_token, "Mamouki").then((value) =>
+      imgurProfileBase(value.acess_token, value.username).then((value) =>
         setProfile(value.data)
       );
     });
