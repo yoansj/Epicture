@@ -34,8 +34,8 @@ export const eraseUserData = async () => {
 
 function AuthPage(props) {
 
-  function getToken(navState) {
-    const url = navState.url + '&'; // Add & to the url so that the last regex doesnt fail
+  async function getToken(navState) {
+    const url = await navState.url + '&'; // Add & to the url so that the last regex doesnt fail
 
     if (
       url.search("state=93") !== -1 &&

@@ -92,6 +92,7 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
 
     const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
     const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
     return (data)
 }
 
