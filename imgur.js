@@ -16,7 +16,7 @@ export async function imgurSearch(acessToken, sort = 'time', window = 'all', pag
     }
 
     console.log("GET Gallery Search");
-    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `${page}?q=${text}`, requestOptions).catch
+    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${text}`, requestOptions).catch
     (value => {console.log("GET Gallery Search Error : ", value)})
     const data = await rep.json();
     //console.log(JSON.stringify(rep));
@@ -117,16 +117,16 @@ export async function imgurAlbumFavorite(acessToken, id) {
 }
 
 //POST Image Upload
-export async function imgurImageUpload(acessToken, image, video, album, type, name, title, description, disable_audio) {
+export async function imgurImageUpload(acessToken, media, mediaType, album, title, description, disable_audio) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
 
     var formdata = new FormData();
-    if (image) formdata.append("image", image);
-    if (video) formdata.append("video", video);
+
+    formdata.append("type", "base64");
+    if (mediaType === "video") formdata.append("video", media);
+    if (mediaType === "image") formdata.append("image", `${media}`);
     if (album) formdata.append("album", album);
-    if (type) formdata.append("type", type);
-    if (name) formdata.append("name", name);
     if (title) formdata.append("title", title);
     if (description) formdata.append("description", description);
     if (disable_audio) formdata.append("disable_audio", 1);
