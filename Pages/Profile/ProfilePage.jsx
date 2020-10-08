@@ -3,7 +3,7 @@ import { View, Text, Button , Image, StyleSheet} from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { color } from "react-native-reanimated";
-import { Container } from "native-base";
+import { Container, Header} from "native-base";
 
 export default function ProfilePage({route}) {
 
@@ -25,6 +25,10 @@ export default function ProfilePage({route}) {
 
   return (
     <Container style={styles.myBlack}>
+
+      <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
+        <Text style={{marginTop: 17, color: 'rgb(27,183,110)'}}>Profile </Text>
+      </Header>
 
       <Image
         source={{

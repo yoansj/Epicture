@@ -61,6 +61,43 @@ export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', 
     return (data);
 }
 
+//GET Album Fav
+export async function imgurGetAlbumFav(accessToken, username) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET album fav");
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}/favorites`, requestOptions)
+    const data = await rep.json();
+    console.log(JSON.stringify(rep),JSON.stringify(data), "get album");
+    return (data);
+}
+
+//GET image from id
+export async function imgurGetImageId(accessToken, imageHash) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+    };
+
+    const rep = await fetch(`https://api.imgur.com/3/image/${imageHash}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep),JSON.stringify(data), "image's info");
+    return (data);
+}
+
 // POST Album / Image Voting
 export async function imgurAlbumVote(acessToken, id, vote = "up") {
     var myHeaders = new Headers();
