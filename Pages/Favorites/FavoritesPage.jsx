@@ -6,12 +6,9 @@ import { Container, Card, Icon, Header, Left, Right, Button} from 'native-base';
 export default function FavoritesPage() {
   return (
     <Container style={styles.myBlack}>
-      <Header rounded androidStatusBarColor='black' style={styles.myGreen}>
-        <Text style={{marginTop: 17, color:'rgb(18,18,18)'}}>Favorites </Text>
+      <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
+        <Text style={{marginTop: 17, color: 'rgb(27,183,110)'}}>Favorites </Text>
       </Header>
-      <Card style={styles.myWarning}>
-        <Text>Log In please </Text>
-      </Card>
       <Container style={styles.myMiddle}>
         <Icon style={styles.myBlack} name="flask" />
         <Text style={styles.myBlack}>Wow !</Text>
