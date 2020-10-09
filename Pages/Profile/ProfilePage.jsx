@@ -1,18 +1,16 @@
-import React , {useState, useEffect} from "react";
-import { View, Text, Button , Image, StyleSheet} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Button, Image, StyleSheet } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { color } from "react-native-reanimated";
-import { Container, Header} from "native-base";
+import { Container, Header, Grid, Row } from "native-base";
 
-export default function ProfilePage({route}) {
-
+export default function ProfilePage({ route }) {
   const greyFont = "#a7a7a7";
   const { disconnect } = route.params;
   // the user data
   const [userData, setUserData] = useState("EMPTY");
   const [userProfil, setProfile] = useState("EMPTY");
-
 
   useEffect(() => {
     getUserData().then((value) => {
@@ -25,57 +23,92 @@ export default function ProfilePage({route}) {
 
   return (
     <Container style={styles.myBlack}>
-
-      <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
-        <Text style={{marginTop: 17, color: 'rgb(27,183,110)'}}>Profile </Text>
+      <Header
+        rounded
+        androidStatusBarColor="black"
+        style={{ backgroundColor: "black" }}
+      >
+        <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+          Profile{" "}
+        </Text>
       </Header>
 
       <Image
         source={{
-          uri: userProfil.cover
+          uri: userProfil.cover,
         }}
-          style={{ height: 160, width: null}}
+        style={{ height: 160, width: null }}
       />
 
       <Image
         source={{
-          uri: userProfil.avatar
+          uri: userProfil.avatar,
         }}
-          style={{ height: 60, width: 60, marginTop: -60}}
+        style={{ height: 60, width: 60, marginTop: -60, alignSelf: "center" }}
       />
 
-      <Text style={{color: greyFont}}>{"Names"}</Text>
-      <Text style={styles.myBlack}>{userData !== "EMPTY" ? userData.username : "NOT log in"}</Text>
+      <Grid style={styles.myMiddle}>
+        <Text style={{ color: greyFont, paddingTop: 15 }}>{"Names"}</Text>
 
-      <Text style={{color: greyFont}}>{"About"}</Text>
-      <Text style={styles.myBlack}>{userProfil.bio !== "" ? userProfil.bio : "Empty bio :("}</Text>
+        <Text style={styles.myBlack}>
+          {userData !== "EMPTY" ? userData.username : "NOT log in"}
+        </Text>
 
-      <Text style={{color: greyFont}}>{"Joined"}</Text>
-      <Text style={styles.myBlack}>{userProfil !== "EMPTY" ? new Date(userProfil.created * 1000).toDateString() : "NOT log in"}</Text>
+        <Text style={{ color: greyFont, paddingTop: 30 }}>{"About"}</Text>
 
-      <Text style={{color: greyFont}}>{"Internet Points"}</Text>
-      <Text style={styles.myBlack}>{userProfil !== "EMPTY" ? userProfil.reputation : "NOT log in"}</Text>
+        <Text style={styles.myBlack}>
+          {userProfil.bio !== "" ? userProfil.bio : "Empty bio :("}
+        </Text>
 
-      <Text style={{color: greyFont}}>{"Notoriety"}</Text>
-      <Text style={styles.myBlack}>{userProfil !== "EMPTY" ? userProfil.reputation_name : "NOT log in"}</Text>
+        <Text style={{ color: greyFont, paddingTop: 30 }}>{"Joined"}</Text>
 
-      <Button color="rgb(27,183,110)" title="Disconnect" onPress={() => eraseUserData().then(disconnect())}></Button>
+        <Text style={styles.myBlack}>
+          {userProfil !== "EMPTY"
+            ? new Date(userProfil.created * 1000).toDateString()
+            : "NOT log in"}
+        </Text>
+
+        <Text style={{ color: greyFont, paddingTop: 30 }}>
+          {"Internet Points"}
+        </Text>
+
+        <Text style={styles.myBlack}>
+          {userProfil !== "EMPTY" ? userProfil.reputation : "NOT log in"}
+        </Text>
+
+        <Text style={{ color: greyFont, paddingTop: 30 }}>{"Notoriety"}</Text>
+
+        <Text style={styles.myBlack}>
+          {userProfil !== "EMPTY" ? userProfil.reputation_name : "NOT log in"}
+        </Text>
+      </Grid>
+      <Button
+        color="rgb(27,183,110)"
+        title="Disconnect"
+        onPress={() => eraseUserData().then(disconnect())}
+      ></Button>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
   myMiddle: {
-    flex: 1,
+    alignItems: "center",
+    flexDirection: "column",
+
+    backgroundColor: "rgb(18,18,18)",
+  },
+  myMiddle_info: {
+    paddingTop: -80,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgb(18,18,18)",
   },
-  myGreen:{
-    backgroundColor: 'rgb(27,183,110)'
+  myGreen: {
+    backgroundColor: "rgb(27,183,110)",
   },
   myBlack: {
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
-  }
+    backgroundColor: "rgb(18,18,18)",
+    color: "rgb(27,183,110)",
+  },
 });
