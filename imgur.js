@@ -98,6 +98,23 @@ export async function imgurGalleryGetAlbum(acessToken, id) {
     return (data);
 }
 
+//GET account submissions
+export async function imgurAccountSubmission(acessToken) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    const rep = await fetch(`https://api.imgur.com/3/account/me/submissions`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep),JSON.stringify(data), "account sub");
+    return (data);
+}
+
 //GET image from id
 export async function imgurGetImageId(accessToken, imageHash) {
     var myHeaders = new Headers();

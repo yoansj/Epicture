@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { StyleSheet } from "react-native";
 import { Col, Grid } from "react-native-easy-grid";
 import {
@@ -12,7 +12,7 @@ import {
   Header,
 } from "native-base";
 import { renderCards } from "./CardDisplayer";
-import { imgurSearch } from "../../imgur";
+import { imgurSearch , imgurAccountSubmission} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 
 /**
@@ -30,6 +30,17 @@ export default function SearchPage() {
   const [windowPicker, setwindowPicker] = useState("all");
   // Data from imgur API
   const [imgurData, setImgurData] = useState(null);
+
+  useEffect(() => {
+    if (searchPicker == "myPost") {
+      getUserData().then((value) => {
+        console.log(value);
+        imgurAccountSubmission(value.acess_token).then((value) => {
+          setImgurData(value.data);
+        });
+      });
+    }
+  }, [searchPicker]);
 
   /**
    * Function called when the user searches
@@ -89,6 +100,7 @@ export default function SearchPage() {
                 <Picker.Item label="Pictures" value="pictures" />
                 <Picker.Item label="Albums" value="albums" />
                 <Picker.Item label="Users" value="users" />
+                <Picker.Item label="My post" value="myPost" />
               </Picker>
             </Col>
             {searchPicker === "pictures" ?
