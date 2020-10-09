@@ -37,7 +37,7 @@ export default function CardDisplayer(props) {
   function doFavorite() {
     getUserData().then((value) =>
       imgurAlbumFavorite(value.acess_token, props.id).then((value) => {
-        setFavorite(true);
+        setFavorite(!favorite);
         console.log("Favorite worked !");
       })
     );
