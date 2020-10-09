@@ -27,7 +27,9 @@ export default class App extends React.Component {
       console.log(value, "<---- value");
       if (value !== "null" && value !== null)
         this.setAuth();
-    }).bind(this);
+    }).catch(
+      error => console.log("Error while getting user data : ", error)
+    ).bind(this);
   }
 
   setAuth() {

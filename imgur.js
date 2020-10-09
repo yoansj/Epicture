@@ -74,9 +74,27 @@ export async function imgurGetAlbumFav(accessToken, username) {
     };
 
     console.log("GET album fav");
-    const rep = await fetch(`https://api.imgur.com/3/account/${username}/favorites`, requestOptions)
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}/gallery_favorites`, requestOptions)
     const data = await rep.json();
-    console.log(JSON.stringify(rep),JSON.stringify(data), "get album");
+    //console.log(JSON.stringify(rep),JSON.stringify(data), "get album");
+    return (data);
+}
+
+//GET Gallery Album
+export async function imgurGalleryGetAlbum(acessToken, id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET Gallery Album");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/album/${id}`,requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep),JSON.stringify(data), "get album");
     return (data);
 }
 

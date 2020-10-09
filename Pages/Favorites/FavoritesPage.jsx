@@ -1,44 +1,35 @@
 import React, {useState, useEffect} from "react";
-import { View, Text ,StyleSheet} from "react-native";
+import { Text ,StyleSheet} from "react-native";
 import { getUserData} from "../Authentification/AuthPage";
-import {imgurGetAlbumFav, imgurGetImageId} from "../../imgur.js"
-import { Container, Card, Icon, Header, Left, Right, Button} from 'native-base';
+import { imgurGetAlbumFav } from "../../imgur.js"
+import { Container, Icon, Header, Button} from 'native-base';
 import { renderCards } from "../Search/CardDisplayer";
-
-
-//iterate function data
-function iterateData(data) {
-  for (let i = 0; i < data.lenght; i++) {
-    data[i].images = getImage(data[i].id);
-  }
-  return (data);
-}
 
 export default function FavoritesPage() {
 
-  const [userData, setUserData] = useState("EMPTY");
-  const [userFav, setUserFav] = useState(null);
+  // Data from the imgur api
+  const [userData, setUserData] = useState(null);
+  // Switches to true and false to refresh the page
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     getUserData().then((value) => {
       setUserData(value);
       imgurGetAlbumFav(value.acess_token, value.username).then((value) => {
-       // setUserFav(value.data)
-        let data = value;
-      }
-      );
+        setUserData(value.data);
+      });
     });
-  }, []);
+  }, [refresh]);
 
   return (
     <Container style={styles.myBlack}>
       <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
         <Text style={{marginTop: 17, color: 'rgb(27,183,110)'}}>Favorites </Text>
+        <Button transparent onPress={() => setRefresh(!refresh)}>
+          <Icon style={styles.myBlack} name="ios-refresh" />
+        </Button>
       </Header>
-
-      {renderCards(userFav)}
-
-
+      {renderCards(userData)}
       <Container style={styles.myMiddle}>
         <Icon style={styles.myBlack} name="flask" />
         <Text style={styles.myBlack}>Wow !</Text>

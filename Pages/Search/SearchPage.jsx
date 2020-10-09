@@ -15,6 +15,11 @@ import { renderCards } from "./CardDisplayer";
 import { imgurSearch } from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 
+/**
+ * SearchPage component which renders the Search Page
+ * Has the SearchBar sub-component
+ * @example <SearchPage />
+ */
 export default function SearchPage() {
 
   // Can be pictures || albums || users
@@ -26,6 +31,13 @@ export default function SearchPage() {
   // Data from imgur API
   const [imgurData, setImgurData] = useState(null);
 
+  /**
+   * Function called when the user searches
+   * Takes a text param which is the query searched by the user
+   * The result of the search is stored in the imgurData state
+   * @param {*} text
+   * @example doSearch("cats") 
+   */
   function doSearch(text) {
     if (searchPicker === "pictures") {
       getUserData().then((value) => {
@@ -38,6 +50,14 @@ export default function SearchPage() {
     }
   }
 
+  /**
+   * Sub component of the SearchPage component
+   * Renders a search bar and some pickers
+   * @example
+   * <Container>
+      <SearchBar />
+    </Container>
+   */
   function SearchBar() {
     return (
       <Container style={styles.myBlack}>
