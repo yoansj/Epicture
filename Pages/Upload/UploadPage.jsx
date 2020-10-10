@@ -20,7 +20,8 @@ export default function UploadPage() {
   const [albumName, setAlbumName] = useState("");
   const [albumDescription, setAlbumDescription] = useState("");
 
-  // Media that will be published (array)
+  // Media that will be published (array of objects)
+  //media
   const [media, setMedia] = useState(null);
 
   // Link modal
@@ -31,18 +32,6 @@ export default function UploadPage() {
   // New media description
   const [mediaDesc, setMediaDesc] = useState("");
 
-
-  // Can be an image or a video
-  // When the user picks a media
-  // toPublish[0] is the uri of the media and toPublish[1] is the type of the media (video or image)
-  const [toPublish, setToPublish] = useState(null);
-  // Know if user gave permission
-  const [permission, setPermission] = useState(false);
-
-  // Title of the post
-  const [title, setTitle] = useState("Man google");
-  // Description of the post
-  const [description, setDescription] = useState("Tu ouvres ton navigateur et tu vas sur google mec");
 
   useEffect(() => {
     (async () => {
@@ -62,15 +51,16 @@ export default function UploadPage() {
     })
   }
 
-  function addMedia(type, newMedia, description) {
+  function addMedia(type, newMedia, desc) {
     let tmp = media;
 
     if (media === null) tmp = [];
     if (newMedia !== "" && type === "link") {
-      tmp.push([type, newMedia, description]);
+      tmp.push({type, newMedia, desc});
       setMedia(tmp);
       setLinkModal(false);
       setLink("");
+      setMediaDesc("");
       console.log("Link added :)");
       console.log(tmp);
     } else {
@@ -92,6 +82,43 @@ export default function UploadPage() {
       base64: true,
     })
     if (!result.cancelled) setToPublish([result.uri, result.type, result.base64]);
+  }
+
+  function mediaPreview() {
+    if (media === null)
+      return (
+        <Text style={{color: 'rgb(33,228,255)', fontSize: 20, alignSelf: 'center'}}>Nothing to see here sadly :(</Text>
+      )
+    return (
+      media.map((element, index) => {
+        return (
+          <View>
+            {element.type === "link" || element.type === "image" ? (
+              <Image
+                source={{
+                  uri: element.type === "link" ? element.newMedia : "",
+                }}
+                style={{ height: 300, width: null, flex: 0 }}
+                key={index}
+              />
+            ) : (
+              <Video
+                style={{ width: 355, height: 280 }}
+                rate={1.0}
+                volume={0.0}
+                isLooping
+                shouldPlay
+                style={{ width: 355, height: 280 }}
+                resizeMode="cover"
+                key={index}
+              />
+            )}
+            <Text style={{backgroundColor: 'white', color: 'black', textAlign: 'center'}}>Image {index + 1} : {element.desc}</Text>
+          </View>
+        );
+      }
+      )
+    )
   }
 
   return (
@@ -118,7 +145,7 @@ export default function UploadPage() {
                   <Text style={{color: "rgb(246, 43, 33)", fontSize: 30, textAlign: 'center'}}>Cancel</Text>
                 </View>
               </Button>
-              <Button transparent onPress={() => addMedia("link", link, description)}>
+              <Button transparent onPress={() => addMedia("link", link, mediaDesc)}>
                 <View style={{alignItems: 'center'}}>
                   <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(33,228,255)"}} />
                   <Text style={{color: "rgb(33,228,255)", fontSize: 30, textAlign: 'center'}}>Add</Text>
@@ -167,7 +194,7 @@ export default function UploadPage() {
           </View>
           <View style={{paddingVertical: 80, display: 'flex', flexDirection: 'row', alignSelf: 'center'}}>
             <Button transparent onPress={() => {setStep("first")}}>
-              <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 80, color: "grey"}} />
+              <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 80, color: "rgb(221,220,220)"}} />
             </Button>
             <Button transparent onPress={() => {setStep("createImages")}}>
               <Icon name="ios-arrow-dropright-circle" style={{fontSize: 80, color: "rgb(33,228,255)"}} />
@@ -178,22 +205,53 @@ export default function UploadPage() {
       {step === "createImages" ?
         <View>
           <Text style={{color: "rgb(33,228,255)", fontSize: 30, alignSelf: 'center', paddingVertical: 20}}>Album preview</Text>
-          <ScrollView>
+          <ScrollView style={{height: 300}}>
+            {mediaPreview(media)}
           </ScrollView>
           <Text style={{color: "rgb(33,228,255)", fontSize: 15, alignSelf: 'center', paddingVertical: 20}}>- {media === null ? '0' : media.length} media to publish -</Text>
-          <View style={{paddingVertical: 80, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
-            <Button transparent onPress={() => {setLinkModal(true); console.log("touuuchhh")}}>
-              <View style={{alignItems: 'center'}}>
-                <Icon name="ios-link" style={{fontSize: 40, color: "rgb(97,33,255)"}} />
-                <Text style={{color: "rgb(97,33,255)", fontSize: 20, textAlign: 'center'}}>Add with link</Text>
-              </View>
-            </Button>
-            <Button transparent onPress={() => setStep("first")}>
-              <View style={{alignItems: 'center'}}>
-                <Icon name="ios-folder" style={{fontSize: 40, color: "rgb(255,164,4)"}} />
-                <Text style={{color: "rgb(255,164,4)", fontSize: 20, textAlign: 'center'}}>Add from device</Text>
-              </View>
-            </Button>
+          <View style={{paddingVertical: 40, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
+            <View style={{marginRight: 15}}>
+              <Button transparent onPress={() => {setLinkModal(true)}}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-link" style={{fontSize: 40, color: "rgb(97,33,255)"}} />
+                  <Text style={{color: "rgb(97,33,255)", fontSize: 20, textAlign: 'center'}}>Add with link</Text>
+                </View>
+              </Button>
+            </View>
+            <View style={{marginLeft: 15}}>
+              <Button transparent onPress={() => setStep("first")}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-folder" style={{fontSize: 40, color: "rgb(255,164,4)"}} />
+                  <Text style={{color: "rgb(255,164,4)", fontSize: 20, textAlign: 'center'}}>Add from device</Text>
+                </View>
+              </Button>
+            </View>
+          </View>
+          <View style={{paddingVertical: 10, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
+            <View style={{marginRight: 15}}>
+              <Button transparent onPress={() => {setStep("create")}}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-return-left" style={{fontSize: 35, color: "rgb(221,220,220)"}} />
+                  <Text style={{color: "rgb(221,220,220)", fontSize: 15, textAlign: 'center'}}>Cancel</Text>
+                </View>
+              </Button>
+            </View>
+            <View style={{marginLeft: 15, marginRight: 15}}>
+              <Button transparent onPress={() => setMedia(null)}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-trash" style={{fontSize: 35, color: "rgb(236,38,19)"}} />
+                  <Text style={{color: "rgb(236,38,19)", fontSize: 15, textAlign: 'center'}}>Erase medias</Text>
+                </View>
+              </Button>
+            </View>
+            <View style={{marginLeft: 15}}>
+              <Button transparent onPress={() => setMedia(null)}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-add-circle" style={{fontSize: 35, color: 'rgb(27,183,110)'}} />
+                  <Text style={{color: 'rgb(27,183,110)', fontSize: 15, textAlign: 'center'}}>Publish</Text>
+                </View>
+              </Button>
+            </View>
           </View>
         </View>
       : []}
