@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, Image , Modal, View} from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import { Video } from 'expo-av';
 
@@ -23,6 +23,8 @@ export default function CardDisplayer(props) {
   const [favorite, setFavorite] = useState(props.favorite);
   // is video playing
   const [playing, setPlaying] = useState(false);
+   // is modal shown
+  const [showModal, setShowModal] = useState(false);
 
   function doVote(user_vote) {
     getUserData().then((value) => {
@@ -45,6 +47,29 @@ export default function CardDisplayer(props) {
 
   return (
     <Card style={props.style}>
+      <Modal
+        animationType="slide"
+        style={{}}
+        transparent
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}>
+          <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
+            <View style={{paddingTop: 20}} />
+            <Image
+              source={{ uri: ("https://media1.tenor.com/images/06c57d9a1182c3e33093e39bafe4767b/tenor.gif?itemid=18534341"),}}
+              style={{ height: 300, width: null, flex: 0 }}
+            />
+            <Text style={{fontSize: 20, color: "rgb(33,228,255)", alignSelf: 'center'}}>- Preview of your image -</Text>
+            <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
+            <Button transparent onPress={() => setShowModal(false)}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: "rgb(246, 43, 33)"}} />
+                  <Text style={{color: "rgb(246, 43, 33)", fontSize: 30, textAlign: 'center'}}>Cancel</Text>
+                </View>
+              </Button>
+          </Container>
+        </Modal>
       <CardItem listItemPadding={0} style={styles.myBlack}>
         <Left>
           <Body>
@@ -95,7 +120,7 @@ export default function CardDisplayer(props) {
         </Content>
         <Right>
           <Button transparent>
-            <Icon name="chatbubbles" style={{color: greenFont}} />
+            <Icon name="chatbubbles" onPress={() => setShowModal(true)} style={{color: greenFont}} />
             <Text style={{color: greyFont}}>{props.comment_count}</Text>
           </Button>
         </Right>
