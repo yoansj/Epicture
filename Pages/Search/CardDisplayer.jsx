@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, Image , Modal, View} from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import { Video } from 'expo-av';
 
@@ -23,6 +23,8 @@ export default function CardDisplayer(props) {
   const [favorite, setFavorite] = useState(props.favorite);
   // is video playing
   const [playing, setPlaying] = useState(false);
+   // is modal shown
+  const [showModal, setShowModal] = useState(false);
 
   function doVote(user_vote) {
     getUserData().then((value) => {
@@ -45,6 +47,36 @@ export default function CardDisplayer(props) {
 
   return (
     <Card style={props.style}>
+      <Modal
+        animationType="slide"
+        style={{}}
+        transparent
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}>
+          <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
+
+          <Button style={styles.myGreen} onPress={() => setShowModal(false)}>
+                  <Text style={{textAlign: 'center'}}>
+                    <Icon name="arrow-dropleft-circle"></Icon>
+                  </Text>
+          </Button>
+
+            <View style={{paddingTop: 20}} />
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+          </Container>
+        </Modal>
       <CardItem listItemPadding={0} style={styles.myBlack}>
         <Left>
           <Body>
@@ -94,7 +126,7 @@ export default function CardDisplayer(props) {
           </Button>
         </Content>
         <Right>
-          <Button transparent>
+          <Button transparent onPress={() => setShowModal(true)}>
             <Icon name="chatbubbles" style={{color: greenFont}} />
             <Text style={{color: greyFont}}>{props.comment_count}</Text>
           </Button>
