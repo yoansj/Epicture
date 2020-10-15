@@ -30,9 +30,12 @@ export default function SearchPage() {
   const [windowPicker, setwindowPicker] = useState("all");
   // Data from imgur API
   const [imgurData, setImgurData] = useState(null);
+  // Search string
+  const [text, setText] = useState("default");
+
 
   useEffect(() => {
-    if (searchPicker == "myPost") {
+    if (searchPicker === "myPost") {
       getUserData().then((value) => {
         console.log(value);
         imgurAccountSubmission(value.acess_token).then((value) => {
@@ -61,94 +64,96 @@ export default function SearchPage() {
     }
   }
 
-  /**
-   * Sub component of the SearchPage component
-   * Renders a search bar and some pickers
-   * @example
-   * <Container>
-      <SearchBar />
-    </Container>
-   */
-  function SearchBar() {
-    return (
-      <Container style={styles.myBlack}>
-        <Header
-          androidStatusBarColor='rgb(1,1,1)'
-          style={{ flexDirection: "column", height: 100 , backgroundColor: 'rgb(1,1,1)'}}
-          searchBar
-          rounded
-        >
-          <Item style={styles.myGreen}>
-            <Icon name="ios-search" />
-            <Input
+  return (
+    <Container style={styles.myBlack}>
+      <Header
+        androidStatusBarColor="rgb(1,1,1)"
+        style={{
+          flexDirection: "column",
+          height: 100,
+          backgroundColor: "rgb(1,1,1)",
+        }}
+        searchBar
+        rounded
+      >
+        <Item style={styles.myGreen}>
+          <Icon name="ios-search" />
+          <Input
+            placeholder="Search"
+            value={text}
+            onChangeText={(txt) => setText(txt)}
+            onSubmitEditing={() => doSearch(text)}
+          />
+        </Item>
+        <Button transparent>
+          <Text>Search</Text>
+        </Button>
+        <Grid>
+          <Col style={{ height: 50 }}>
+            <Picker
+              mode="dropdown"
+              style={styles.myPickerGreen}
+              selectedValue={searchPicker}
+              onValueChange={(value) => {
+                setSearchPicker(value);
+                doSearch(text);
+              }}
               placeholder="Search"
-              onSubmitEditing={(event) => doSearch(event.nativeEvent.text)}
-            />
-          </Item>
-          <Button transparent>
-            <Text>Search</Text>
-          </Button>
-          <Grid>
+            >
+              <Picker.Item label="Pictures" value="pictures" />
+              <Picker.Item label="Albums" value="albums" />
+              <Picker.Item label="Users" value="users" />
+              <Picker.Item label="My post" value="myPost" />
+            </Picker>
+          </Col>
+          {searchPicker === "pictures" ? (
+            <Col>
+              <Picker
+                mode="dropdown"
+                style={styles.myPickerGreen}
+                selectedValue={sortPicker}
+                onValueChange={(value) => {
+                  setSortPicker(value);
+                  doSearch(text);
+                }}
+              >
+                <Picker.Item label="Most Viral" value="viral" />
+                <Picker.Item label="By date" value="time" />
+                <Picker.Item label="Hightest Scoring" value="top" />
+                <Picker.Item label="Random" value="random" />
+              </Picker>
+            </Col>
+          ) : (
+            []
+          )}
+          {sortPicker === "top" && searchPicker === "pictures" ? (
             <Col style={{ height: 50 }}>
               <Picker
                 mode="dropdown"
                 style={styles.myPickerGreen}
-                selectedValue={searchPicker}
-                onValueChange={(value) => setSearchPicker(value)}
-                placeholder="Search"
+                selectedValue={windowPicker}
+                onValueChange={(value) => {
+                  setwindowPicker(value);
+                  doSearch(text);
+                }}
               >
-                <Picker.Item label="Pictures" value="pictures" />
-                <Picker.Item label="Albums" value="albums" />
-                <Picker.Item label="Users" value="users" />
-                <Picker.Item label="My post" value="myPost" />
+                <Picker.Item label="Day" value="day" />
+                <Picker.Item label="Week" value="week" />
+                <Picker.Item label="Month" value="month" />
+                <Picker.Item label="Year" value="year" />
+                <Picker.Item label="All Time" value="all" />
               </Picker>
             </Col>
-            {searchPicker === "pictures" ?
-              <Col>
-                <Picker
-                  mode="dropdown"
-                  style={styles.myPickerGreen}
-                  selectedValue={sortPicker}
-                  onValueChange={(value) => setSortPicker(value)}
-                >
-                  <Picker.Item label="Most Viral" value="viral" />
-                  <Picker.Item label="By date" value="time" />
-                  <Picker.Item label="Hightest Scoring" value="top" />
-                  <Picker.Item label="Random" value="random" />
-                </Picker>
-              </Col>
-              : []
-            }
-            {sortPicker === "top" && searchPicker === "pictures" ?
-              <Col style={{ height: 50 }}>
-                <Picker
-                  mode="dropdown"
-                  style={styles.myPickerGreen}
-                  selectedValue={windowPicker}
-                  onValueChange={(value) => setwindowPicker(value)}
-                >
-                  <Picker.Item label="Day" value="day" />
-                  <Picker.Item label="Week" value="week" />
-                  <Picker.Item label="Month" value="month" />
-                  <Picker.Item label="Year" value="year" />
-                  <Picker.Item label="All Time" value="all" />
-                </Picker>
-              </Col>
-              : []
-            }
-          </Grid>
-        </Header>
-        {renderCards(imgurData)}
-      </Container>
-    );
-  }
-
-  return (
-    <Container>
-      <SearchBar />
+          ) : (
+            []
+          )}
+        </Grid>
+      </Header>
+      {renderCards(imgurData)}
     </Container>
   );
 }
+
 
 const styles = StyleSheet.create({
   myTop: {

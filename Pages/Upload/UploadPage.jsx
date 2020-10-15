@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, ScrollView, Modal } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av';
-import { Container, Input, Content, CheckBox, Header, Button, Icon } from "native-base";
+import { Container, Input, Spinner, Content, CheckBox, Header, Button, Icon, Toast } from "native-base";
 import { Col, Row, Grid } from 'react-native-easy-grid';
 
 import { getUserData } from "../Authentification/AuthPage";
-import { imgurImageUpload } from "../../imgur";
+import { imgurAlbumCreate, imgurImageUpload } from "../../imgur";
 
 export default function UploadPage() {
 
@@ -14,6 +14,7 @@ export default function UploadPage() {
   // - 1 : first
   // - 2 : create or add
   // - 3 : createImages or addImages
+  // - 4 : createPublish or publish
   const [step, setStep] = useState("first");
 
   // Album name and description
@@ -21,7 +22,6 @@ export default function UploadPage() {
   const [albumDescription, setAlbumDescription] = useState("");
 
   // Media that will be published (array of objects)
-  //media
   const [media, setMedia] = useState(null);
 
   // Link modal
@@ -29,9 +29,28 @@ export default function UploadPage() {
   // Link image
   const [link, setLink] = useState("");
 
+  // Files modal
+  const [filesModal, setFilesModal] = useState(false);
+  // Chosen file when user hits "Add from file button"
+  const [file, setFile] = useState(null);
+
   // New media description
   const [mediaDesc, setMediaDesc] = useState("");
 
+  // Know if app has files permission
+  const [permission, setPermission] = useState(false);
+
+  // Creating step
+  const [creatingStep, setCreatingStep] = useState("album");
+
+  // New album hash
+  const [albumHash, setAlbumHash] = useState("");
+
+  // Publishing media
+  const [mediaIndex, setMediaIndex] = useState(0);
+
+  // Publishing errors
+  const [mediaErrors, setMediaErrors] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -43,29 +62,118 @@ export default function UploadPage() {
     })();
   }, [])
 
-  function uploadImage() {
-    getUserData().then(value => {
-      imgurImageUpload(value.acess_token, toPublish[2], toPublish[1], null, title, description, null).then(
-        value => {console.log("Upload over !")}
-      )
-    })
+  function addMedia(type, newMedia, desc, base64) {
+    let tmp = media;
+    if (media === null) tmp = [];
+
+    if (type === "video" || type === "image" ) {
+      tmp.push({type, newMedia, desc, base64});
+      setMedia(tmp);
+      setFilesModal(false);
+      setMediaDesc("");
+      setFile(null);
+      return;
+    }
+
+    if (newMedia !== "" && type === "link") {
+      tmp.unshift({type, newMedia, desc});
+      setMedia(tmp);
+      closeLinkModal();
+    } else {
+      closeLinkModal();
+      Toast.show({
+        text: "Can't add an image with no link",
+        buttonText: "Okay",
+        type: 'danger',
+        duration: 5000,
+      })
+    }
   }
 
-  function addMedia(type, newMedia, desc) {
-    let tmp = media;
+  function openLinkModal() {
+    setLink("");
+    setMediaDesc("");
+    setFile(null);
+    setLinkModal(true);
+  }
 
-    if (media === null) tmp = [];
-    if (newMedia !== "" && type === "link") {
-      tmp.push({type, newMedia, desc});
-      setMedia(tmp);
-      setLinkModal(false);
-      setLink("");
-      setMediaDesc("");
-      console.log("Link added :)");
-      console.log(tmp);
-    } else {
-      setLink("What are you trying to do exactly ?");
-    }
+  function closeLinkModal() {
+    setLink("");
+    setMediaDesc("");
+    setFile(null);
+    setLinkModal(false);
+  }
+
+  async function createAlbum() {
+    setStep("createPublish")
+    getUserData().then(userdata => {
+      imgurAlbumCreate(userdata.acess_token, null, null, albumName, albumDescription, "public", null).then(
+        albumCreate => (async () => {
+          if (albumCreate.rep.success === false) {
+            setStep("createImages");
+            Toast.show({
+              text: "An issue was encountered while creating the album",
+              buttonText: "Okay",
+              type: 'danger',
+              duration: 5000,
+            })
+            console.log("Album non créé !");
+          } else {
+            console.log("-----ALBUM CREATE----");
+            setCreatingStep("images");
+            await media.forEach((element) => (async () => {
+              if (element.type === "link") {
+                await imgurImageUpload(userdata.acess_token, element.newMedia, "url", albumCreate.data.data.id, element.desc, element.desc, null).then(
+                  call => {
+                    if (call.data.success === true) {
+                      console.log("Link upload worked !");
+                      setMediaIndex(mediaIndex + 1);
+                      Toast.show({text: "Uploaded 1 image (link)", buttonText: "Cool", type: 'success', duration: 1000});
+                    } else {
+                      setMediaErrors(mediaErrors + 1);
+                      Toast.show({text: "Upload failed for image (link)", buttonText: "Crap !", type: 'danger', duration: 1000});
+                    }
+                  }
+                )
+              }
+              if (element.type === "image") {
+                await imgurImageUpload(userdata.acess_token, element.base64, "image", albumCreate.data.data.id, element.desc, element.desc, null).then(
+                  call => {
+                    if (call.data.success === true) {
+                      console.log("Image upload worked !");
+                      setMediaIndex(mediaIndex + 1);
+                      Toast.show({text: "Uploaded 1 image", buttonText: "Cool", type: 'success', duration: 1000});
+                    } else {
+                      setMediaErrors(mediaErrors + 1);
+                      Toast.show({text: "Upload failed for image", buttonText: "Crap !", type: 'danger', duration: 1000});
+                    }
+                  }
+                )
+              }
+              if (element.type === "video") {
+                console.log(element);
+                await imgurImageUpload(userdata.acess_token, element.newMedia, "video", albumCreate.data.data.id, element.desc, element.desc, null).then(
+                  call => {
+                    if (call.data.success === true) {
+                      console.log("Video upload worked !");
+                      setMediaIndex(mediaIndex + 1);
+                      Toast.show({text: "Uploaded 1 video", buttonText: "Cool", type: 'success', duration: 1000});
+                    } else {
+                      setMediaErrors(mediaErrors + 1);
+                      Toast.show({text: "Upload failed for video", buttonText: "Crap !", type: 'danger', duration: 1000});
+                    }
+                  }
+                )
+              }
+            })().then(
+              () => {
+                console.log("Fin de création ! index:", mediaIndex);
+              }
+            ))
+          }
+        })()
+      )
+    })
   }
 
   async function pickImage() {
@@ -77,43 +185,43 @@ export default function UploadPage() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
       base64: true,
     })
-    if (!result.cancelled) setToPublish([result.uri, result.type, result.base64]);
+    if (!result.cancelled) setFile({uri: result.uri, type: result.type, base64: result.base64});
   }
 
   function mediaPreview() {
     if (media === null)
       return (
-        <Text style={{color: 'rgb(33,228,255)', fontSize: 20, alignSelf: 'center'}}>Nothing to see here sadly :(</Text>
+        <Text style={{color: 'rgb(27,183,110)', fontSize: 20, alignSelf: 'center'}}>Nothing to see here sadly :(</Text>
       )
     return (
       media.map((element, index) => {
         return (
-          <View>
+          <View key={index}>
             {element.type === "link" || element.type === "image" ? (
               <Image
                 source={{
-                  uri: element.type === "link" ? element.newMedia : "",
+                  uri: element.type === "link" || element.type === "image" ? element.newMedia : "",
                 }}
                 style={{ height: 300, width: null, flex: 0 }}
-                key={index}
               />
             ) : (
               <Video
                 style={{ width: 355, height: 280 }}
+                source={{uri: element.newMedia}}
                 rate={1.0}
                 volume={0.0}
                 isLooping
                 shouldPlay
                 style={{ width: 355, height: 280 }}
                 resizeMode="cover"
-                key={index}
               />
             )}
-            <Text style={{backgroundColor: 'white', color: 'black', textAlign: 'center'}}>Image {index + 1} : {element.desc}</Text>
+            <Text
+              style={{backgroundColor: 'white', color: 'black', textAlign: 'center'}}
+            >{element.type === "image" || element.type === "url" ? "Image " : "Video "}{index + 1} : {element.desc === "" ? "(Empty description)" : element.desc}</Text>
           </View>
         );
       }
@@ -130,7 +238,7 @@ export default function UploadPage() {
           <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
             <View style={{paddingTop: 20}} />
             <Image
-              source={{ uri: (link === "" ? "https://media1.tenor.com/images/06c57d9a1182c3e33093e39bafe4767b/tenor.gif?itemid=18534341" : link),}}
+              source={{ uri: (link === "" ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517" : link),}}
               style={{ height: 300, width: null, flex: 0 }}
             />
             <Text style={{fontSize: 20, color: "rgb(33,228,255)", alignSelf: 'center'}}>- Preview of your image -</Text>
@@ -139,7 +247,7 @@ export default function UploadPage() {
             <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
             <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
             <View style={{paddingTop: 60, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
-              <Button transparent onPress={() => setLinkModal(false)}>
+              <Button transparent onPress={() => closeLinkModal()}>
                 <View style={{alignItems: 'center'}}>
                   <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: "rgb(246, 43, 33)"}} />
                   <Text style={{color: "rgb(246, 43, 33)", fontSize: 30, textAlign: 'center'}}>Cancel</Text>
@@ -154,13 +262,63 @@ export default function UploadPage() {
             </View>
           </Container>
         </Modal>
+        <Modal
+        animationType="slide"
+        visible={filesModal}
+        onRequestClose={() => setFilesModal(false)}>
+          <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
+            <View style={{paddingTop: 20}} />
+            {file === null ?
+              <Image
+                source={{ uri: (link === "" ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517" : link),}}
+                style={{ height: 300, width: null, flex: 0 }}
+              />
+            : []}
+            {file !== null && file.type === "video" ?
+              <Video
+                style={{ width: 355, height: 300 }}
+                source={{uri: file.uri}}
+                rate={1.0}
+                volume={0.5}
+                isLooping
+                shouldPlay
+                resizeMode="cover"
+              />
+              : file !== null ?
+              <Image
+                source={{ uri: file.uri}}
+                style={{ height: 300, width: null, flex: 0 }}
+              />
+            : []}
+            <Text style={{fontSize: 20, color: "rgb(33,228,255)", alignSelf: 'center'}}>- Preview of your media -</Text>
+            <Button success style={{alignSelf: 'center'}} onPress={() => {pickImage()}}>
+              <Text style={{color: "white", fontSize: 20, alignSelf: 'center', fontWeight: "bold"}}>Pick new media</Text>
+            </Button>
+            <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
+            <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
+            <View style={{paddingTop: 60, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
+              <Button transparent onPress={() => {setFilesModal(false); setFile(null); setMediaDesc("");}}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: "rgb(246, 43, 33)"}} />
+                  <Text style={{color: "rgb(246, 43, 33)", fontSize: 30, textAlign: 'center'}}>Cancel</Text>
+                </View>
+              </Button>
+              <Button transparent onPress={() => addMedia(file.type, file.uri, mediaDesc, file.base64)}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(33,228,255)"}} />
+                  <Text style={{color: "rgb(33,228,255)", fontSize: 30, textAlign: 'center'}}>Add</Text>
+                </View>
+              </Button>
+            </View>
+          </Container>
+        </Modal>
       <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
         <Text style={{marginTop: 17, color: 'rgb(27,183,110)', fontSize: 20}}>Upload</Text>
       </Header>
       {step === "first" ?
         <Container style={styles.myBlack}>
           <Container style={styles.myBlackPadding}>
-            <Button transparent onPress={() => {setStep("create"); console.log(step);}}>
+            <Button transparent onPress={() => setStep("create")}>
               <Grid>
                 <Col style={{alignItems: 'center'}}>
                   <Icon name="albums" style={{fontSize: 50, color: "rgb(33,228,255)"}} />
@@ -204,25 +362,25 @@ export default function UploadPage() {
       : []}
       {step === "createImages" ?
         <View>
-          <Text style={{color: "rgb(33,228,255)", fontSize: 30, alignSelf: 'center', paddingVertical: 20}}>Album preview</Text>
+          <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Album preview</Text>
           <ScrollView style={{height: 300}}>
             {mediaPreview(media)}
           </ScrollView>
-          <Text style={{color: "rgb(33,228,255)", fontSize: 15, alignSelf: 'center', paddingVertical: 20}}>- {media === null ? '0' : media.length} media to publish -</Text>
+          <Text style={{color: "rgb(27,183,110)", fontSize: 15, alignSelf: 'center', paddingVertical: 20}}>- {media === null ? '0' : media.length} media to publish -</Text>
           <View style={{paddingVertical: 40, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
             <View style={{marginRight: 15}}>
-              <Button transparent onPress={() => {setLinkModal(true)}}>
+              <Button transparent onPress={() => openLinkModal()}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-link" style={{fontSize: 40, color: "rgb(97,33,255)"}} />
-                  <Text style={{color: "rgb(97,33,255)", fontSize: 20, textAlign: 'center'}}>Add with link</Text>
+                  <Icon name="ios-link" style={{fontSize: 40, color: "rgb(27,183,110)"}} />
+                  <Text style={{color: "rgb(27,183,110)", fontSize: 20, textAlign: 'center'}}>Add with link</Text>
                 </View>
               </Button>
             </View>
             <View style={{marginLeft: 15}}>
-              <Button transparent onPress={() => setStep("first")}>
+              <Button transparent onPress={() => setFilesModal(true)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-folder" style={{fontSize: 40, color: "rgb(255,164,4)"}} />
-                  <Text style={{color: "rgb(255,164,4)", fontSize: 20, textAlign: 'center'}}>Add from device</Text>
+                  <Icon name="ios-folder" style={{fontSize: 40, color: "rgb(27,183,110)"}} />
+                  <Text style={{color: "rgb(27,183,110)", fontSize: 20, textAlign: 'center'}}>Add from files</Text>
                 </View>
               </Button>
             </View>
@@ -245,7 +403,7 @@ export default function UploadPage() {
               </Button>
             </View>
             <View style={{marginLeft: 15}}>
-              <Button transparent onPress={() => setMedia(null)}>
+              <Button transparent onPress={() => createAlbum()}>
                 <View style={{alignItems: 'center'}}>
                   <Icon name="ios-add-circle" style={{fontSize: 35, color: 'rgb(27,183,110)'}} />
                   <Text style={{color: 'rgb(27,183,110)', fontSize: 15, textAlign: 'center'}}>Publish</Text>
@@ -255,25 +413,41 @@ export default function UploadPage() {
           </View>
         </View>
       : []}
+      {step === "createPublish" ?
+        <View style={{alignItems: 'center'}}>
+          {creatingStep === "album" ?
+            <View style={{alignItems: "center", paddingVertical: 180}}>
+              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Creating your album</Text>
+              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>This might take some time</Text>
+              <Spinner color="green" style={{paddingVertical: 20}} />
+              <View style={{alignSelf: 'center', paddingVertical: 50}}>
+                <Button transparent onPress={() => {setStep("createImages")}}>
+                  <View style={{alignItems: 'center'}}>
+                    <Icon name="ios-return-left" style={{fontSize: 35, color: "rgb(221,220,220)"}} />
+                    <Text style={{color: "rgb(221,220,220)", fontSize: 15, textAlign: 'center'}}>Cancel</Text>
+                  </View>
+                </Button>
+              </View>
+            </View>
+          : []}
+          {creatingStep === "images" ?
+            <View style={{alignItems: "center", paddingVertical: 180}}>
+              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Adding medias to album</Text>
+              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Media published {mediaIndex + " / " + media.length}</Text>
+              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Medias not published : {mediaErrors}</Text>
+              <Spinner color="green" style={{paddingVertical: 20}} />
+              <Button transparent onPress={() => {setStep("first"); setMediaIndex(0); setMediaErrors(0)}}>
+                  <View style={{alignItems: 'center'}}>
+                    <Icon name="ios-return-left" style={{fontSize: 35, color: "rgb(221,220,220)"}} />
+                    <Text style={{color: "rgb(221,220,220)", fontSize: 15, textAlign: 'center'}}>Cancel</Text>
+                  </View>
+                </Button>
+            </View>
+          : []}
+        </View>
+      : []}
     </Container>
   )
-
-  return (
-    <Container style={styles.myBlack}>
-      <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
-        <Text style={{marginTop: 17, color: 'rgb(27,183,110)', fontSize: 20}}>Upload</Text>
-      </Header>
-      <Button title="Select Image" onPress={() => pickImage()}/>
-      {toPublish !== null && toPublish[1] === 'video' ?
-        <Video style={{ width: 355, height: 280 }} source={{uri: (toPublish !== null ? toPublish[0] : null)}} rate={1.0} volume={0.0} isLooping shouldPlay style={{ width: 355, height: 280 }} resizeMode="cover" />
-        :
-        <Image source={{ uri: (toPublish !== null ? toPublish[0] : null)}} style={{ height: 200, width: null}} />
-      }
-      <Input style={{borderColor: 'green', borderWidth: 2, height: 50, flex: 0, color: 'white'}} placeholder="Title of your post" value={title} onChangeText={(text) => setTitle(text)} />
-      <Input multiline style={{borderColor: 'green', borderWidth: 2, height: 90, flex: 0, color: 'white'}} placeholder="Description" value={description} onChangeText={(text) => setDescription(text)} />
-      <Button title="Upload now" onPress={() => uploadImage()}/>
-    </Container>
-  );
 }
 
 const styles = StyleSheet.create({
