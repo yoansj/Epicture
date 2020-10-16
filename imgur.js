@@ -1,3 +1,4 @@
+import * as FileSystem from 'expo-file-system';
 
 export const CLIENT_ID = "350a4b0450465d9"
 export const CLIENT_SECRET = "3cd9f8af74e1c40abbf9abbb5da334fefcdd075b"
@@ -16,7 +17,7 @@ export async function imgurSearch(acessToken, sort = 'time', window = 'all', pag
     }
 
     console.log("GET Gallery Search");
-    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${text}`, requestOptions).catch
+    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${encodeURI(text)}`, requestOptions).catch
     (value => {console.log("GET Gallery Search Error : ", value)})
     const data = await rep.json();
     //console.log(JSON.stringify(rep));
@@ -195,12 +196,22 @@ export async function imgurImageUpload(acessToken, media, mediaType, album, titl
 
     var formdata = new FormData();
 
-    formdata.append("type", "base64");
-    if (mediaType === "video") formdata.append("video", media);
-    if (mediaType === "image") formdata.append("image", `${media}`);
-    if (album) formdata.append("album", album);
-    if (title) formdata.append("title", title);
-    if (description) formdata.append("description", description);
+    if (mediaType === "url") formdata.append("type", "url");
+    if (mediaType === "image") formdata.append("type", "base64");
+    if (mediaType === "video") {
+        formdata.append("type", "file");
+        const file = await FileSystem.readAsStringAsync(media, {
+            encoding: FileSystem.EncodingType.UTF8,
+        }).catch(
+            err => {console.log(err)}
+        ).then(
+            value => {formdata.append("video", `${value}`); console.log("---------->", value);}
+        );
+    }
+    if (mediaType === "image" || mediaType === "url") formdata.append("image", `${media}`);
+    if (album) formdata.append("album", `${album}`);
+    if (title) formdata.append("title", `${title}`);
+    if (description) formdata.append("description", `${description}`);
     if (disable_audio) formdata.append("disable_audio", 1);
 
     var requestOptions = {
@@ -214,5 +225,34 @@ export async function imgurImageUpload(acessToken, media, mediaType, album, titl
     const rep = await fetch("https://api.imgur.com/3/image", requestOptions);
     const data = await rep.json();
     console.log(JSON.stringify(rep), JSON.stringify(data));
-    return (data);
+    console.log("Image upload ended");
+    return ({rep, data});
+}
+
+//POST Album Creation
+export async function imgurAlbumCreate(acessToken, ids, deleteHashes, title, description, privacy, cover) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (ids) formdata.append("ids[]", ids);
+    if (deleteHashes) formdata.append("deletehashes[]", deleteHashes);
+    formdata.append("title", title);
+    formdata.append("description", description);
+    formdata.append("privacy", privacy);
+    if (cover) formdata.append("cover", cover);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow",
+    };
+
+    console.log("POST Album Creation");
+    const rep = await fetch("https://api.imgur.com/3/album", requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(data), JSON.stringify(rep));
+    return ({rep, data});
 }

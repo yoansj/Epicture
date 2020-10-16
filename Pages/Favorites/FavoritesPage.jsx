@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Text ,StyleSheet} from "react-native";
 import { getUserData} from "../Authentification/AuthPage";
 import { imgurGetAlbumFav } from "../../imgur.js"
-import { Container, Icon, Header, Button} from 'native-base';
+import { Container, Icon, Header, Button, Item, Input} from 'native-base';
 import { renderCards } from "../Search/CardDisplayer";
 
 export default function FavoritesPage() {
@@ -12,6 +12,8 @@ export default function FavoritesPage() {
   // Switches to true and false to refresh the page
   const [refresh, setRefresh] = useState(false);
 
+  const [test, setTest] = useState("");
+
   useEffect(() => {
     getUserData().then((value) => {
       setUserData(value);
@@ -20,6 +22,21 @@ export default function FavoritesPage() {
       });
     });
   }, [refresh]);
+
+  return (
+    <Container>
+      <Header searchBar rounded>
+        <Item>
+          <Icon name="ios-search" />
+          <Input value={test} onChangeText={text => setTest(text)} placeholder="Search" />
+          <Icon name="ios-people" />
+        </Item>
+        <Button transparent>
+          <Text>Search</Text>
+        </Button>
+      </Header>
+    </Container>
+  );
 
   return (
     <Container style={styles.myBlack}>
