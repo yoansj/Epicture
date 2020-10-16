@@ -63,7 +63,11 @@ export default function ProfilePage({ route }) {
         style={{ flex: 1, resizeMode: "cover", justifyContent: 'center'}}
         blurRadius={0.5}
       >
-
+      <Button
+        color="rgb(27,183,110)"
+        title="Disconnect"
+        onPress={() => eraseUserData().then(disconnect())}
+      />
       </ImageBackground>
     </Container>
   )

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView} from 'react-native';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Container, Header, Content, Card, CardItem, Thumbnail, Spinner, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
 import { Video } from 'expo-av';
 
-import { imgurAlbumVote, imgurAlbumFavorite } from '../../imgur';
+import { imgurAlbum, imgurAlbumFavorite } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
 
 const greenFont = "rgb(27,183,110)";
@@ -25,6 +25,19 @@ export default function CardDisplayer(props) {
   const [playing, setPlaying] = useState(false);
    // is modal shown
   const [showModal, setShowModal] = useState(false);
+  // data form the post
+  const [postData, setPostData] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  function getPostData(id) {
+    getUserData().then((value) => {
+      imgurAlbum(value.acess_token, id).then((value) =>
+        {setPostData(value.data);}
+      );
+    });
+  }
 
   function doVote(user_vote) {
     getUserData().then((value) => {
@@ -45,6 +58,30 @@ export default function CardDisplayer(props) {
     );
   }
 
+  function ImagesDisplayer() {
+    if (postData && postData.images && isLoading === false) {
+      return (
+        postData.images.map((img, index) => {
+          return (
+          <View>
+            <Image
+              source={{ uri: img.link }}
+              style={{ height: 400, width: null, marginTop: 40 }}
+              key={index}
+            />
+            <Text style={{textAlign: "center", color: "rgb(27,183,110)"}}>{img.title ? img.title + "\n" : ""}{img.description}</Text>
+          </View>)
+        })
+      )
+    } else {
+      return (
+        <View>
+          <Spinner color="green" />
+        </View>
+      )
+    }
+  }
+
   return (
     <Card style={props.style}>
       <Modal
@@ -54,52 +91,29 @@ export default function CardDisplayer(props) {
         onRequestClose={() => setShowModal(false)}
       >
         <Container style={{ backgroundColor: "rgb(18,18,18)" }}>
-          <Button transparent onPress={() => setShowModal(false)}>
-            <Text style={{ textAlign: "center" }}>
-              <Icon
-                style={{ color: "rgb(27,183,110)" }}
-                name="arrow-dropleft-circle"
-              ></Icon>
+          <Header
+            rounded
+            androidStatusBarColor="black"
+            style={{ backgroundColor: "black" }}
+          >
+            <Button transparent onPress={() => setShowModal(false)}>
+              <Text style={{ textAlign: "center" }}>
+                <Icon
+                  style={{ color: "rgb(27,183,110)" }}
+                  name="arrow-dropleft-circle"
+                />
+              </Text>
+            </Button>
+            <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+              {props.title}
             </Text>
-          </Button>
-
-
+          </Header>
           <ScrollView>
-            {props.images.map((item, index) =>
-              {
-                return (
-                  <Image
-                    source={{ uri: item.link }}
-                    style={{ height: 200, width: null, marginTop: 40 }}
-                    key={index}
-                  />
-                )
-              }
-            )}
+            {props.description ? <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+              {props.description}
+            </Text> : []}
+            {<ImagesDisplayer />}
           </ScrollView>
-
-
-
-          <SafeAreaView style={{ flex: 1, maxHeight: 300 }}>
-            <FlatList
-              data={props.images}
-              style={{ height: 200, marginBottom: 30 }}
-              renderItem={({ item, index }) => {
-                return (
-                  <Image
-                    source={{ uri: item.link }}
-                    style={{ height: 200, width: null, marginTop: 40 }}
-                    key={index}
-                  />
-                );
-              }}
-            />
-          </SafeAreaView>
-
-
-
-
-
         </Container>
       </Modal>
       <CardItem listItemPadding={0} style={styles.myBlack}>
@@ -189,7 +203,13 @@ export default function CardDisplayer(props) {
           </Button>
         </Content>
         <Right>
-          <Button transparent onPress={() => setShowModal(true)}>
+          <Button
+            transparent
+            onPress={() => {
+              setShowModal(true);
+              getPostData(props.id);
+            }}
+          >
             <Icon name="chatbubbles" style={{ color: greenFont }} />
             <Text style={{ color: greyFont }}>{props.comment_count}</Text>
           </Button>
@@ -209,7 +229,9 @@ export default function CardDisplayer(props) {
  * @param {*} item
  */
 export const renderPicture = ({ item }) => {
-  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count } = item;
+  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count, description } = item;
+
+  //console.log(item.images);
 
   return (
     <CardDisplayer
@@ -220,11 +242,12 @@ export const renderPicture = ({ item }) => {
       downs={downs}
       comment_count={comment_count}
       image={images ? images[0].link : link}
-      images={images}
+      images={item.images}
       id={id}
       vote={vote}
       favorite={favorite}
       images_count={images_count}
+      description={description}
       key={id}
     />
   );

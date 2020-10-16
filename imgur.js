@@ -189,6 +189,24 @@ export async function imgurAlbumFavorite(acessToken, id) {
     return (data);
 }
 
+//GET Album
+export async function imgurAlbum(acessToken, id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET Album");
+    const rep = await fetch(`https://api.imgur.com/3/album/${id}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (data);
+}
+
 //POST Image Upload
 export async function imgurImageUpload(acessToken, media, mediaType, album, title, description, disable_audio) {
     var myHeaders = new Headers();

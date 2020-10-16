@@ -65,7 +65,6 @@ export default function SearchPage() {
         );
       });
     }
-
     if (firstSearch === false) {
       getUserData().then((value) => {
         imgurGallery(value.acess_token, "hot", "top", "all", "true").then(
@@ -138,7 +137,6 @@ export default function SearchPage() {
               selectedValue={searchPicker}
               onValueChange={(value) => {
                 setSearchPicker(value);
-                //doSearch(text);
               }}
               placeholder="Search"
               textStyle={{fontSize: 5}}
@@ -157,7 +155,6 @@ export default function SearchPage() {
                 selectedValue={sectionPicker}
                 onValueChange={(value) => {
                   setSectionPicker(value);
-                  //doSearch(text);
                 }}
               >
                 <Picker.Item label="Hot" value="hot" />
@@ -176,7 +173,6 @@ export default function SearchPage() {
                 selectedValue={sortPicker}
                 onValueChange={(value) => {
                   setSortPicker(value);
-                  //doSearch(text);
                 }}
               >
                 <Picker.Item label="Most Viral" value="viral" />
@@ -196,7 +192,6 @@ export default function SearchPage() {
                 selectedValue={windowPicker}
                 onValueChange={(value) => {
                   setwindowPicker(value);
-                  //doSearch(text);
                 }}
               >
                 <Picker.Item label="Day" value="day" />
