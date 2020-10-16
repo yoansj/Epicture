@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, SafeAreaView, Image , Modal, View} from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView} from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import { Video } from 'expo-av';
 
@@ -49,91 +49,154 @@ export default function CardDisplayer(props) {
     <Card style={props.style}>
       <Modal
         animationType="slide"
-        style={{}}
         transparent
         visible={showModal}
-        onRequestClose={() => setShowModal(false)}>
-          <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
-
-          <Button style={styles.myGreen} onPress={() => setShowModal(false)}>
-                  <Text style={{textAlign: 'center'}}>
-                    <Icon name="arrow-dropleft-circle"></Icon>
-                  </Text>
+        onRequestClose={() => setShowModal(false)}
+      >
+        <Container style={{ backgroundColor: "rgb(18,18,18)" }}>
+          <Button transparent onPress={() => setShowModal(false)}>
+            <Text style={{ textAlign: "center" }}>
+              <Icon
+                style={{ color: "rgb(27,183,110)" }}
+                name="arrow-dropleft-circle"
+              ></Icon>
+            </Text>
           </Button>
 
-            <View style={{paddingTop: 20}} />
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-          </Container>
-        </Modal>
+
+          <ScrollView>
+            {props.images.map((item, index) =>
+              {
+                return (
+                  <Image
+                    source={{ uri: item.link }}
+                    style={{ height: 200, width: null, marginTop: 40 }}
+                    key={index}
+                  />
+                )
+              }
+            )}
+          </ScrollView>
+
+
+
+          <SafeAreaView style={{ flex: 1, maxHeight: 300 }}>
+            <FlatList
+              data={props.images}
+              style={{ height: 200, marginBottom: 30 }}
+              renderItem={({ item, index }) => {
+                return (
+                  <Image
+                    source={{ uri: item.link }}
+                    style={{ height: 200, width: null, marginTop: 40 }}
+                    key={index}
+                  />
+                );
+              }}
+            />
+          </SafeAreaView>
+
+
+
+
+
+        </Container>
+      </Modal>
       <CardItem listItemPadding={0} style={styles.myBlack}>
         <Left>
           <Body>
-            <Text style={{color: greenFont}}>{props.title}</Text>
+            <Text style={{ color: greenFont }}>{props.title}</Text>
             <Text note>{props.author}</Text>
           </Body>
         </Left>
         <Right>
           <Content>
-            {props.images_count > 1 ? <Icon active name="albums" style={{color:greenFont}}/> : []}
-            {props.images && props.images[0].type === "video/mp4" ? <Icon active name="videocam" style={{color:greenFont}}/> : [] }
+            {props.images_count > 1 ? (
+              <Icon active name="albums" style={{ color: greenFont }} />
+            ) : (
+              []
+            )}
+            {props.images && props.images[0].type === "video/mp4" ? (
+              <Icon active name="videocam" style={{ color: greenFont }} />
+            ) : (
+              []
+            )}
           </Content>
         </Right>
       </CardItem>
       <CardItem cardBody>
-        {props.images && props.images[0].type === "video/mp4" ?
-          <Button onPress={() => setPlaying(!playing)} transparent style={{ width: 355, height: 280 }}>
+        {props.images && props.images[0].type === "video/mp4" ? (
+          <Button
+            onPress={() => setPlaying(!playing)}
+            transparent
+            style={{ width: 355, height: 280 }}
+          >
             <Container style={{ width: 355, height: 280 }}>
-              <Video source={{uri: props.images[0].link}} rate={1.0} volume={playing ? 1.0 : 0.0} isLooping shouldPlay={playing} style={{ width: 355, height: 280 }} resizeMode="cover" />
+              <Video
+                source={{ uri: props.images[0].link }}
+                rate={1.0}
+                volume={playing ? 1.0 : 0.0}
+                isLooping
+                shouldPlay={playing}
+                style={{ width: 355, height: 280 }}
+                resizeMode="cover"
+              />
             </Container>
           </Button>
-          :
+        ) : (
           <Image
-          source={{
-            uri: props.image,
-          }}
-          style={{ height: 200, width: null, flex: 1 }}
-        />
-        }
+            source={{
+              uri: props.image,
+            }}
+            style={{ height: 200, width: null, flex: 1 }}
+          />
+        )}
       </CardItem>
       <CardItem style={styles.myBlack}>
         <Left>
           <Button onPress={() => doVote("up")} transparent>
-            <Icon active name="thumbs-up" style={{color: (vote === "up" ? '#1D2CB5' : greenFont)}}/>
-            <Text style={{color: (vote === "up" ? '#1D2CB5' : greyFont)}}>{props.ups + (vote === "up" ? 1 : 0)}</Text>
+            <Icon
+              active
+              name="thumbs-up"
+              style={{ color: vote === "up" ? "#1D2CB5" : greenFont }}
+            />
+            <Text style={{ color: vote === "up" ? "#1D2CB5" : greyFont }}>
+              {props.ups + (vote === "up" ? 1 : 0)}
+            </Text>
           </Button>
         </Left>
         <Left>
           <Button onPress={() => doVote("down")} transparent>
-            <Icon style={{color: (vote === "down" ? '#FF0000' : greenFont)}} icon active name="thumbs-down" />
-            <Text style={{color: (vote === "down" ? '#FF0000' : greyFont)}}>{props.downs + (vote === "down" ? 1 : 0)}</Text>
+            <Icon
+              style={{ color: vote === "down" ? "#FF0000" : greenFont }}
+              icon
+              active
+              name="thumbs-down"
+            />
+            <Text style={{ color: vote === "down" ? "#FF0000" : greyFont }}>
+              {props.downs + (vote === "down" ? 1 : 0)}
+            </Text>
           </Button>
         </Left>
         <Content>
-          <Button transparent onPress={() => doFavorite()} >
-            <Icon style={{fontSize: 25, color: greenFont}} icon active name={(favorite === false ? "md-heart-empty" : "md-heart")} />
+          <Button transparent onPress={() => doFavorite()}>
+            <Icon
+              style={{ fontSize: 25, color: greenFont }}
+              icon
+              active
+              name={favorite === false ? "md-heart-empty" : "md-heart"}
+            />
           </Button>
         </Content>
         <Right>
           <Button transparent onPress={() => setShowModal(true)}>
-            <Icon name="chatbubbles" style={{color: greenFont}} />
-            <Text style={{color: greyFont}}>{props.comment_count}</Text>
+            <Icon name="chatbubbles" style={{ color: greenFont }} />
+            <Text style={{ color: greyFont }}>{props.comment_count}</Text>
           </Button>
         </Right>
         <Right>
-          <Icon active name="eye" style={{color: greenFont}}/>
-          <Text style={{color: greyFont, fontSize: 15}}>{props.views}</Text>
+          <Icon active name="eye" style={{ color: greenFont }} />
+          <Text style={{ color: greyFont, fontSize: 15 }}>{props.views}</Text>
         </Right>
       </CardItem>
     </Card>
@@ -190,6 +253,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgb(18,18,18)",
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+    color : "red"
   },
   myGreen:{
     backgroundColor: 'rgb(27,183,110)'
