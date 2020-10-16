@@ -56,10 +56,10 @@ function AuthPage(props) {
           expiration_token: expiration_re.exec(url)[1],
           refresh_token: refresh_token_re.exec(url)[1],
           username: username_re.exec(url)[1],
-          id: id_re.exec(url)[1]
+          id: id_re.exec(url)[1],
+          date: new Date().toJSON()
         };
-        console.log(userData);
-        console.log("Logged in !");
+        
         saveUserData(userData).then(value => props.setAuth());
     }
     }

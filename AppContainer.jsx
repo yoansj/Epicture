@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ProfilePage from "./Pages/Profile/ProfilePage.jsx";
+import { getUserData } from "./Pages/Authentification/AuthPage.jsx";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,7 +29,16 @@ const MyDarkGreen = {
   },
 };
 
+function tokenChecker() {
+  /*getUserData().then(userdata => {
+    //if (new Date() >= new Date(userdata.date) + userdata.e
+  })*/
+}
+
 export default function AppContainer(props) {
+
+  //setInterval
+
   return (
     <NavigationContainer theme={MyDarkGreen}>
       <Tab.Navigator

@@ -24,21 +24,6 @@ export default function FavoritesPage() {
   }, [refresh]);
 
   return (
-    <Container>
-      <Header searchBar rounded>
-        <Item>
-          <Icon name="ios-search" />
-          <Input value={test} onChangeText={text => setTest(text)} placeholder="Search" />
-          <Icon name="ios-people" />
-        </Item>
-        <Button transparent>
-          <Text>Search</Text>
-        </Button>
-      </Header>
-    </Container>
-  );
-
-  return (
     <Container style={styles.myBlack}>
       <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
         <Text style={{marginTop: 17, color: 'rgb(27,183,110)'}}>Favorites </Text>

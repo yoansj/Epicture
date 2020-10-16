@@ -25,6 +25,7 @@ export default class App extends React.Component {
     this.setState({ loading: false });
     getUserData().then(value => {
       console.log(value, "<---- value");
+      console.log(new Date(value.expiration_token * 1000).toDateString())
       if (value !== "null" && value !== null)
         this.setAuth();
     }).catch(

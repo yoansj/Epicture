@@ -12,7 +12,7 @@ import {
   Header,
 } from "native-base";
 import { renderCards } from "./CardDisplayer";
-import { imgurSearch , imgurAccountSubmission} from "../../imgur";
+import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 
 /**
@@ -23,15 +23,19 @@ import { getUserData } from "../Authentification/AuthPage";
 export default function SearchPage() {
 
   // Can be pictures || albums || users
-  const [searchPicker, setSearchPicker] = useState("pictures");
+  const [searchPicker, setSearchPicker] = useState("albums");
   // Can be time || viral || top || random
-  const [sortPicker, setSortPicker] = useState("time");
+  const [sortPicker, setSortPicker] = useState("top");
   // Can be day || week || month || year || all
   const [windowPicker, setwindowPicker] = useState("all");
+  // Can be hot || top || user
+  const [sectionPicker, setSectionPicker] = useState("hot");
   // Data from imgur API
   const [imgurData, setImgurData] = useState(null);
   // Search string
-  const [text, setText] = useState("default");
+  const [text, setText] = useState("");
+
+  const [firstSearch, setFirstSearch] = useState(false);
 
 
   useEffect(() => {
@@ -43,7 +47,36 @@ export default function SearchPage() {
         });
       });
     }
-  }, [searchPicker]);
+    if (searchPicker === "pictures") {
+      getUserData().then((value) => {
+        imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+    }
+    if (searchPicker === "albums") {
+      getUserData().then((value) => {
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true").then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+    }
+
+    if (firstSearch === false) {
+      getUserData().then((value) => {
+        imgurGallery(value.acess_token, "hot", "top", "all", "true").then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+      setFirstSearch(true);
+    }
+  }, [searchPicker, sortPicker, windowPicker, sectionPicker]);
 
   /**
    * Function called when the user searches
@@ -56,6 +89,15 @@ export default function SearchPage() {
     if (searchPicker === "pictures") {
       getUserData().then((value) => {
         imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+    }
+    if (searchPicker === "albums") {
+      getUserData().then((value) => {
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true").then(
           (value) => {
             setImgurData(value.data);
           }
@@ -96,17 +138,37 @@ export default function SearchPage() {
               selectedValue={searchPicker}
               onValueChange={(value) => {
                 setSearchPicker(value);
-                doSearch(text);
+                //doSearch(text);
               }}
               placeholder="Search"
+              textStyle={{fontSize: 5}}
             >
               <Picker.Item label="Pictures" value="pictures" />
               <Picker.Item label="Albums" value="albums" />
               <Picker.Item label="Users" value="users" />
-              <Picker.Item label="My post" value="myPost" />
+              <Picker.Item label="My posts" value="myPost" />
             </Picker>
           </Col>
-          {searchPicker === "pictures" ? (
+          {searchPicker === "albums" ? (
+            <Col>
+              <Picker
+                mode="dropdown"
+                style={styles.myPickerGreen}
+                selectedValue={sectionPicker}
+                onValueChange={(value) => {
+                  setSectionPicker(value);
+                  //doSearch(text);
+                }}
+              >
+                <Picker.Item label="Hot" value="hot" />
+                <Picker.Item label="Top" value="top" />
+                <Picker.Item label="User" value="user" />
+              </Picker>
+            </Col>
+          ) : (
+            []
+          )}
+          {searchPicker === "pictures" || searchPicker === "albums" ? (
             <Col>
               <Picker
                 mode="dropdown"
@@ -114,7 +176,7 @@ export default function SearchPage() {
                 selectedValue={sortPicker}
                 onValueChange={(value) => {
                   setSortPicker(value);
-                  doSearch(text);
+                  //doSearch(text);
                 }}
               >
                 <Picker.Item label="Most Viral" value="viral" />
@@ -126,7 +188,7 @@ export default function SearchPage() {
           ) : (
             []
           )}
-          {sortPicker === "top" && searchPicker === "pictures" ? (
+          {sortPicker === "top" && (searchPicker === "pictures" || searchPicker === "albums") ? (
             <Col style={{ height: 50 }}>
               <Picker
                 mode="dropdown"
@@ -134,7 +196,7 @@ export default function SearchPage() {
                 selectedValue={windowPicker}
                 onValueChange={(value) => {
                   setwindowPicker(value);
-                  doSearch(text);
+                  //doSearch(text);
                 }}
               >
                 <Picker.Item label="Day" value="day" />

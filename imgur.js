@@ -20,7 +20,7 @@ export async function imgurSearch(acessToken, sort = 'time', window = 'all', pag
     const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${encodeURI(text)}`, requestOptions).catch
     (value => {console.log("GET Gallery Search Error : ", value)})
     const data = await rep.json();
-    //console.log(JSON.stringify(rep));
+    console.log(JSON.stringify(rep));
     //console.log(JSON.stringify(data));
     return (data);
 }
@@ -44,7 +44,7 @@ export async function imgurFavorites(acessToken, username, page = 0, sort = "new
 }
 
 // GET Gallery
-export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', page = 0, window = 'day', showViral = 'true', showMature = 'false') {
+export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', window = 'day', showViral = 'true') {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
 
@@ -56,9 +56,9 @@ export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', 
 
     console.log("GET Gallery");
     const rep = await fetch(`https://api.imgur.com/3/gallery/${section}/` + (section === "user" ? `${sort}/` : '') +
-    (section === "top" ? `${window}/` : '') + `${page}?showViral=${showViral}&mature=${showMature}&albumPreviews=true`, requestOptions);
+    (section === "top" ? `${window}/` : '') + `showViral=${showViral}&albumPreviews=true`, requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(rep));
+    console.log(JSON.stringify(data));
     return (data);
 }
 

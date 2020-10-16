@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, Image, StyleSheet } from "react-native";
+import { Text, Button, Image, StyleSheet, ImageBackground } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
-import { color } from "react-native-reanimated";
-import { Container, Header, Grid, Row } from "native-base";
+import { Container, Header, Grid, Thumbnail } from "native-base";
 
 export default function ProfilePage({ route }) {
   const greyFont = "#a7a7a7";
@@ -21,6 +20,31 @@ export default function ProfilePage({ route }) {
     });
   }, []);
 
+  function ProfileDisplayer(props) {
+    return (
+      <Container style={styles.myBlack}>
+      <Header
+        rounded
+        androidStatusBarColor="black"
+        style={{ backgroundColor: "black" }}
+      >
+        <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+          Profile{" "}
+        </Text>
+      </Header>
+      <ImageBackground
+        source={{
+          uri: userProfil.cover,
+        }}
+        style={{ flex: 1, resizeMode: "cover", justifyContent: 'center'}}
+        blurRadius={2}
+      >
+
+      </ImageBackground>
+    </Container>
+    )
+  }
+
   return (
     <Container style={styles.myBlack}>
       <Header
@@ -32,7 +56,37 @@ export default function ProfilePage({ route }) {
           Profile{" "}
         </Text>
       </Header>
+      <ImageBackground
+        source={{
+          uri: userProfil.cover,
+        }}
+        style={{ flex: 1, resizeMode: "cover", justifyContent: 'center'}}
+        blurRadius={0.5}
+      >
 
+      </ImageBackground>
+    </Container>
+  )
+
+  return (
+    <Container style={styles.myBlack}>
+      <Header
+        rounded
+        androidStatusBarColor="black"
+        style={{ backgroundColor: "black" }}
+      >
+        <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+          Profile{" "}
+        </Text>
+      </Header>
+      <ImageBackground
+        source={{
+          uri: userProfil.cover,
+        }}
+        style={{ flex: 1, resizeMode: "cover", justifyContent: 'center'}}
+      >
+
+      </ImageBackground>
       <Image
         source={{
           uri: userProfil.cover,
@@ -40,7 +94,7 @@ export default function ProfilePage({ route }) {
         style={{ height: 160, width: null }}
       />
 
-      <Image
+      <Thumbnail
         source={{
           uri: userProfil.avatar,
         }}
