@@ -3,7 +3,7 @@ import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView} from 're
 import { Container, Header, Content, Card, CardItem, Thumbnail, Spinner, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
 import { Video } from 'expo-av';
 
-import { imgurAlbum, imgurAlbumFavorite } from '../../imgur';
+import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
 
 const greenFont = "rgb(27,183,110)";
@@ -145,7 +145,7 @@ export default function CardDisplayer(props) {
             transparent
             style={{ width: 355, height: 280 }}
           >
-            <Container style={{ width: 355, height: 280 }}>
+            <Container style={{ width: 355, height: undefined }}>
               <Video
                 source={{ uri: props.images[0].link }}
                 rate={1.0}
@@ -153,7 +153,7 @@ export default function CardDisplayer(props) {
                 isLooping
                 shouldPlay={playing}
                 style={{ width: 355, height: 280 }}
-                resizeMode="cover"
+                resizeMode="contain"
               />
             </Container>
           </Button>
@@ -162,7 +162,8 @@ export default function CardDisplayer(props) {
             source={{
               uri: props.image,
             }}
-            style={{ height: 200, width: null, flex: 1 }}
+            style={{ height: 200, flex: 1 }}
+            resizeMode="contain"
           />
         )}
       </CardItem>
@@ -253,7 +254,7 @@ export const renderPicture = ({ item }) => {
   );
 }
 
-export function renderCards(data) {
+export function renderCards(data, setUpdateList, setFlatListRef) {
   if (data === null) {
     return (
       <Container style={styles.myMiddle}>
@@ -264,7 +265,14 @@ export function renderCards(data) {
   } else {
   return (
     <SafeAreaView>
-      <FlatList data={data} renderItem={renderPicture} />
+      <FlatList
+        data={data}
+        renderItem={renderPicture}
+        onEndReached={() => setUpdateList(true)}
+        ref={(ref) => {
+          setFlatListRef(ref);
+        }}
+      />
     </SafeAreaView>
   );
   }

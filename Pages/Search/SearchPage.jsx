@@ -16,9 +16,8 @@ import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 
 /**
- * SearchPage component which renders the Search Page
- * Has the SearchBar sub-component
- * @example <SearchPage />
+ * The SearchPage component renders a search page for the user
+ * The user can change the Picker to search for Pictures, Albums, Users or see his own posts
  */
 export default function SearchPage() {
 
@@ -34,50 +33,105 @@ export default function SearchPage() {
   const [imgurData, setImgurData] = useState(null);
   // Search string
   const [text, setText] = useState("");
+  // Page for the search
+  const [page, setPage] = useState(0);
+  // UpdateList
+  const [updateList, setUpdateList] = useState(false);
+
+  const [flatListRef, setFlatListRef] = useState(null);
+
 
   const [firstSearch, setFirstSearch] = useState(false);
 
-
   useEffect(() => {
+
+    if (updateList) {
+      let newPage = page + 1;
+      console.log(`End reached ! Page:${page} New Page:${newPage}`);
+      setPage(page + 1);
+
+      if (searchPicker === "albums") {
+        getUserData().then((value) => {
+          imgurGallery(
+            value.acess_token,
+            sectionPicker,
+            sortPicker,
+            windowPicker,
+            "true",
+            newPage
+          ).then((value) => {
+            {
+              if (updateList) {
+                setImgurData(value.data);
+                setUpdateList(false);
+                console.log("Nouvelle page !");
+                flatListRef.scrollToIndex({ index: 0 });
+              }
+            }
+          });
+        });
+      }
+      if (searchPicker === "pictures") {
+        getUserData().then((value) => {
+          imgurSearch(
+            value.acess_token,
+            sortPicker,
+            windowPicker,
+            newPage,
+            text
+          ).then((value) => {
+            setImgurData(value.data);
+            setUpdateList(false);
+            console.log("Nouvelle page !");
+            flatListRef.scrollToIndex({ index: 0 });
+          });
+        });
+      }
+    }
     if (searchPicker === "myPost") {
       getUserData().then((value) => {
         console.log(value);
         imgurAccountSubmission(value.acess_token).then((value) => {
           setImgurData(value.data);
+          setPage(0);
         });
       });
     }
-    if (searchPicker === "pictures") {
+    if (updateList === false && searchPicker === "pictures") {
       getUserData().then((value) => {
         imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
           (value) => {
             setImgurData(value.data);
+            setPage(0);
           }
         );
       });
     }
-    if (searchPicker === "albums") {
+    if (updateList === false && searchPicker === "albums") {
       getUserData().then((value) => {
-        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true").then(
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", page).then(
           (value) => {
             setImgurData(value.data);
+            setPage(0);
           }
         );
       });
     }
+
     if (firstSearch === false) {
       getUserData().then((value) => {
         imgurGallery(value.acess_token, "hot", "top", "all", "true").then(
           (value) => {
             setImgurData(value.data);
+            setPage(0);
           }
         );
       });
       setFirstSearch(true);
     }
-  }, [searchPicker, sortPicker, windowPicker, sectionPicker]);
+  }, [searchPicker, sortPicker, windowPicker, sectionPicker, updateList]);
 
-  /**
+    /**
    * Function called when the user searches
    * Takes a text param which is the query searched by the user
    * The result of the search is stored in the imgurData state
@@ -96,7 +150,7 @@ export default function SearchPage() {
     }
     if (searchPicker === "albums") {
       getUserData().then((value) => {
-        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true").then(
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", 0).then(
           (value) => {
             setImgurData(value.data);
           }
@@ -206,7 +260,7 @@ export default function SearchPage() {
           )}
         </Grid>
       </Header>
-      {renderCards(imgurData)}
+      {renderCards(imgurData, setUpdateList, setFlatListRef)}
     </Container>
   );
 }

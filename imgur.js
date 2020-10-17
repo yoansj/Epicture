@@ -39,12 +39,12 @@ export async function imgurFavorites(acessToken, username, page = 0, sort = "new
     console.log("GET Account Favorites");
     const rep = await fetch(`https://api.imgur.com/3/account/${username}/favorites/${page}/${sort}`, requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(rep));
+    //console.log(JSON.stringify(rep));
     return (data);
 }
 
 // GET Gallery
-export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', window = 'day', showViral = 'true') {
+export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', window = 'day', showViral = 'true', page = 0) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
 
@@ -56,9 +56,9 @@ export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', 
 
     console.log("GET Gallery");
     const rep = await fetch(`https://api.imgur.com/3/gallery/${section}/` + (section === "user" ? `${sort}/` : '') +
-    (section === "top" ? `${window}/` : '') + `showViral=${showViral}&albumPreviews=true`, requestOptions);
+    (section === "top" ? `${window}/` : '') + `showViral=${showViral}&albumPreviews=true&page=${page}&perPage=100`, requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     return (data);
 }
 
@@ -167,7 +167,7 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
     console.log("POST ACCOUNT BASE");
     const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     return (data)
 }
 
