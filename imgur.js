@@ -5,7 +5,15 @@ export const CLIENT_SECRET = "3cd9f8af74e1c40abbf9abbb5da334fefcdd075b"
 export const REFRESH = "fecba479d2891084b4426d0fc9594c17b37f60f3"
 
 
-// GET Gallery Search
+/* GET Gallery Search */
+/**
+ * Search the gallery with a given query string.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} sort -how so sort search
+ * @param {string} window - Change the date range of the request
+ * @param {number} page - the data paging number
+ * @param {string} text - searching parameter
+ */
 export async function imgurSearch(acessToken, sort = 'time', window = 'all', page = 0, text = "cats") {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -25,7 +33,14 @@ export async function imgurSearch(acessToken, sort = 'time', window = 'all', pag
     return (data);
 }
 
-// GET Account Favorites
+/* GET Account Favorites */
+/**
+ * Returns the users favorited images, only accessible if you're logged in as the user.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} username - user's name you're looking for
+ * @param {number} page - allows you to set the page number so you don't have to retrieve all the data at once
+ * @param {string} sort -how so sort search
+ */
 export async function imgurFavorites(acessToken, username, page = 0, sort = "newest") {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -43,7 +58,16 @@ export async function imgurFavorites(acessToken, username, page = 0, sort = "new
     return (data);
 }
 
-// GET Gallery
+/* GET Gallery */
+/**
+ * Getting the gallery of imgur api
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} section - top, hot or user parameter
+ * @param {string} sort  - sorting filter
+ * @param {string} window - Change the date range of the request (day, week, ...)
+ * @param {boolean} showViral - showing or not by viral
+ * @param {number} page - Page of the search
+ */
 export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', window = 'day', showViral = 'true', page = 0) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -62,7 +86,12 @@ export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', 
     return (data);
 }
 
-//GET Album Fav
+/* GET Album Fav */
+/**
+ *  Listing the favorites of a user
+ * @param {string} accessToken - a user's token giving by the api
+ * @param {string} username - user's name you're looking for
+ */
 export async function imgurGetAlbumFav(accessToken, username) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${accessToken}`);
@@ -81,7 +110,12 @@ export async function imgurGetAlbumFav(accessToken, username) {
     return (data);
 }
 
-//GET Gallery Album
+/* GET Gallery Album */
+/**
+ * Get additional information about an album in the gallery.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} id - the id of the user in imgur
+ */
 export async function imgurGalleryGetAlbum(acessToken, id) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -99,7 +133,11 @@ export async function imgurGalleryGetAlbum(acessToken, id) {
     return (data);
 }
 
-//GET account submissions
+/* GET account submissions */
+/**
+ * Return the images a user has submitted to the gallery.
+ * @param {string} acessToken - a user's token giving by the api
+ */
 export async function imgurAccountSubmission(acessToken) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -116,7 +154,12 @@ export async function imgurAccountSubmission(acessToken) {
     return (data);
 }
 
-//GET image from id
+/* GET image from id */
+/**
+ * Returns an array of Image IDs that are associated with the account.
+ * @param {string} accessToken - a user's token giving by the api
+ * @param {string} imageHash - image you are looking for
+ */
 export async function imgurGetImageId(accessToken, imageHash) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${accessToken}`);
@@ -134,7 +177,13 @@ export async function imgurGetImageId(accessToken, imageHash) {
     return (data);
 }
 
-// POST Album / Image Voting
+/* POST Album / Image Voting */
+/**
+ * Vote for an image
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {number} id - the id of the user in imgur
+ * @param {string} vote - can be 'up' or 'down'
+ */
 export async function imgurAlbumVote(acessToken, id, vote = "up") {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -152,7 +201,12 @@ export async function imgurAlbumVote(acessToken, id, vote = "up") {
     return (rep);
 }
 
-//POST ACCOUNT BASE
+/* POST ACCOUNT BASE */
+/**
+ * Post account base
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} username - the name of the user in imgur
+ */
 export async function imgurProfileBase(acessToken, username = "Mamouki") {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -171,7 +225,12 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
     return (data)
 }
 
-//POST Favorite Album
+/* POST Favorite Album */
+/**
+ * Favorite an album with a given ID
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {number} id  - the id of the user in imgur
+ */
 export async function imgurAlbumFavorite(acessToken, id) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -189,7 +248,12 @@ export async function imgurAlbumFavorite(acessToken, id) {
     return (data);
 }
 
-//GET Album
+/* GET Album */
+/**
+ * Get all the albums associated with the account.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {number} id - the id of the user in imgur
+ */
 export async function imgurAlbum(acessToken, id) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -207,7 +271,17 @@ export async function imgurAlbum(acessToken, id) {
     return (data);
 }
 
-//POST Image Upload
+/* POST Image Upload */
+/**
+ * Upload a new image or video.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {*} media 
+ * @param {string} mediaType -url
+ * @param {*} album 
+ * @param {*} title 
+ * @param {*} description 
+ * @param {*} disable_audio 
+ */
 export async function imgurImageUpload(acessToken, media, mediaType, album, title, description, disable_audio) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
