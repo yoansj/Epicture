@@ -12,6 +12,10 @@ export default function FavoritesPage() {
   // Switches to true and false to refresh the page
   const [refresh, setRefresh] = useState(false);
 
+  const [updateList, setUpdateList] = useState(false);
+
+  const [flatListRef, setFlatListRef] = useState(null);
+
   const [test, setTest] = useState("");
 
   useEffect(() => {
@@ -31,7 +35,7 @@ export default function FavoritesPage() {
           <Icon style={styles.myBlack} name="ios-refresh" />
         </Button>
       </Header>
-      {renderCards(userData)}
+      {renderCards(userData), setUpdateList, setFlatListRef}
       <Container style={styles.myMiddle}>
         <Icon style={styles.myBlack} name="flask" />
         <Text style={styles.myBlack}>Wow !</Text>
