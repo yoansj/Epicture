@@ -298,12 +298,12 @@ export async function imgurGetCom(accessToken, postId) {
 /**
  * Upload a new image or video.
  * @param {string} acessToken - a user's token giving by the api
- * @param {*} media 
- * @param {string} mediaType -url
- * @param {*} album 
- * @param {*} title 
- * @param {*} description 
- * @param {*} disable_audio 
+ * @param {*} media - Media that will be sent
+ * @param {string} mediaType - Can be url or base64
+ * @param {string} album - Album in which the media will be published
+ * @param {string} title - Title of the post
+ * @param {string} description - Description of the post
+ * @param {number} disable_audio - Set to 1 to disable the audio of the video
  */
 export async function imgurImageUpload(acessToken, media, mediaType, album, title, description, disable_audio) {
     var myHeaders = new Headers();
@@ -345,6 +345,17 @@ export async function imgurImageUpload(acessToken, media, mediaType, album, titl
 }
 
 //POST Album Creation
+/**
+ * Create a new album
+ * @param {string} acessToken - A user's token giving by the api
+ * @param {Array} ids - The image ids that you want to be included in the album
+ * @param {*} deleteHashes - The deletehashes of the images that you want to be included in the album
+ * @param {*} title - The title of the album
+ * @param {*} description - The description of the album
+ * @param {*} privacy - Sets the privacy level of the album. Values are : public | hidden | secret. Defaults to user's privacy settings for logged in users.
+ * @param {*} cover - The ID of an image that you want to be the cover of the album
+ * @see https://apidocs.imgur.com/#3606f862-8281-48f1-b0f7-49a5f77da0e1
+ */
 export async function imgurAlbumCreate(acessToken, ids, deleteHashes, title, description, privacy, cover) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -370,4 +381,27 @@ export async function imgurAlbumCreate(acessToken, ids, deleteHashes, title, des
     const data = await rep.json();
     console.log(JSON.stringify(data), JSON.stringify(rep));
     return ({rep, data});
+}
+
+// GET Account Settings
+/**
+ * Returns the account settings, only accessible if you're logged in as the user.
+ * @param {string} acessToken
+ * @see https://apidocs.imgur.com/#a94d108b-d6e3-4e68-9521-47ea79501c85
+ */
+export async function imgurAccountSettings(acessToken) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("GET Account Settings");
+    const rep = await fetch("https://api.imgur.com/3/account/me/settings", requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(data), JSON.stringify(rep));
+    return (data);
 }

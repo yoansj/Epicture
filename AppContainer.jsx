@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
   NavigationContainer,
-  DarkTheme,
 } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import SearchPage from "./Pages/Search/SearchPage.jsx";
 import FavoritesPage from "./Pages/Favorites/FavoritesPage.jsx";
 import UploadPage from "./Pages/Upload/UploadPage.jsx";
+import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -81,14 +81,19 @@ export default function AppContainer(props) {
                     color={color}
                   />
                 );
+            } else if (route.name === "Settings") {
+              return (
+                <Ionicons name="ios-cog" size={size} color={color} />
+              )
             }
           },
         })}
       >
-        <Tab.Screen name="Search" component={SearchPage} />
-        <Tab.Screen name="Favorites" component={FavoritesPage} />
         <Tab.Screen name="Upload" component={UploadPage} />
+        <Tab.Screen name="Favorites" component={FavoritesPage} />
+        <Tab.Screen name="Search" component={SearchPage} />
         <Tab.Screen name="Profile" component={ProfilePage} initialParams={{disconnect: props.disconnect}} />
+        <Tab.Screen name="Settings" component={SettingsPage} />
       </Tab.Navigator>
     </NavigationContainer>
   );
