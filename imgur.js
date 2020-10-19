@@ -291,7 +291,6 @@ export async function imgurGetCom(accessToken, postId) {
     console.log("GET Post comment :");
     const rep = await fetch(`https://api.imgur.com/3/gallery/${postId}/comments`, requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(rep), JSON.stringify(data));
     return (data);
 }
 

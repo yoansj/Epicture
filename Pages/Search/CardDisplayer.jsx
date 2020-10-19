@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   myCom: {
     flex: 1,
     backgroundColor: 'rgb(18,18,18)',
-    color: 'white'
+    color: '#a7a7a7'
   },
   item: {
     padding: 10,
