@@ -48,7 +48,7 @@ export default function SearchPage() {
     if (updateList) {
       let newPage = page + 1;
       console.log(`End reached ! Page:${page} New Page:${newPage}`);
-      setPage(newPage);
+      setPage(page => page + 1);
 
       if (searchPicker === "albums") {
         getUserData().then((value) => {

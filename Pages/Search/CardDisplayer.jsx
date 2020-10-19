@@ -3,7 +3,7 @@ import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView} from 're
 import { Container, Header, Content, Card, CardItem, Thumbnail, Spinner, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
 import { Video } from 'expo-av';
 
-import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite } from '../../imgur';
+import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
 
 const greenFont = "rgb(27,183,110)";
@@ -29,12 +29,21 @@ export default function CardDisplayer(props) {
   const [postData, setPostData] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
-
+  // comment from the post
+  const[postCom, setPostCom] = useState(null);
 
   function getPostData(id) {
     getUserData().then((value) => {
       imgurAlbum(value.acess_token, id).then((value) =>
         {setPostData(value.data);}
+      );
+    });
+  }
+
+  function getPostCom(id) {
+    getUserData().then((value) => {
+      imgurGetCom(value.acess_token, id).then((value) =>
+        {setPostCom(value.data);}
       );
     });
   }
@@ -63,11 +72,10 @@ export default function CardDisplayer(props) {
       return (
         postData.images.map((img, index) => {
           return (
-          <View>
+          <View key={index}>
             <Image
               source={{ uri: img.link }}
               style={{ height: 400, width: null, marginTop: 40 }}
-              key={index}
             />
             <Text style={{textAlign: "center", color: "rgb(27,183,110)"}}>{img.title ? img.title + "\n" : ""}{img.description}</Text>
           </View>)
@@ -79,6 +87,37 @@ export default function CardDisplayer(props) {
           <Spinner color="green" />
         </View>
       )
+    }
+  }
+
+  /**
+   * Display comment
+   */
+  function CommentDisplayer() {
+    if (postCom) {
+      return (
+        <View>
+          <Text style={styles.myBlackText}>
+            <Icon name="chatbubbles" style={styles.myBlack} />
+            Comment section
+            <Icon name="chatbubbles" style={styles.myBlack} />
+          </Text>
+          {postCom.map((comment, index) => {
+            return (
+              <View key={index}>
+                <Text style={styles.myAuth}>{comment.author} said : </Text>
+                <Text style={styles.myCom}> {comment.comment} </Text>
+              </View>
+            );
+          })}
+        </View>
+      );
+    } else {
+      return (
+        <View>
+          <Spinner color="green" />
+        </View>
+      );
     }
   }
 
@@ -113,6 +152,7 @@ export default function CardDisplayer(props) {
               {props.description}
             </Text> : []}
             {<ImagesDisplayer />}
+            <CommentDisplayer/>
           </ScrollView>
         </Container>
       </Modal>
@@ -209,6 +249,7 @@ export default function CardDisplayer(props) {
             onPress={() => {
               setShowModal(true);
               getPostData(props.id);
+              getPostCom(props.id);
             }}
           >
             <Icon name="chatbubbles" style={{ color: greenFont }} />
@@ -285,6 +326,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgb(18,18,18)",
+  },
+  myBlackText: {
+    flex: 1,
+    textAlign: "center",
+    backgroundColor: 'rgb(18,18,18)',
+    color: 'rgb(27,183,110)'
+  },
+  myAuth: {
+    flex: 1,
+    backgroundColor: 'rgb(18,18,18)',
+    color: 'rgb(27,183,110)'
+  },
+  myCom: {
+    flex: 1,
+    backgroundColor: 'rgb(18,18,18)',
+    color: 'white'
   },
   item: {
     padding: 10,
