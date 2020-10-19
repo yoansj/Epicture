@@ -24,8 +24,8 @@ export async function imgurSearch(acessToken, sort = 'time', window = 'all', pag
         redirect: 'follow'
     }
 
-    console.log("GET Gallery Search");
-    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${encodeURI(text)}`, requestOptions).catch
+    console.log(`GET Gallery Search Page: ${page}`);
+    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${encodeURI(text)}&page=${page}`, requestOptions).catch
     (value => {console.log("GET Gallery Search Error : ", value)})
     const data = await rep.json();
     //console.log(JSON.stringify(rep));

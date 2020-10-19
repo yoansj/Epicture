@@ -268,7 +268,10 @@ export function RenderCards(props) {
       <FlatList
         data={props.data}
         renderItem={renderPicture}
-        onEndReached={() => props.setUpdateList(true)}
+        onEndReached={() => {
+          if (props.onEnd)
+            props.onEnd()
+        }}
         ref={(ref) => {
           if (props.setFlatListRef)
             props.setFlatListRef(ref);

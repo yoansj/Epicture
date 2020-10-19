@@ -12,8 +12,9 @@ import {
   Header,
 } from "native-base";
 import { RenderCards } from "./CardDisplayer";
-import { imgurSearch , imgurAccountSubmission, imgurGallery, imgurProfileBase} from "../../imgur";
+import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
+import { useStateWithCallbackLazy } from 'use-state-with-callback';
 
 /**
  * The SearchPage component renders a search page for the user
@@ -21,7 +22,7 @@ import { getUserData } from "../Authentification/AuthPage";
  */
 export default function SearchPage() {
 
-  // Can be pictures || albums || users
+  // Can be pictures || albums
   const [searchPicker, setSearchPicker] = useState("albums");
   // Can be time || viral || top || random
   const [sortPicker, setSortPicker] = useState("top");
@@ -34,21 +35,20 @@ export default function SearchPage() {
   // Search string
   const [text, setText] = useState("");
   // Page for the search
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useStateWithCallbackLazy(0);
   // UpdateList
   const [updateList, setUpdateList] = useState(false);
-
   const [flatListRef, setFlatListRef] = useState(null);
-
-
   const [firstSearch, setFirstSearch] = useState(false);
+  //test
+  const [test, setTest] = useState(false);
 
-  useEffect(() => {
+    function changePage() {
+    flatListRef.scrollToIndex({animated: true, index: 0});
 
-    if (updateList) {
-      let newPage = page + 1;
-      console.log(`End reached ! Page:${page} New Page:${newPage}`);
-      setPage(newPage);
+
+    setPage(page => page + 1, (currentPage) => {
+      console.log(`End reached ! Page:${currentPage}`);
 
       if (searchPicker === "albums") {
         getUserData().then((value) => {
@@ -58,15 +58,11 @@ export default function SearchPage() {
             sortPicker,
             windowPicker,
             "true",
-            newPage
+            currentPage
           ).then((value) => {
             {
-              if (updateList) {
-                setImgurData(value.data);
-                setUpdateList(false);
-                console.log("Nouvelle page !");
-                flatListRef.scrollToIndex({ index: 0 });
-              }
+              console.log("agagagagz")
+              setImgurData(value.data);
             }
           });
         });
@@ -77,17 +73,24 @@ export default function SearchPage() {
             value.acess_token,
             sortPicker,
             windowPicker,
-            newPage,
+            currentPage,
             text
           ).then((value) => {
             setImgurData(value.data);
-            setUpdateList(false);
-            console.log("Nouvelle page !");
-            flatListRef.scrollToIndex({ index: 0 });
           });
         });
       }
+    })
+  }
+
+  useEffect(() => {
+
+    if (test) {
+      console.log("tac");
+      setTest(false);
+      return;
     }
+
     if (searchPicker === "myPost") {
       getUserData().then((value) => {
         console.log(value);
@@ -118,16 +121,6 @@ export default function SearchPage() {
         );
       });
     }
-    if (searchPicker === "users") {
-      getUserData().then((value) => {
-        imgurProfileBase(value.acess_token, text, true).then(
-          (value) => {
-            console.log(`Rep -> ${value.data.rep.status}`)
-          }
-        );
-      });
-    }
-
     if (firstSearch === false) {
       getUserData().then((value) => {
         imgurGallery(value.acess_token, "hot", "top", "all", "true").then(
@@ -139,7 +132,7 @@ export default function SearchPage() {
       });
       setFirstSearch(true);
     }
-  }, [searchPicker, sortPicker, windowPicker, sectionPicker, updateList]);
+  }, [searchPicker, sortPicker, windowPicker, sectionPicker, test]);
 
     /**
    * Function called when the user searches
@@ -163,19 +156,6 @@ export default function SearchPage() {
         imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", 0).then(
           (value) => {
             setImgurData(value.data);
-          }
-        );
-      });
-    }
-    if (searchPicker === "users") {
-      getUserData().then((value) => {
-        imgurProfileBase(value.acess_token, text, true).then(
-          (value) => {
-            JSON.stringify(value).catch(
-              error => {console.log("No such profile !")}
-            )
-            //console.log(JSON.stringify(value))
-            //console.log(`Rep -> ${value.data.status}`)
           }
         );
       });
@@ -220,7 +200,6 @@ export default function SearchPage() {
             >
               <Picker.Item label="Pictures" value="pictures" />
               <Picker.Item label="Albums" value="albums" />
-              <Picker.Item label="Users" value="users" />
               <Picker.Item label="My posts" value="myPost" />
             </Picker>
           </Col>
@@ -283,7 +262,7 @@ export default function SearchPage() {
           )}
         </Grid>
       </Header>
-      <RenderCards data={imgurData} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
+      <RenderCards data={imgurData} onEnd={changePage} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
     </Container>
   );
 }
