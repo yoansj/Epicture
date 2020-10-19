@@ -194,7 +194,7 @@ export default function UploadPage() {
   function mediaPreview() {
     if (media === null)
       return (
-        <Text style={{color: 'rgb(27,183,110)', fontSize: 20, alignSelf: 'center'}}>Nothing to see here sadly :(</Text>
+        <Text style={{color: 'rgb(27,183,110)', fontSize: 20, textAlign: 'center', alignSelf: 'center'}}>Add medias to see the media preview here</Text>
       )
     return (
       media.map((element, index) => {
@@ -317,22 +317,12 @@ export default function UploadPage() {
       </Header>
       {step === "first" ?
         <Container style={styles.myBlack}>
-          <Container style={styles.myBlackPadding}>
+          <Container style={{...styles.myBlackPadding, alignItems: "center", justifyContent: 'center'}}>
             <Button transparent onPress={() => setStep("create")}>
               <Grid>
                 <Col style={{alignItems: 'center'}}>
                   <Icon name="albums" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
                   <Text style={{color: "rgb(27,183,110)", fontSize: 30}}>Create an album</Text>
-                </Col>
-              </Grid>
-            </Button>
-          </Container>
-          <Container style={styles.myBlackPadding}>
-            <Button transparent onPress={() => setStep("upload")}>
-              <Grid>
-                <Col style={{alignItems: 'center'}}>
-                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(255,33,167)"}} />
-                  <Text style={{color: "rgb(255,33,167)", fontSize: 30, textAlign: 'center'}}>Upload to an existing album</Text>
                 </Col>
               </Grid>
             </Button>
@@ -367,7 +357,7 @@ export default function UploadPage() {
             {mediaPreview(media)}
           </ScrollView>
           <Text style={{color: "rgb(27,183,110)", fontSize: 15, alignSelf: 'center', paddingVertical: 20}}>- {media === null ? '0' : media.length} media to publish -</Text>
-          <View style={{paddingVertical: 40, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
+          <View style={{paddingTop: 10, display: 'flex', flexDirection: 'row', alignSelf: 'center', alignItems: "center", justifyContent: 'center'}}>
             <View style={{marginRight: 15}}>
               <Button transparent onPress={() => openLinkModal()}>
                 <View style={{alignItems: 'center'}}>
@@ -385,7 +375,7 @@ export default function UploadPage() {
               </Button>
             </View>
           </View>
-          <View style={{paddingVertical: 10, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
+          <View style={{paddingTop: 30, display: 'flex', flexDirection: 'row', alignItems: "center", justifyContent: 'center'}}>
             <View style={{marginRight: 15}}>
               <Button transparent onPress={() => {setStep("create")}}>
                 <View style={{alignItems: 'center'}}>
