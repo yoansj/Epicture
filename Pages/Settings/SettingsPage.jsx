@@ -61,7 +61,7 @@ export default function SettingsPage() {
         androidStatusBarColor="black"
         style={{ backgroundColor: "black" }}
       >
-        <Text style={{ marginTop: 17, color: styles.myGreen }}>
+        <Text style={{ marginTop: 17, color: styles.myGreen.backgroundColor }}>
           Settings
         </Text>
       </Header>
