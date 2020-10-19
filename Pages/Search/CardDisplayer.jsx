@@ -255,11 +255,11 @@ export const renderPicture = ({ item }) => {
 }
 
 export function renderCards(data, setUpdateList, setFlatListRef) {
-  if (data === null) {
+  if (data === null || data.length === 0) {
     return (
       <Container style={styles.myMiddle}>
         <Icon style={styles.myBlack} name="flask" />
-        <Text style={styles.myBlack}>Do a research</Text>
+        <Text style={styles.myBlack}>What are you looking for ?</Text>
       </Container>
     )
   } else {

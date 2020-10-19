@@ -28,7 +28,7 @@ export async function imgurSearch(acessToken, sort = 'time', window = 'all', pag
     const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${encodeURI(text)}`, requestOptions).catch
     (value => {console.log("GET Gallery Search Error : ", value)})
     const data = await rep.json();
-    console.log(JSON.stringify(rep));
+    //console.log(JSON.stringify(rep));
     //console.log(JSON.stringify(data));
     return (data);
 }
@@ -201,13 +201,13 @@ export async function imgurAlbumVote(acessToken, id, vote = "up") {
     return (rep);
 }
 
-/* POST ACCOUNT BASE */
+/* GET ACCOUNT BASE */
 /**
- * Post account base
+ * Get account base
  * @param {string} acessToken - a user's token giving by the api
  * @param {string} username - the name of the user in imgur
  */
-export async function imgurProfileBase(acessToken, username = "Mamouki") {
+export async function imgurProfileBase(acessToken, username = "Mamouki", returnRep) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
 
@@ -218,10 +218,11 @@ export async function imgurProfileBase(acessToken, username = "Mamouki") {
         redirect: "follow",
     };
 
-    console.log("POST ACCOUNT BASE");
+    console.log("GET ACCOUNT BASE");
     const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
     const data = await rep.json();
-    //console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(rep));
+    if (returnRep) return (rep);
     return (data)
 }
 

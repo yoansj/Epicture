@@ -12,7 +12,7 @@ import {
   Header,
 } from "native-base";
 import { renderCards } from "./CardDisplayer";
-import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
+import { imgurSearch , imgurAccountSubmission, imgurGallery, imgurProfileBase} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 
 /**
@@ -48,7 +48,7 @@ export default function SearchPage() {
     if (updateList) {
       let newPage = page + 1;
       console.log(`End reached ! Page:${page} New Page:${newPage}`);
-      setPage(page + 1);
+      setPage(newPage);
 
       if (searchPicker === "albums") {
         getUserData().then((value) => {
@@ -98,6 +98,7 @@ export default function SearchPage() {
       });
     }
     if (updateList === false && searchPicker === "pictures") {
+      console.log("/!\\ Pas ce print svp /!\\")
       getUserData().then((value) => {
         imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
           (value) => {
@@ -113,6 +114,15 @@ export default function SearchPage() {
           (value) => {
             setImgurData(value.data);
             setPage(0);
+          }
+        );
+      });
+    }
+    if (searchPicker === "users") {
+      getUserData().then((value) => {
+        imgurProfileBase(value.acess_token, text, true).then(
+          (value) => {
+            console.log(`Rep -> ${value.data.rep.status}`)
           }
         );
       });
@@ -157,6 +167,19 @@ export default function SearchPage() {
         );
       });
     }
+    if (searchPicker === "users") {
+      getUserData().then((value) => {
+        imgurProfileBase(value.acess_token, text, true).then(
+          (value) => {
+            JSON.stringify(value).catch(
+              error => {console.log("No such profile !")}
+            )
+            //console.log(JSON.stringify(value))
+            //console.log(`Rep -> ${value.data.status}`)
+          }
+        );
+      });
+    }
   }
 
   return (
@@ -174,7 +197,7 @@ export default function SearchPage() {
         <Item style={styles.myGreen}>
           <Icon name="ios-search" />
           <Input
-            placeholder="Search"
+            placeholder={"Search " + `(Page ${page})`}
             value={text}
             onChangeText={(txt) => setText(txt)}
             onSubmitEditing={() => doSearch(text)}
