@@ -254,8 +254,8 @@ export const renderPicture = ({ item }) => {
   );
 }
 
-export function renderCards(data, setUpdateList, setFlatListRef) {
-  if (data === null || data.length === 0) {
+export function RenderCards(props) {
+  if (props.data === null || props.data.length === 0) {
     return (
       <Container style={styles.myMiddle}>
         <Icon style={styles.myBlack} name="flask" />
@@ -266,11 +266,12 @@ export function renderCards(data, setUpdateList, setFlatListRef) {
   return (
     <SafeAreaView>
       <FlatList
-        data={data}
+        data={props.data}
         renderItem={renderPicture}
-        onEndReached={() => setUpdateList(true)}
+        onEndReached={() => props.setUpdateList(true)}
         ref={(ref) => {
-          setFlatListRef(ref);
+          if (props.setFlatListRef)
+            props.setFlatListRef(ref);
         }}
       />
     </SafeAreaView>

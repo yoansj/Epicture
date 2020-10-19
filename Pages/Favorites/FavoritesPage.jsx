@@ -3,7 +3,7 @@ import { Text ,StyleSheet} from "react-native";
 import { getUserData} from "../Authentification/AuthPage";
 import { imgurGetAlbumFav } from "../../imgur.js"
 import { Container, Icon, Header, Button, Item, Input} from 'native-base';
-import { renderCards } from "../Search/CardDisplayer";
+import { RenderCards } from "../Search/CardDisplayer";
 
 export default function FavoritesPage() {
 
@@ -35,7 +35,7 @@ export default function FavoritesPage() {
           <Icon style={styles.myBlack} name="ios-refresh" />
         </Button>
       </Header>
-      {renderCards(userData), setUpdateList, setFlatListRef}
+      <RenderCards data={userData} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
       <Container style={styles.myMiddle}>
         <Icon style={styles.myBlack} name="flask" />
         <Text style={styles.myBlack}>Wow !</Text>

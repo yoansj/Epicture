@@ -11,7 +11,7 @@ import {
   Container,
   Header,
 } from "native-base";
-import { renderCards } from "./CardDisplayer";
+import { RenderCards } from "./CardDisplayer";
 import { imgurSearch , imgurAccountSubmission, imgurGallery, imgurProfileBase} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 
@@ -283,7 +283,7 @@ export default function SearchPage() {
           )}
         </Grid>
       </Header>
-      {renderCards(imgurData, setUpdateList, setFlatListRef)}
+      <RenderCards data={imgurData} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
     </Container>
   );
 }
