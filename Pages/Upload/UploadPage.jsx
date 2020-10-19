@@ -241,10 +241,10 @@ export default function UploadPage() {
               source={{ uri: (link === "" ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517" : link),}}
               style={{ height: 300, width: null, flex: 0 }}
             />
-            <Text style={{fontSize: 20, color: "rgb(33,228,255)", alignSelf: 'center'}}>- Preview of your image -</Text>
-            <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Text style={{fontSize: 20, color: "rgb(27,183,110)", alignSelf: 'center'}}>- Preview of your image -</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
             <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={link} onChangeText={(text) => setLink(text)} multiline placeholder="Any valid link" />
-            <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
             <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
             <View style={{paddingTop: 60, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
               <Button transparent onPress={() => closeLinkModal()}>
@@ -255,8 +255,8 @@ export default function UploadPage() {
               </Button>
               <Button transparent onPress={() => addMedia("link", link, mediaDesc)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(33,228,255)"}} />
-                  <Text style={{color: "rgb(33,228,255)", fontSize: 30, textAlign: 'center'}}>Add</Text>
+                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
+                  <Text style={{color: "rgb(27,183,110)", fontSize: 30, textAlign: 'center'}}>Add</Text>
                 </View>
               </Button>
             </View>
@@ -290,11 +290,11 @@ export default function UploadPage() {
                 style={{ height: 300, width: null, flex: 0 }}
               />
             : []}
-            <Text style={{fontSize: 20, color: "rgb(33,228,255)", alignSelf: 'center'}}>- Preview of your media -</Text>
+            <Text style={{fontSize: 20, color: "rgb(27,183,110)", alignSelf: 'center'}}>- Preview of your media -</Text>
             <Button success style={{alignSelf: 'center'}} onPress={() => {pickImage()}}>
               <Text style={{color: "white", fontSize: 20, alignSelf: 'center', fontWeight: "bold"}}>Pick new media</Text>
             </Button>
-            <Text style={{paddingTop: 30, color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
+            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
             <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
             <View style={{paddingTop: 60, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
               <Button transparent onPress={() => {setFilesModal(false); setFile(null); setMediaDesc("");}}>
@@ -305,8 +305,8 @@ export default function UploadPage() {
               </Button>
               <Button transparent onPress={() => addMedia(file.type, file.uri, mediaDesc, file.base64)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(33,228,255)"}} />
-                  <Text style={{color: "rgb(33,228,255)", fontSize: 30, textAlign: 'center'}}>Add</Text>
+                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
+                  <Text style={{color: "rgb(27,183,110)", fontSize: 30, textAlign: 'center'}}>Add</Text>
                 </View>
               </Button>
             </View>
@@ -321,8 +321,8 @@ export default function UploadPage() {
             <Button transparent onPress={() => setStep("create")}>
               <Grid>
                 <Col style={{alignItems: 'center'}}>
-                  <Icon name="albums" style={{fontSize: 50, color: "rgb(33,228,255)"}} />
-                  <Text style={{color: "rgb(33,228,255)", fontSize: 30}}>Create an album</Text>
+                  <Icon name="albums" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
+                  <Text style={{color: "rgb(27,183,110)", fontSize: 30}}>Create an album</Text>
                 </Col>
               </Grid>
             </Button>
@@ -341,13 +341,13 @@ export default function UploadPage() {
       : []}
       {step === "create" ?
         <View style={styles.myBlack}>
-          <Text style={{color: "rgb(33,228,255)", fontSize: 30, alignSelf: 'center', paddingVertical: 50}}>Create an album</Text>
+          <Text style={{color: "rgb(27,183,110)", fontSize: 30, alignSelf: 'center', paddingVertical: 50}}>Create an album</Text>
           <View>
-            <Text style={{color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>First of all a name</Text>
+            <Text style={{color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>First of all a name</Text>
             <Input style={{color: "white", flex: 0, alignSelf: 'center'}} onChangeText={(text) => setAlbumName(text)} placeholder="Name of your album" />
           </View>
           <View style={{paddingVertical: 70}}>
-            <Text style={{color: "rgb(33,228,255)", fontSize: 20, alignSelf: 'center'}}>Then a description</Text>
+            <Text style={{color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Then a description</Text>
             <Input style={{color: "white", flex: 0, alignSelf: 'center'}} onChangeText={(text) => setAlbumDescription(text)} multiline placeholder="Description of your album" />
           </View>
           <View style={{paddingVertical: 80, display: 'flex', flexDirection: 'row', alignSelf: 'center'}}>
@@ -355,7 +355,7 @@ export default function UploadPage() {
               <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 80, color: "rgb(221,220,220)"}} />
             </Button>
             <Button transparent onPress={() => {setStep("createImages")}}>
-              <Icon name="ios-arrow-dropright-circle" style={{fontSize: 80, color: "rgb(33,228,255)"}} />
+              <Icon name="ios-arrow-dropright-circle" style={{fontSize: 80, color: "rgb(27,183,110)"}} />
             </Button>
           </View>
         </View>

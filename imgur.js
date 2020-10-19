@@ -272,6 +272,28 @@ export async function imgurAlbum(acessToken, id) {
     return (data);
 }
 
+/* GET Album / Image Comments */
+/**
+ * Get comments on an image or album in the gallery.
+ * @param {string} accessToken - a user's token giving by the api
+ * @param {string} postId - unique id of the image or album
+ */
+export async function imgurGetCom(accessToken, postId) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("GET Post comment :");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/${postId}/comments`, requestOptions);
+    const data = await rep.json();
+    return (data);
+}
+
 /* POST Image Upload */
 /**
  * Upload a new image or video.
