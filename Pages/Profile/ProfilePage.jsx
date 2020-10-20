@@ -57,11 +57,9 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
           []
         )}
         {props.loading ? (
-          <View style={{paddingTop: 250, alignItems: "center"}}>
+          <View style={{ paddingTop: 250, alignItems: "center" }}>
             <Spinner color="green" size={"large"} />
-            <Text style={{ color: "#a7a7a7"}}>
-            Loading Profile
-            </Text>
+            <Text style={{ color: "#a7a7a7" }}>Loading Profile</Text>
           </View>
         ) : (
           []
@@ -76,10 +74,12 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
           <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
             {props.loading === false ? "About" : ""}
           </Text>
-          <Text style={{...styles.myBlack, textAlign: "center"}}>
+          <Text style={{ ...styles.myBlack, textAlign: "center" }}>
             {props.loading === false && props.userdata.bio !== ""
               ? decodeURI(props.userdata.bio)
-              : props.loading === true ? "" : "Empty bio :("}
+              : props.loading === true
+              ? ""
+              : "Empty bio :("}
           </Text>
           <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
             {props.loading === false ? "Joined" : ""}
@@ -90,7 +90,7 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
               : ""}
           </Text>
           <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
-          {props.loading === false ? "Internet Points" : ""}
+            {props.loading === false ? "Internet Points" : ""}
           </Text>
           <Text style={styles.myBlack}>
             {props.loading === false ? props.userdata.reputation : ""}
@@ -103,11 +103,20 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
           </Text>
         </Grid>
         {props.renderDisconnect ? (
-          <Button
-            color="rgb(27,183,110)"
-            title="Disconnect"
-            onPress={() => eraseUserData().then(props.disconnect())}
-          />
+          <View
+            style={{
+              paddingTop: 10,
+              position: "absolute",
+              bottom: 30,
+              alignSelf: "center",
+            }}
+          >
+            <Button
+              color="rgb(27,183,110)"
+              title="Disconnect"
+              onPress={() => eraseUserData().then(props.disconnect())}
+            />
+          </View>
         ) : (
           []
         )}

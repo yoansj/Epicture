@@ -386,7 +386,7 @@ export async function imgurAlbumCreate(acessToken, ids, deleteHashes, title, des
 // GET Account Settings
 /**
  * Returns the account settings, only accessible if you're logged in as the user.
- * @param {string} acessToken
+ * @param {string} acessToken - A user's token giving by the api
  * @see https://apidocs.imgur.com/#a94d108b-d6e3-4e68-9521-47ea79501c85
  */
 export async function imgurAccountSettings(acessToken) {
@@ -402,6 +402,47 @@ export async function imgurAccountSettings(acessToken) {
     console.log("GET Account Settings");
     const rep = await fetch("https://api.imgur.com/3/account/me/settings", requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(data), JSON.stringify(rep));
+    //console.log(JSON.stringify(data), JSON.stringify(rep));
+    return (data);
+}
+
+//POST Change Account Settings
+/**
+ * Updates the account settings for a given user, the user must be logged in.
+ * @param {string} acessToken - A user's token giving by the api
+ * @param {string} bio - The biography of the user, is displayed in the gallery profile page.
+ * @param {string} public_images - Set the users images to private or public by default
+ * @param {string} messaging_enabled - true | false - Allows the user to enable / disable private messages
+ * @param {string} ablum_privacy - public | hidden | secret - Sets the default privacy level of albums the users creates
+ * @param {string} username - A valid Imgur username (between 4 and 63 alphanumeric characters has to be checked before calling this function)
+ * @param {string} show_mature - true | false - Toggle display of mature images in gallery list endpoints.
+ * @param {string} newsletter_subscribed - true | false - Toggle subscription to email newsletter.
+ * @see https://apidocs.imgur.com/#a94d108b-d6e3-4e68-9521-47ea79501c85
+ */
+export async function imgurAccountChangeSettings(acessToken, bio, public_images, messaging_enabled, ablum_privacy, username, show_mature, newsletter_subscribed) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (bio) formdata.append("bio", bio);
+    if (public_images) formdata.append("public_images", public_images);
+    if (messaging_enabled) formdata.append("messaging_enabled", messaging_enabled);
+    if (ablum_privacy) formdata.append("ablum_privacy", ablum_privacy);
+    if (username) formdata.append("username", username);
+    if (show_mature) formdata.append("show_mature", show_mature);
+    if (newsletter_subscribed) formdata.append("newsletter_subscribed", newsletter_subscribed);
+
+    var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("POST Change Account Settings");
+    const rep = await fetch("https://api.imgur.com/3/account/me/settings", requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(data));
     return (data);
 }
