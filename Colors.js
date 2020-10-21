@@ -19,5 +19,16 @@ export const generalStyle = StyleSheet.create({
 	primaryColor: {
     backgroundColor: BACKGROUND_LIGHT,
     color: GENERAL_COLOR
-  }
+	},
+	primaryWhite: {
+    backgroundColor: BACKGROUND_COLOR,
+    color: GENERAL_COLOR
+	},
+	primarySetting: {
+		backgroundColor:GENERAL_COLOR
+	},
+	primaryHeader: {
+		backgroundColor: GENERAL_COLOR,
+		color: BACKGROUND_LIGHT
+	}
 });

@@ -5,10 +5,10 @@ import { Video } from 'expo-av';
 
 import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
-import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, TEXT_COLOR } from "../../Colors";
 
 const purleFont = "#7E78d2";
-const greyFont = "#a7a7a7";
+const greyFont = "#0C0C0C";
 
 /**
  * CardDisplayer component to display Images, Profiles and Galleries
@@ -192,7 +192,7 @@ export default function CardDisplayer(props) {
         <Left>
           <Body>
             <Text style={{ color: purleFont }}>{props.title}</Text>
-            <Text note>{props.author}</Text>
+            <Text note style={{color: TEXT_COLOR}}>{props.author}</Text>
           </Body>
         </Left>
         <Right>
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     height: 44,
     color : "red"
-  },
+  }
 });
 
 // title = titre

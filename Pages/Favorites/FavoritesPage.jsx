@@ -30,18 +30,18 @@ export default function FavoritesPage() {
   }, [refresh]);
 
   return (
-    <Container style={generalStyle.primaryColor}>
-      <Header rounded androidStatusBarColor='black' style={{backgroundColor: BACKGROUND_LIGHT}}>
-        <Text style={{marginTop: 17, color: GENERAL_COLOR}}>Favorites </Text>
+    <Container style={generalStyle.primaryWhite}>
+      <Header rounded androidStatusBarColor={GENERAL_COLOR} style={{backgroundColor: GENERAL_COLOR}}>
+        <Text style={{marginTop: 17, color: BACKGROUND_LIGHT}}>Favorites </Text>
         <Button transparent onPress={() => setRefresh(!refresh)}>
-          <Icon style={generalStyle.primaryColor} name="ios-refresh" />
+          <Icon style={{color: 'white'}} name="ios-refresh" />
         </Button>
       </Header>
       <RenderCards data={userData} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
       <Container style={generalStyle.contentMiddle}>
-        <Icon style={generalStyle.primaryColor} name="flask" />
-        <Text style={generalStyle.primaryColor}>Wow !</Text>
-        <Text style={generalStyle.primaryColor}>There is some space here</Text>
+        <Icon style={styles.myloading} name="flask" />
+        <Text style={styles.myloading}>Wow !</Text>
+        <Text style={styles.myloading}>There is some space here</Text>
       </Container>
     </Container>
   );
@@ -52,5 +52,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 60,
     justifyContent: "center"
+  },
+  myloading: {
+    backgroundColor: '#EBEBEC',
+    color: '#7E78d2'
   }
 });

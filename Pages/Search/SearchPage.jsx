@@ -15,6 +15,7 @@ import { RenderCards } from "./CardDisplayer";
 import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
 import { useStateWithCallbackLazy } from 'use-state-with-callback';
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
 
 /**
  * The SearchPage component renders a search page for the user
@@ -163,18 +164,18 @@ export default function SearchPage() {
   }
 
   return (
-    <Container style={styles.myBlack}>
+    <Container style={generalStyle.primaryWhite}>
       <Header
-        androidStatusBarColor="rgb(1,1,1)"
+        androidStatusBarColor= "#7E78d2"
         style={{
           flexDirection: "column",
           height: 100,
-          backgroundColor: "rgb(1,1,1)",
+          backgroundColor: GENERAL_COLOR,
         }}
         searchBar
         rounded
       >
-        <Item style={styles.myGreen}>
+        <Item style={styles.myBar}>
           <Icon name="ios-search" />
           <Input
             placeholder={"Search " + `(Page ${page})`}
@@ -284,28 +285,10 @@ const styles = StyleSheet.create({
     width: 175,
   },
   myPickerGreen:{
-    color: 'rgb(27,183,110)',
+    color: '#0C0C0C',
     width: undefined
   },
-  myGreen:{
-    backgroundColor: 'rgb(27,183,110)'
-  },
-  myBlack: {
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
-  },
-  myBar: {
-    marginLeft: 80,
-    marginTop: 60,
-    width: 200,
-    height: 40,
-    borderColor: "black",
-    backgroundColor: "#808B96",
-    borderTopLeftRadius: 7,
-    borderTopRightRadius: 7,
-    borderBottomRightRadius: 7,
-    borderBottomLeftRadius: 7,
-    borderWidth: 1,
-    alignSelf: "center",
+  myBar:{
+    backgroundColor: '#F9F9F1'
   }
 });

@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, Button, Switch } from "react-native"
 import { Container, Header, Spinner, Input, Toast } from "native-base";
 import { getUserData } from '../Authentification/AuthPage';
 import { imgurAccountChangeSettings, imgurAccountSettings, imgurProfileBase } from '../../imgur';
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, BACKGROUND_COLOR, TEXT_COLOR } from "../../Colors";
 
 function SettingsDisplayer(props) {
   const [newBio, setNewBio] = useState(props.bio);
@@ -56,10 +57,10 @@ function SettingsDisplayer(props) {
   }
 
   return (
-    <Container style={styles.myBlack}>
+    <Container style={generalStyle.primaryColor}>
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           justifyContent: "center",
           alignSelf: "center",
@@ -70,14 +71,14 @@ function SettingsDisplayer(props) {
       </Text>
       <Input
         style={{
-          color: styles.myGreen.backgroundColor,
+          color: GENERAL_COLOR,
           flex: 0,
           alignSelf: "center",
           textAlign: "center",
           maxHeight: 100,
           borderRightWidth: 1,
           borderLeftWidth: 1,
-          borderColor: styles.myGreen.backgroundColor,
+          borderColor: GENERAL_COLOR,
         }}
         defaultValue={newBio}
         onChangeText={(text) => setNewBio(text)}
@@ -86,7 +87,7 @@ function SettingsDisplayer(props) {
       />
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           justifyContent: "center",
           alignSelf: "center",
@@ -97,15 +98,15 @@ function SettingsDisplayer(props) {
       </Text>
       <Switch
         style={{ alignSelf: "center" }}
-        trackColor={{ false: "#a7a7a7", true: styles.myGreen.backgroundColor }}
-        thumbColor={publicImages ? styles.myGreen.backgroundColor : "#a7a7a7"}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={publicImages ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
         ios_backgroundColor="#3e3e3e"
         onValueChange={() => setPublicImages(!publicImages)}
         value={publicImages}
       />
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           justifyContent: "center",
           alignSelf: "center",
@@ -116,15 +117,15 @@ function SettingsDisplayer(props) {
       </Text>
       <Switch
         style={{ alignSelf: "center" }}
-        trackColor={{ false: "#a7a7a7", true: styles.myGreen.backgroundColor }}
-        thumbColor={messaging ? styles.myGreen.backgroundColor : "#a7a7a7"}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={messaging ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
         ios_backgroundColor="#3e3e3e"
         onValueChange={() => setMessaging(!messaging)}
         value={messaging}
       />
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           marginBottom: 8,
           justifyContent: "center",
@@ -142,8 +143,8 @@ function SettingsDisplayer(props) {
             style={{
               color:
                 albumPrivacy === "hidden"
-                  ? styles.myGreen.backgroundColor
-                  : "#a7a7a7",
+                  ? generalStyle.primarySetting.backgroundColor
+                  : "#0C0C0C",
               fontSize: 20,
             }}
           >
@@ -158,8 +159,8 @@ function SettingsDisplayer(props) {
             style={{
               color:
                 albumPrivacy === "public"
-                  ? styles.myGreen.backgroundColor
-                  : "#a7a7a7",
+                  ? generalStyle.primarySetting.backgroundColor
+                  : "#0C0C0C",
               fontSize: 20,
             }}
           >
@@ -174,8 +175,8 @@ function SettingsDisplayer(props) {
             style={{
               color:
                 albumPrivacy === "secret"
-                  ? styles.myGreen.backgroundColor
-                  : "#a7a7a7",
+                  ? generalStyle.primarySetting.backgroundColor
+                  : "#0C0C0C",
               fontSize: 20,
             }}
           >
@@ -185,7 +186,7 @@ function SettingsDisplayer(props) {
       </View>
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           justifyContent: "center",
           alignSelf: "center",
@@ -196,7 +197,7 @@ function SettingsDisplayer(props) {
       </Text>
       <Input
         style={{
-          color: styles.myGreen.backgroundColor,
+          color: generalStyle.primarySetting.backgroundColor,
           flex: 0,
           alignSelf: "center",
           textAlign: "center",
@@ -207,7 +208,7 @@ function SettingsDisplayer(props) {
       />
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           justifyContent: "center",
           alignSelf: "center",
@@ -218,15 +219,15 @@ function SettingsDisplayer(props) {
       </Text>
       <Switch
         style={{ alignSelf: "center" }}
-        trackColor={{ false: "#a7a7a7", true: styles.myGreen.backgroundColor }}
-        thumbColor={mature ? styles.myGreen.backgroundColor : "#a7a7a7"}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={mature ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
         ios_backgroundColor="#3e3e3e"
         onValueChange={() => setMature(!mature)}
         value={mature}
       />
       <Text
         style={{
-          color: "#a7a7a7",
+          color: "#0C0C0C",
           marginTop: 17,
           justifyContent: "center",
           alignSelf: "center",
@@ -237,8 +238,8 @@ function SettingsDisplayer(props) {
       </Text>
       <Switch
         style={{ alignSelf: "center" }}
-        trackColor={{ false: "#a7a7a7", true: styles.myGreen.backgroundColor }}
-        thumbColor={newsletter ? styles.myGreen.backgroundColor : "#a7a7a7"}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={newsletter ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
         ios_backgroundColor="#3e3e3e"
         onValueChange={() => setNewsletter(!newsletter)}
         value={newsletter}
@@ -252,7 +253,7 @@ function SettingsDisplayer(props) {
         }}
       >
         <Button
-          color="rgb(27,183,110)"
+          color= {generalStyle.primarySetting.backgroundColor}
           title="Confirm changes"
           onPress={() => {
             confirmChanges();
@@ -291,20 +292,20 @@ export default function SettingsPage() {
   }, []);
 
   return (
-    <Container style={styles.myBlack}>
+    <Container style={generalStyle.primaryColor}>
       <Header
         rounded
-        androidStatusBarColor="black"
-        style={{ backgroundColor: "black" }}
+        androidStatusBarColor={GENERAL_COLOR}
+        style={{ backgroundColor: GENERAL_COLOR }}
       >
-        <Text style={{ marginTop: 17, color: styles.myGreen.backgroundColor }}>
+        <Text style={{ marginTop: 17, color: BACKGROUND_COLOR}}>
           Settings
         </Text>
       </Header>
       {loading === true ? (
         <View style={{ paddingTop: 250, alignItems: "center" }}>
-          <Spinner color="green" size={"large"} />
-          <Text style={styles.myGrey}>Loading your settings</Text>
+          <Spinner color= {TEXT_COLOR} size={"large"} />
+          <Text style={generalStyle.primaryWhite}>Loading your settings</Text>
         </View>
       ) : (
         <SettingsDisplayer
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     color: "rgb(27,183,110)",
   },
   myGrey: {
-    color: "#a7a7a7"
+    color: "#0C0C0C"
   },
   myPickerGreen:{
     color: 'rgb(27,183,110)',

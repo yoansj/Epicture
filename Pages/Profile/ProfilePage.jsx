@@ -3,7 +3,7 @@ import { Text, Button, Image, StyleSheet, View } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
-import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR } from "../../Colors";
+import { BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR, generalStyle } from "../../Colors";
 
 /**
    * The ProfileDisplayer component displays a imgur profile
@@ -22,10 +22,10 @@ import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR } from ".
         {props.showHeader ? (
           <Header
             rounded
-            androidStatusBarColor={BACKGROUND_COLOR}
-            style={{ backgroundColor: BACKGROUND_COLOR }}
+            androidStatusBarColor={GENERAL_COLOR}
+            style={generalStyle.primaryHeader}
           >
-            <Text style={{ marginTop: 17, ...styles.InfoText }}>
+            <Text style={{ marginTop: 17, color: BACKGROUND_LIGHT}}>
               Profile
             </Text>
           </Header>
