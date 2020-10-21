@@ -5,8 +5,9 @@ import { Video } from 'expo-av';
 
 import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
 
-const greenFont = "rgb(27,183,110)";
+const purleFont = "#7E78d2";
 const greyFont = "#a7a7a7";
 
 /**
@@ -97,10 +98,10 @@ export default function CardDisplayer(props) {
     if (postCom) {
       return (
         <View>
-          <Text style={styles.myBlackText}>
-            <Icon name="chatbubbles" style={styles.myBlack} />
+          <Text style={generalStyle.primaryColorText}>
+            <Icon name="chatbubbles" style={generalStyle.primaryColor} />
             Comment section
-            <Icon name="chatbubbles" style={styles.myBlack} />
+            <Icon name="chatbubbles" style={generalStyle.primaryColor} />
           </Text>
           {postCom.map((comment, index) => {
             return (
@@ -116,7 +117,7 @@ export default function CardDisplayer(props) {
                     <Icon
                       active
                       name="thumbs-up"
-                      style={{ color: comment.ups === "up" ? "#1D2CB5" : greenFont }}
+                      style={{ color: comment.ups === "up" ? "#1D2CB5" : purleFont }}
                     />
                     <Text
                       style={{ color: comment.ups === "up" ? "#1D2CB5" : greyFont }}
@@ -126,7 +127,7 @@ export default function CardDisplayer(props) {
                   </Left>
                   <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
                     <Icon
-                      style={{ color: vote === "down" ? "#FF0000" : greenFont }}
+                      style={{ color: vote === "down" ? "#FF0000" : purleFont }}
                       icon
                       active
                       name="thumbs-down"
@@ -187,22 +188,22 @@ export default function CardDisplayer(props) {
           </ScrollView>
         </Container>
       </Modal>
-      <CardItem listItemPadding={0} style={styles.myBlack}>
+      <CardItem listItemPadding={0} style={generalStyle.primaryColor}>
         <Left>
           <Body>
-            <Text style={{ color: greenFont }}>{props.title}</Text>
+            <Text style={{ color: purleFont }}>{props.title}</Text>
             <Text note>{props.author}</Text>
           </Body>
         </Left>
         <Right>
           <Content>
             {props.images_count > 1 ? (
-              <Icon active name="albums" style={{ color: greenFont }} />
+              <Icon active name="albums" style={{ color: purleFont }} />
             ) : (
               []
             )}
             {props.images && props.images[0].type === "video/mp4" ? (
-              <Icon active name="videocam" style={{ color: greenFont }} />
+              <Icon active name="videocam" style={{ color: purleFont }} />
             ) : (
               []
             )}
@@ -238,13 +239,13 @@ export default function CardDisplayer(props) {
           />
         )}
       </CardItem>
-      <CardItem style={styles.myBlack}>
+      <CardItem style={generalStyle.primaryColor}>
         <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button onPress={() => doVote("up")} transparent>
             <Icon
               active
               name="thumbs-up"
-              style={{ color: vote === "up" ? "#1D2CB5" : greenFont }}
+              style={{ color: vote === "up" ? "#1D2CB5" : purleFont }}
             />
             <Text style={{ color: vote === "up" ? "#1D2CB5" : greyFont }}>
               {props.ups + (vote === "up" ? 1 : 0)}
@@ -254,7 +255,7 @@ export default function CardDisplayer(props) {
         <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button onPress={() => doVote("down")} transparent>
             <Icon
-              style={{ color: vote === "down" ? "#FF0000" : greenFont }}
+              style={{ color: vote === "down" ? "#FF0000" : purleFont }}
               icon
               active
               name="thumbs-down"
@@ -268,7 +269,7 @@ export default function CardDisplayer(props) {
         <Content>
           <Button transparent onPress={() => doFavorite()}>
             <Icon
-              style={{ fontSize: 25, color: greenFont }}
+              style={{ fontSize: 25, color: purleFont }}
               icon
               active
               name={favorite === false ? "md-heart-empty" : "md-heart"}
@@ -285,12 +286,12 @@ export default function CardDisplayer(props) {
               getPostCom(props.id);
             }}
           >
-            <Icon name="chatbubbles" style={{ color: greenFont }} />
+            <Icon name="chatbubbles" style={{ color: purleFont }} />
             <Text style={{ color: greyFont }}>{props.comment_count}</Text>
           </Button>
         </Left>
         <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-          <Icon active name="eye" style={{ color: greenFont }} />
+          <Icon active name="eye" style={{ color: purleFont }} />
           <Text style={{ color: greyFont, fontSize: 15 }}>{props.views}</Text>
         </Left>
       </CardItem>
@@ -332,8 +333,8 @@ export function RenderCards(props) {
   if (props.data === null || props.data.length === 0) {
     return (
       <Container style={styles.myMiddle}>
-        <Icon style={styles.myBlack} name="flask" />
-        <Text style={styles.myBlack}>What are you looking for ?</Text>
+        <Icon style={generalStyle.primaryColor} name="flask" />
+        <Text style={generalStyle.primaryColor}>What are you looking for ?</Text>
       </Container>
     )
   } else {
@@ -371,13 +372,13 @@ const styles = StyleSheet.create({
   },
   myAuth: {
     flex: 1,
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
+    backgroundColor: '#EBEBEC',
+    color: '#7E78d2'
   },
   myCom: {
     flex: 1,
-    backgroundColor: 'rgb(18,18,18)',
-    color: '#a7a7a7'
+    backgroundColor: '#EBEBEC',
+    color: '#0C0C0C'
   },
   item: {
     padding: 10,
@@ -385,13 +386,6 @@ const styles = StyleSheet.create({
     height: 44,
     color : "red"
   },
-  myGreen:{
-    backgroundColor: 'rgb(27,183,110)'
-  },
-  myBlack: {
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
-  }
 });
 
 // title = titre

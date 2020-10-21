@@ -4,6 +4,8 @@ import { getUserData} from "../Authentification/AuthPage";
 import { imgurGetAlbumFav } from "../../imgur.js"
 import { Container, Icon, Header, Button, Item, Input} from 'native-base';
 import { RenderCards } from "../Search/CardDisplayer";
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
+
 
 export default function FavoritesPage() {
 
@@ -28,40 +30,27 @@ export default function FavoritesPage() {
   }, [refresh]);
 
   return (
-    <Container style={styles.myBlack}>
-      <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
-        <Text style={{marginTop: 17, color: 'rgb(27,183,110)'}}>Favorites </Text>
+    <Container style={generalStyle.primaryColor}>
+      <Header rounded androidStatusBarColor='black' style={{backgroundColor: BACKGROUND_LIGHT}}>
+        <Text style={{marginTop: 17, color: GENERAL_COLOR}}>Favorites </Text>
         <Button transparent onPress={() => setRefresh(!refresh)}>
-          <Icon style={styles.myBlack} name="ios-refresh" />
+          <Icon style={generalStyle.primaryColor} name="ios-refresh" />
         </Button>
       </Header>
       <RenderCards data={userData} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
-      <Container style={styles.myMiddle}>
-        <Icon style={styles.myBlack} name="flask" />
-        <Text style={styles.myBlack}>Wow !</Text>
-        <Text style={styles.myBlack}>There is some space here</Text>
+      <Container style={generalStyle.contentMiddle}>
+        <Icon style={generalStyle.primaryColor} name="flask" />
+        <Text style={generalStyle.primaryColor}>Wow !</Text>
+        <Text style={generalStyle.primaryColor}>There is some space here</Text>
       </Container>
     </Container>
   );
 }
 const styles = StyleSheet.create({
-  myMiddle: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgb(18,18,18)",
-  },
   myWarning: {
     backgroundColor: 'red',
     alignItems: 'center',
     height: 60,
     justifyContent: "center"
-  },
-  myGreen:{
-    backgroundColor: 'rgb(27,183,110)'
-  },
-  myBlack: {
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
   }
 });

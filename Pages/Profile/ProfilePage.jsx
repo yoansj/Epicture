@@ -22,7 +22,7 @@ import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR } from ".
         {props.showHeader ? (
           <Header
             rounded
-            androidStatusBarColor="black"
+            androidStatusBarColor={BACKGROUND_COLOR}
             style={{ backgroundColor: BACKGROUND_COLOR }}
           >
             <Text style={{ marginTop: 17, ...styles.InfoText }}>
