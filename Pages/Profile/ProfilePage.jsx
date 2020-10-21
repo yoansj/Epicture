@@ -3,7 +3,7 @@ import { Text, Button, Image, StyleSheet, View } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
-import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR } from "../../Styles";
+import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR } from "../../Colors";
 
 /**
    * The ProfileDisplayer component displays a imgur profile
