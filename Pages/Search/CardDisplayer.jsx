@@ -5,7 +5,7 @@ import { Video } from 'expo-av';
 
 import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
-import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, TEXT_COLOR } from "../../Colors";
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, TEXT_COLOR, BACKGROUND_COLOR } from "../../Colors";
 
 const purleFont = "#7E78d2";
 const greyFont = "#0C0C0C";
@@ -78,14 +78,14 @@ export default function CardDisplayer(props) {
               source={{ uri: img.link }}
               style={{ height: 400, width: null, marginTop: 40 }}
             />
-            <Text style={{textAlign: "center", color: "rgb(27,183,110)"}}>{img.title ? img.title + "\n" : ""}{img.description}</Text>
+            <Text style={{textAlign: "center", color: GENERAL_COLOR}}>{img.title ? img.title + "\n" : ""}{img.description}</Text>
           </View>)
         })
       )
     } else {
       return (
         <View>
-          <Spinner color="green" />
+          <Spinner color={GENERAL_COLOR} />
         </View>
       )
     }
@@ -98,7 +98,7 @@ export default function CardDisplayer(props) {
     if (postCom) {
       return (
         <View>
-          <Text style={generalStyle.primaryColorText}>
+          <Text style={generalStyle.primaryColor}>
             <Icon name="chatbubbles" style={generalStyle.primaryColor} />
             Comment section
             <Icon name="chatbubbles" style={generalStyle.primaryColor} />
@@ -117,23 +117,23 @@ export default function CardDisplayer(props) {
                     <Icon
                       active
                       name="thumbs-up"
-                      style={{ color: comment.ups === "up" ? "#1D2CB5" : purleFont }}
+                      style={{ color: comment.ups === "up" ? "#2ECC71" : purleFont }}
                     />
                     <Text
-                      style={{ color: comment.ups === "up" ? "#1D2CB5" : greyFont }}
+                      style={{ color: comment.ups === "up" ? "#2ECC71" : greyFont }}
                     >
                       {comment.ups + (vote === "up" ? 1 : 0)}
                     </Text>
                   </Left>
                   <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
                     <Icon
-                      style={{ color: vote === "down" ? "#FF0000" : purleFont }}
+                      style={{ color: vote === "down" ? "#2ECC71" : purleFont }}
                       icon
                       active
                       name="thumbs-down"
                     />
                     <Text
-                      style={{ color: vote === "down" ? "#FF0000" : greyFont }}
+                      style={{ color: vote === "down" ? "#2ECC71" : greyFont }}
                     >
                       {comment.downs + (vote === "down" ? 1 : 0)}
                     </Text>
@@ -147,7 +147,7 @@ export default function CardDisplayer(props) {
     } else {
       return (
         <View>
-          <Spinner color="green" />
+          <Spinner color={GENERAL_COLOR} />
         </View>
       );
     }
@@ -161,26 +161,26 @@ export default function CardDisplayer(props) {
         visible={showModal}
         onRequestClose={() => setShowModal(false)}
       >
-        <Container style={{ backgroundColor: "rgb(18,18,18)" }}>
+        <Container style={{ backgroundColor: BACKGROUND_LIGHT }}>
           <Header
             rounded
-            androidStatusBarColor="black"
-            style={{ backgroundColor: "black" }}
+            androidStatusBarColor={BACKGROUND_COLOR}
+            style={{ backgroundColor: GENERAL_COLOR }}
           >
             <Button transparent onPress={() => setShowModal(false)}>
               <Text style={{ textAlign: "center" }}>
                 <Icon
-                  style={{ color: "rgb(27,183,110)" }}
+                  style={{ color: BACKGROUND_COLOR }}
                   name="arrow-dropleft-circle"
                 />
               </Text>
             </Button>
-            <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+            <Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>
               {props.title}
             </Text>
           </Header>
           <ScrollView>
-            {props.description ? <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+            {props.description ? <Text style={{ marginTop: 17, color: GENERAL_COLOR }}>
               {props.description}
             </Text> : []}
             {<ImagesDisplayer />}
@@ -245,9 +245,9 @@ export default function CardDisplayer(props) {
             <Icon
               active
               name="thumbs-up"
-              style={{ color: vote === "up" ? "#1D2CB5" : purleFont }}
+              style={{ color: vote === "up" ? "#2ECC71" : purleFont }}
             />
-            <Text style={{ color: vote === "up" ? "#1D2CB5" : greyFont }}>
+            <Text style={{ color: vote === "up" ? "#2ECC71" : greyFont }}>
               {props.ups + (vote === "up" ? 1 : 0)}
             </Text>
           </Button>
@@ -255,12 +255,12 @@ export default function CardDisplayer(props) {
         <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button onPress={() => doVote("down")} transparent>
             <Icon
-              style={{ color: vote === "down" ? "#FF0000" : purleFont }}
+              style={{ color: vote === "down" ? "#2ECC71" : purleFont }}
               icon
               active
               name="thumbs-down"
             />
-            <Text style={{ color: vote === "down" ? "#FF0000" : greyFont }}>
+            <Text style={{ color: vote === "down" ? "#2ECC71" : greyFont }}>
               {props.downs + (vote === "down" ? 1 : 0)}
             </Text>
           </Button>
@@ -362,22 +362,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgb(18,18,18)",
+    backgroundColor: "#F9F9F1",
   },
   myBlackText: {
     flex: 1,
     textAlign: "center",
     backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
+    color: GENERAL_COLOR
   },
   myAuth: {
     flex: 1,
-    backgroundColor: '#EBEBEC',
     color: '#7E78d2'
   },
   myCom: {
     flex: 1,
-    backgroundColor: '#EBEBEC',
     color: '#0C0C0C'
   },
   item: {
