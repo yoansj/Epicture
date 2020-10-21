@@ -51,6 +51,7 @@ export default function CardDisplayer(props) {
 
   function doVote(user_vote) {
     getUserData().then((value) => {
+      console.log("DEBUG:", props.id, user_vote, vote);
       if (vote === user_vote) {
         imgurAlbumVote(value.acess_token, props.id, "veto").then(value => {console.log("Veto worked !"); setVote(null)})
       } else {
@@ -72,12 +73,36 @@ export default function CardDisplayer(props) {
     if (postData && postData.images && isLoading === false) {
       return (
         postData.images.map((img, index) => {
+
+          const [videoPlaying, setVideoPlaying] = useState(false);
+
           return (
           <View key={index}>
+            {img.type === "video/mp4" ?
+            <Button
+            onPress={() => setVideoPlaying(!videoPlaying)}
+            transparent
+            style={{ width: 355, height: 280 }}
+            >
+              <Container style={{ width: 355, height: undefined }}>
+                <Video
+                  source={{ uri: img.link }}
+                  rate={1.0}
+                  volume={videoPlaying ? 1.0 : 0.0}
+                  isLooping
+                  shouldPlay={videoPlaying}
+                  style={{ width: 355, height: 280 }}
+                  resizeMode="contain"
+                />
+              </Container>
+            </Button>
+            :
             <Image
               source={{ uri: img.link }}
-              style={{ height: 400, width: null, marginTop: 40 }}
+              style={{ height: 400, flex: 1, marginTop: 40}}
+              resizeMode="contain"
             />
+            }
             <Text style={{textAlign: "center", color: GENERAL_COLOR}}>{img.title ? img.title + "\n" : ""}{img.description}</Text>
           </View>)
         })
