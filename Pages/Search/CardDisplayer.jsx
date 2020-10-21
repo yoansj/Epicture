@@ -104,10 +104,41 @@ export default function CardDisplayer(props) {
           </Text>
           {postCom.map((comment, index) => {
             return (
-              <View key={index}>
-                <Text style={styles.myAuth}>{comment.author} said : </Text>
-                <Text style={styles.myCom}> {comment.comment} </Text>
-              </View>
+              <Card key={index}>
+                <CardItem>
+                  <Text style={styles.myAuth}>{comment.author} :</Text>
+                </CardItem>
+                <CardItem cardBody>
+                  <Text style={styles.myCom}> {comment.comment} </Text>
+                </CardItem>
+                <CardItem>
+                  <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+                    <Icon
+                      active
+                      name="thumbs-up"
+                      style={{ color: comment.ups === "up" ? "#1D2CB5" : greenFont }}
+                    />
+                    <Text
+                      style={{ color: comment.ups === "up" ? "#1D2CB5" : greyFont }}
+                    >
+                      {comment.ups + (vote === "up" ? 1 : 0)}
+                    </Text>
+                  </Left>
+                  <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+                    <Icon
+                      style={{ color: vote === "down" ? "#FF0000" : greenFont }}
+                      icon
+                      active
+                      name="thumbs-down"
+                    />
+                    <Text
+                      style={{ color: vote === "down" ? "#FF0000" : greyFont }}
+                    >
+                      {comment.downs + (vote === "down" ? 1 : 0)}
+                    </Text>
+                  </Left>
+                </CardItem>
+              </Card>
             );
           })}
         </View>
@@ -208,7 +239,7 @@ export default function CardDisplayer(props) {
         )}
       </CardItem>
       <CardItem style={styles.myBlack}>
-        <Left>
+        <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button onPress={() => doVote("up")} transparent>
             <Icon
               active
@@ -220,7 +251,7 @@ export default function CardDisplayer(props) {
             </Text>
           </Button>
         </Left>
-        <Left>
+        <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button onPress={() => doVote("down")} transparent>
             <Icon
               style={{ color: vote === "down" ? "#FF0000" : greenFont }}
@@ -233,6 +264,7 @@ export default function CardDisplayer(props) {
             </Text>
           </Button>
         </Left>
+        <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
         <Content>
           <Button transparent onPress={() => doFavorite()}>
             <Icon
@@ -243,7 +275,8 @@ export default function CardDisplayer(props) {
             />
           </Button>
         </Content>
-        <Right>
+        </Left>
+        <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button
             transparent
             onPress={() => {
@@ -255,11 +288,11 @@ export default function CardDisplayer(props) {
             <Icon name="chatbubbles" style={{ color: greenFont }} />
             <Text style={{ color: greyFont }}>{props.comment_count}</Text>
           </Button>
-        </Right>
-        <Right>
+        </Left>
+        <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Icon active name="eye" style={{ color: greenFont }} />
           <Text style={{ color: greyFont, fontSize: 15 }}>{props.views}</Text>
-        </Right>
+        </Left>
       </CardItem>
     </Card>
   );
