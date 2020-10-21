@@ -14,33 +14,31 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ProfilePage from "./Pages/Profile/ProfilePage.jsx";
-import { getUserData } from "./Pages/Authentification/AuthPage.jsx";
+import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR } from "./Styles.js";
 
 const Tab = createBottomTabNavigator();
 
-const MyDarkGreen = {
+const TabBarTheme = {
   colors: {
-    primary: 'rgb(27, 183, 110)',
-    background: 'rgb(1, 1, 1)',
-    card: 'rgb(18, 18, 18)',
-    text: 'rgb(229, 229, 231)',
-    border: 'rgb(39, 39, 41)',
-    notification: 'rgb(255, 69, 58)',
+    primary: GENERAL_COLOR,
+    background: BACKGROUND_COLOR,
+    card: BACKGROUND_COLOR,
+    text: GENERAL_COLOR,
+    border: GENERAL_COLOR,
+    notification: GENERAL_COLOR,
   },
 };
 
-function tokenChecker() {
-  /*getUserData().then(userdata => {
-    //if (new Date() >= new Date(userdata.date) + userdata.e
-  })*/
-}
-
+/**
+ * The App Container component is displayed once the user is logged into the application
+ * It displays a Tab Navigator containing all the pages of the application
+ * It's this component that calls each Component representing the Pages
+ * Takes a disconnect props that is a function that is called to disconnect the user
+ * @param {*} props 
+ */
 export default function AppContainer(props) {
-
-  //setInterval
-
   return (
-    <NavigationContainer theme={MyDarkGreen}>
+    <NavigationContainer theme={TabBarTheme}>
       <Tab.Navigator
         initialRouteName="Search"
         screenOptions={({ route }) => ({

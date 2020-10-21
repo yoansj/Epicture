@@ -3,6 +3,7 @@ import { Text, Button, Image, StyleSheet, View } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
+import { BACKGROUND_COLOR, BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR } from "../../Styles";
 
 /**
    * The ProfileDisplayer component displays a imgur profile
@@ -17,14 +18,14 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
    */
   function ProfileDisplayer(props) {
     return (
-      <Container style={styles.myBlack}>
+      <Container style={styles.Containers}>
         {props.showHeader ? (
           <Header
             rounded
             androidStatusBarColor="black"
-            style={{ backgroundColor: "black" }}
+            style={{ backgroundColor: BACKGROUND_COLOR }}
           >
-            <Text style={{ marginTop: 17, color: "rgb(27,183,110)" }}>
+            <Text style={{ marginTop: 17, ...styles.InfoText }}>
               Profile
             </Text>
           </Header>
@@ -58,47 +59,47 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
         )}
         {props.loading ? (
           <View style={{ paddingTop: 250, alignItems: "center" }}>
-            <Spinner color="green" size={"large"} />
-            <Text style={{ color: "#a7a7a7" }}>Loading Profile</Text>
+            <Spinner color={GENERAL_COLOR} size={"large"} />
+            <Text style={{ color: TEXT_COLOR }}>Loading Profile</Text>
           </View>
         ) : (
           []
         )}
-        <Grid style={styles.myMiddle}>
-          <Text style={{ color: "#a7a7a7", paddingTop: 15 }}>
+        <Grid style={styles.PageContent}>
+          <Text style={{ ...styles.FieldText, paddingTop: 15 }}>
             {props.loading === false ? "Names" : ""}
           </Text>
-          <Text style={styles.myBlack}>
+          <Text style={styles.InfoText}>
             {props.loading === false ? props.userdata.url : ""}
           </Text>
-          <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
+          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
             {props.loading === false ? "About" : ""}
           </Text>
-          <Text style={{ ...styles.myBlack, textAlign: "center" }}>
+          <Text style={{ ...styles.InfoText, textAlign: "center" }}>
             {props.loading === false && props.userdata.bio !== ""
               ? decodeURI(props.userdata.bio)
               : props.loading === true
               ? ""
               : "Empty bio :("}
           </Text>
-          <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
+          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
             {props.loading === false ? "Joined" : ""}
           </Text>
-          <Text style={styles.myBlack}>
+          <Text style={styles.InfoText}>
             {props.loading === false
               ? new Date(props.userdata.created * 1000).toDateString()
               : ""}
           </Text>
-          <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
+          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
             {props.loading === false ? "Internet Points" : ""}
           </Text>
-          <Text style={styles.myBlack}>
+          <Text style={styles.InfoText}>
             {props.loading === false ? props.userdata.reputation : ""}
           </Text>
-          <Text style={{ color: "#a7a7a7", paddingTop: 30 }}>
+          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
             {props.loading === false ? "Notoriety" : ""}
           </Text>
-          <Text style={styles.myBlack}>
+          <Text style={styles.InfoText}>
             {props.loading === false ? props.userdata.reputation_name : ""}
           </Text>
         </Grid>
@@ -112,7 +113,7 @@ import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
             }}
           >
             <Button
-              color="rgb(27,183,110)"
+              color={GENERAL_COLOR}
               title="Disconnect"
               onPress={() => eraseUserData().then(props.disconnect())}
             />
@@ -156,23 +157,19 @@ export default function ProfilePage({ route }) {
 }
 
 const styles = StyleSheet.create({
-  myMiddle: {
+  PageContent: {
     alignItems: "center",
     flexDirection: "column",
-
-    backgroundColor: "rgb(18,18,18)",
+    backgroundColor: BACKGROUND_LIGHT,
   },
-  myMiddle_info: {
-    paddingTop: -80,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgb(18,18,18)",
+  Containers: {
+    backgroundColor: BACKGROUND_LIGHT,
+    color: BACKGROUND_LIGHT,
   },
-  myGreen: {
-    backgroundColor: "rgb(27,183,110)",
+  FieldText: {
+    color: TEXT_COLOR,
   },
-  myBlack: {
-    backgroundColor: "rgb(18,18,18)",
-    color: "rgb(27,183,110)",
+  InfoText: {
+    color: GENERAL_COLOR,
   },
 });
