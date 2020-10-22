@@ -3,7 +3,7 @@ import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView} from 're
 import { Container, Header, Content, Card, CardItem, Thumbnail, Spinner, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
 import { Video } from 'expo-av';
 
-import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom } from '../../imgur';
+import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom, imgurCommentVote } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
 import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, TEXT_COLOR, BACKGROUND_COLOR } from "../../Colors";
 
@@ -122,48 +122,66 @@ export default function CardDisplayer(props) {
   function CommentDisplayer() {
     if (postCom) {
       return (
-        <View>
-          <View style={{...generalStyle.contentMiddle, backgroundColor: BACKGROUND_LIGHT}}>
-            <Text style={generalStyle.primaryColor}>
-            <Icon name="chatbubbles" style={generalStyle.primaryColor} />
+        <View style={{paddingTop: 30}}>
+          <View style={{...generalStyle.contentMiddle, backgroundColor: BACKGROUND_LIGHT, flexDirection: "row"}}>
+            <Icon fontSize={20} name="chatbubbles" style={{...generalStyle.primaryColor, marginRight: 25}} />
+            <Text style={{...generalStyle.primaryColor, fontSize: 25}}>
               Comment section
-            <Icon name="chatbubbles" style={generalStyle.primaryColor} />
             </Text>
+            <Icon fontSize={20} name="chatbubbles" style={{...generalStyle.primaryColor, marginLeft: 25}} />
           </View>
           {postCom.map((comment, index) => {
+
+            const [commentVote, setCommentVote] = useState(comment.vote);
+
+            function doVoteComment(user_vote) {
+              getUserData().then((value) => {
+                console.log("DEBUG:", props.id, user_vote, vote);
+                if (vote === user_vote) {
+                  imgurCommentVote(value.acess_token, comment.id, "veto").then(value => {console.log("Veto worked !"); setCommentVote(null)})
+                } else {
+                  imgurCommentVote(value.acess_token, comment.id, user_vote).then(value => {console.log(`Vote ${user_vote} worked !`); setCommentVote(user_vote)})
+                }
+              });
+            }
+
             return (
               <Card key={index}>
                 <CardItem>
                   <Text style={styles.myAuth}>{comment.author} :</Text>
                 </CardItem>
                 <CardItem cardBody>
-                  <Text style={styles.myCom}> {comment.comment} </Text>
+                  <Text style={{...styles.myCom, marginLeft: 15}}>{comment.comment}</Text>
                 </CardItem>
                 <CardItem>
                   <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-                    <Icon
-                      active
-                      name="thumbs-up"
-                      style={{ color: comment.vote === "up" ? "#2ECC71" : purleFont }}
-                    />
-                    <Text
-                      style={{ color: comment.vote === "up" ? "#2ECC71" : greyFont }}
-                    >
-                      {comment.ups + (vote === "up" ? 1 : 0)}
-                    </Text>
+                    <Button transparent onPress={() => doVoteComment("up")}>
+                      <Icon
+                        active
+                        name="thumbs-up"
+                        style={{ color: commentVote === "up" ? "#2ECC71" : purleFont, fontSize: 25}}
+                      />
+                      <Text
+                        style={{ color: commentVote === "up" ? "#2ECC71" : greyFont }}
+                      >
+                        {comment.ups}
+                      </Text>
+                    </Button>
                   </Left>
                   <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-                    <Icon
-                      style={{ color: vote === "down" ? "#2ECC71" : purleFont }}
-                      icon
-                      active
-                      name="thumbs-down"
-                    />
-                    <Text
-                      style={{ color: vote === "down" ? "#2ECC71" : greyFont }}
-                    >
-                      {comment.downs + (vote === "down" ? 1 : 0)}
-                    </Text>
+                    <Button transparent onPress={() => doVoteComment("down")}>
+                      <Icon
+                        style={{ color: commentVote=== "down" ? "#2ECC71" : purleFont, fontSize: 25 }}
+                        icon
+                        active
+                        name="thumbs-down"
+                      />
+                      <Text
+                        style={{ color: commentVote === "down" ? "#2ECC71" : greyFont }}
+                      >
+                        {comment.downs}
+                      </Text>
+                    </Button>
                   </Left>
                 </CardItem>
               </Card>
@@ -210,7 +228,7 @@ export default function CardDisplayer(props) {
             {props.description ? <Text style={{ marginTop: 17, color: GENERAL_COLOR }}>
               {props.description}
             </Text> : []}
-            {<ImagesDisplayer />}
+            <ImagesDisplayer />
             <CommentDisplayer/>
           </ScrollView>
         </Container>
@@ -257,13 +275,25 @@ export default function CardDisplayer(props) {
             </Container>
           </Button>
         ) : (
-          <Image
-            source={{
-              uri: props.image,
+          <Button
+            onPress={() => {
+              setShowModal(true);
+              getPostData(props.id);
+              getPostCom(props.id);
             }}
-            style={{ height: 200, flex: 1 }}
-            resizeMode="contain"
-          />
+            transparent
+            style={{ width: 355, height: 280 }}
+          >
+            <Container style={{ width: 200, height: undefined, flex: 1 }}>
+              <Image
+                source={{
+                  uri: props.image,
+                }}
+                style={{ height: 200, flex: 1 }}
+                resizeMode="contain"
+              />
+            </Container>
+          </Button>
         )}
       </CardItem>
       <CardItem style={generalStyle.primaryColor}>
@@ -275,7 +305,7 @@ export default function CardDisplayer(props) {
               style={{ color: vote === "up" ? "#2ECC71" : purleFont }}
             />
             <Text style={{ color: vote === "up" ? "#2ECC71" : greyFont }}>
-              {props.ups + (vote === "up" ? 1 : 0)}
+              {props.ups}
             </Text>
           </Button>
         </Left>
@@ -288,7 +318,7 @@ export default function CardDisplayer(props) {
               name="thumbs-down"
             />
             <Text style={{ color: vote === "down" ? "#2ECC71" : greyFont }}>
-              {props.downs + (vote === "down" ? 1 : 0)}
+              {props.downs}
             </Text>
           </Button>
         </Left>
@@ -308,6 +338,7 @@ export default function CardDisplayer(props) {
           <Button
             transparent
             onPress={() => {
+              setPlaying(false);
               setShowModal(true);
               getPostData(props.id);
               getPostCom(props.id);
@@ -366,16 +397,10 @@ export function RenderCards(props) {
   return (
     <SafeAreaView>
       <FlatList
+        refreshing={(props.refreshing ? props.refreshing : false)}
+        onRefresh={() => {props.onRefresh()}}
         data={props.data}
         renderItem={renderPicture}
-        onEndReached={() => {
-          if (props.onEnd)
-            props.onEnd()
-        }}
-        ref={(ref) => {
-          if (props.setFlatListRef)
-            props.setFlatListRef(ref);
-        }}
       />
     </SafeAreaView>
   );

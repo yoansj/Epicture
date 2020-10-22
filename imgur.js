@@ -481,3 +481,27 @@ export async function imgurAlbumShare(acessToken, albumHash, title, topic, matur
     console.log(JSON.stringify(data));
     return (data);
 }
+
+/* POST Vote / Comment Voting */
+/**
+ * Vote for a comment
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} id - Comment id
+ * @param {string} vote - can be 'up' or 'down' or 'veto'
+ */
+export async function imgurCommentVote(acessToken, id, vote = "up") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("POST Vote / Comment Voting");
+    const rep = await fetch(`https://api.imgur.com/3/comment/${id}/vote/${vote}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (rep);
+}

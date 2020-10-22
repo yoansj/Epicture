@@ -1,5 +1,5 @@
 import React, { useState , useEffect} from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Col, Grid } from "react-native-easy-grid";
 import {
   Picker,
@@ -14,7 +14,6 @@ import {
 import { RenderCards } from "./CardDisplayer";
 import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
-import { useStateWithCallbackLazy } from 'use-state-with-callback';
 import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
 
 /**
@@ -35,81 +34,38 @@ export default function SearchPage() {
   const [imgurData, setImgurData] = useState(null);
   // Search string
   const [text, setText] = useState("");
-  // Page for the search
-  const [page, setPage] = useStateWithCallbackLazy(0);
-  // UpdateList
-  const [updateList, setUpdateList] = useState(false);
-  const [flatListRef, setFlatListRef] = useState(null);
+  // Refresh
+  const [refresh, setRefresh] = useState(false);
   const [firstSearch, setFirstSearch] = useState(false);
 
 
-    function changePage() {
-    flatListRef.scrollToIndex({animated: true, index: 0});
-
-
-    setPage(page => page + 1, (currentPage) => {
-      console.log(`End reached ! Page:${currentPage}`);
-
-      if (searchPicker === "albums") {
-        getUserData().then((value) => {
-          imgurGallery(
-            value.acess_token,
-            sectionPicker,
-            sortPicker,
-            windowPicker,
-            "true",
-            currentPage
-          ).then((value) => {
-            {
-              console.log("agagagagz")
-              setImgurData(value.data);
-            }
-          });
-        });
-      }
-      if (searchPicker === "pictures") {
-        getUserData().then((value) => {
-          imgurSearch(
-            value.acess_token,
-            sortPicker,
-            windowPicker,
-            currentPage,
-            text
-          ).then((value) => {
-            setImgurData(value.data);
-          });
-        });
-      }
-    })
-  }
-
   useEffect(() => {
     if (searchPicker === "myPost") {
+      console.log("eh oh ?")
       getUserData().then((value) => {
         console.log(value);
         imgurAccountSubmission(value.acess_token).then((value) => {
           setImgurData(value.data);
-          setPage(0);
+          setRefresh(false);
         });
       });
     }
     if (searchPicker === "pictures") {
-      console.log("/!\\ Pas ce print svp /!\\")
       getUserData().then((value) => {
         imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
           (value) => {
             setImgurData(value.data);
-            setPage(0);
+            setRefresh(false);
           }
         );
       });
     }
     if (searchPicker === "albums") {
       getUserData().then((value) => {
-        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", page).then(
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", 0).then(
           (value) => {
             setImgurData(value.data);
-            setPage(0);
+            setRefresh(false);
           }
         );
       });
@@ -119,13 +75,12 @@ export default function SearchPage() {
         imgurGallery(value.acess_token, "hot", "top", "all", "true").then(
           (value) => {
             setImgurData(value.data);
-            setPage(0);
           }
         );
       });
       setFirstSearch(true);
     }
-  }, [searchPicker, sortPicker, windowPicker, sectionPicker, updateList]);
+  }, [searchPicker, sortPicker, windowPicker, sectionPicker, refresh]);
 
     /**
    * Function called when the user searches
@@ -158,7 +113,7 @@ export default function SearchPage() {
   return (
     <Container style={generalStyle.primaryWhite}>
       <Header
-        androidStatusBarColor= "#7E78d2"
+        androidStatusBarColor={GENERAL_COLOR}
         style={{
           flexDirection: "column",
           height: 100,
@@ -167,7 +122,7 @@ export default function SearchPage() {
         searchBar
         rounded
       >
-        <Item style={styles.myBar}>
+        <Item style={{...styles.myBar, marginTop: 10}}>
           <Icon name="ios-search" />
           <Input
             placeholder={"Search"}
@@ -255,7 +210,7 @@ export default function SearchPage() {
           )}
         </Grid>
       </Header>
-      <RenderCards data={imgurData} onEnd={changePage} onRefresh={() => {setUpdateList(!updateList)}} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
+      <RenderCards data={imgurData} refreshing={refresh} onRefresh={() => {setRefresh(true)}}  />
     </Container>
   );
 }
