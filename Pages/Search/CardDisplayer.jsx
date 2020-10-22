@@ -123,11 +123,13 @@ export default function CardDisplayer(props) {
     if (postCom) {
       return (
         <View>
-          <Text style={generalStyle.primaryColor}>
+          <View style={{...generalStyle.contentMiddle, backgroundColor: BACKGROUND_LIGHT}}>
+            <Text style={generalStyle.primaryColor}>
             <Icon name="chatbubbles" style={generalStyle.primaryColor} />
-            Comment section
+              Comment section
             <Icon name="chatbubbles" style={generalStyle.primaryColor} />
-          </Text>
+            </Text>
+          </View>
           {postCom.map((comment, index) => {
             return (
               <Card key={index}>
@@ -142,10 +144,10 @@ export default function CardDisplayer(props) {
                     <Icon
                       active
                       name="thumbs-up"
-                      style={{ color: comment.ups === "up" ? "#2ECC71" : purleFont }}
+                      style={{ color: comment.vote === "up" ? "#2ECC71" : purleFont }}
                     />
                     <Text
-                      style={{ color: comment.ups === "up" ? "#2ECC71" : greyFont }}
+                      style={{ color: comment.vote === "up" ? "#2ECC71" : greyFont }}
                     >
                       {comment.ups + (vote === "up" ? 1 : 0)}
                     </Text>
