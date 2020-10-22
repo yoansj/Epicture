@@ -41,8 +41,7 @@ export default function SearchPage() {
   const [updateList, setUpdateList] = useState(false);
   const [flatListRef, setFlatListRef] = useState(null);
   const [firstSearch, setFirstSearch] = useState(false);
-  //test
-  const [test, setTest] = useState(false);
+
 
     function changePage() {
     flatListRef.scrollToIndex({animated: true, index: 0});
@@ -85,13 +84,6 @@ export default function SearchPage() {
   }
 
   useEffect(() => {
-
-    if (test) {
-      console.log("tac");
-      setTest(false);
-      return;
-    }
-
     if (searchPicker === "myPost") {
       getUserData().then((value) => {
         console.log(value);
@@ -101,7 +93,7 @@ export default function SearchPage() {
         });
       });
     }
-    if (updateList === false && searchPicker === "pictures") {
+    if (searchPicker === "pictures") {
       console.log("/!\\ Pas ce print svp /!\\")
       getUserData().then((value) => {
         imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
@@ -112,7 +104,7 @@ export default function SearchPage() {
         );
       });
     }
-    if (updateList === false && searchPicker === "albums") {
+    if (searchPicker === "albums") {
       getUserData().then((value) => {
         imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", page).then(
           (value) => {
@@ -133,7 +125,7 @@ export default function SearchPage() {
       });
       setFirstSearch(true);
     }
-  }, [searchPicker, sortPicker, windowPicker, sectionPicker, test]);
+  }, [searchPicker, sortPicker, windowPicker, sectionPicker, updateList]);
 
     /**
    * Function called when the user searches
@@ -178,7 +170,7 @@ export default function SearchPage() {
         <Item style={styles.myBar}>
           <Icon name="ios-search" />
           <Input
-            placeholder={"Search " + `(Page ${page})`}
+            placeholder={"Search"}
             value={text}
             onChangeText={(txt) => setText(txt)}
             onSubmitEditing={() => doSearch(text)}
@@ -263,7 +255,7 @@ export default function SearchPage() {
           )}
         </Grid>
       </Header>
-      <RenderCards data={imgurData} onEnd={changePage} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
+      <RenderCards data={imgurData} onEnd={changePage} onRefresh={() => {setUpdateList(!updateList)}} setUpdateList={setUpdateList} setFlatListRef={setFlatListRef} />
     </Container>
   );
 }

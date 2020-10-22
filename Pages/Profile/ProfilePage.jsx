@@ -60,7 +60,7 @@ import { BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR, generalStyle } from "../..
         {props.loading ? (
           <View style={{ paddingTop: 250, alignItems: "center" }}>
             <Spinner color={GENERAL_COLOR} size={"large"} />
-            <Text style={{ color: TEXT_COLOR }}>Loading Profile</Text>
+            <Text style={{ color: GENERAL_COLOR }}>Loading Profile</Text>
           </View>
         ) : (
           []

@@ -304,7 +304,7 @@ export default function SettingsPage() {
       </Header>
       {loading === true ? (
         <View style={{ paddingTop: 250, alignItems: "center" }}>
-          <Spinner color= {GENERAL_COLOR} size={"large"} />
+          <Spinner color={GENERAL_COLOR} size={"large"} />
           <Text style={{...generalStyle.primaryWhite, backgroundColor: BACKGROUND_LIGHT}}>Loading your settings</Text>
         </View>
       ) : (

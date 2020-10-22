@@ -447,6 +447,15 @@ export async function imgurAccountChangeSettings(acessToken, bio, public_images,
     return (data);
 }
 
+/**
+ * Share an Album or Image to the Gallery
+ * @param {string} acessToken - A user's token giving by the api
+ * @param {string} albumHash - Album to share
+ * @param {string} title - Title of the post
+ * @param {string} topic - Topic name
+ * @param {number} mature - If the post is mature, set this value to 1.
+ * @param {string} tags - The name of the tags you wish to associate with a post.
+ */
 export async function imgurAlbumShare(acessToken, albumHash, title, topic, mature, tags) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${acessToken}`);
@@ -457,7 +466,7 @@ export async function imgurAlbumShare(acessToken, albumHash, title, topic, matur
     if (topic) formdata.append("topic", topic);
     formdata.append("terms", "1");
     if (mature) formdata.append("mature", mature);
-    if (tags) formdata.append("tags", tags.split);
+    if (tags) formdata.append("tags", `tags=${tags}`);
 
     var requestOptions = {
         method: 'POST',

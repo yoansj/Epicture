@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, Modal } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Modal, Switch } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av';
-import { Container, Input, Spinner, Content, CheckBox, Header, Button, Icon, Toast } from "native-base";
-import { Col, Row, Grid } from 'react-native-easy-grid';
+import { Container, Input, Spinner, Header, Button, Icon, Toast } from "native-base";
+import { Col, Grid } from 'react-native-easy-grid';
 
 import { getUserData } from "../Authentification/AuthPage";
-import { imgurAlbumCreate, imgurImageUpload } from "../../imgur";
+import { imgurAlbumCreate, imgurAlbumShare, imgurImageUpload } from "../../imgur";
+import { BACKGROUND_LIGHT, generalStyle, GENERAL_COLOR, TEXT_COLOR } from "../../Colors";
 
 export default function UploadPage() {
 
@@ -43,8 +44,17 @@ export default function UploadPage() {
   // Creating step
   const [creatingStep, setCreatingStep] = useState("album");
 
-  // New album hash
-  const [albumHash, setAlbumHash] = useState("");
+  // Title of the post
+  const [postName, setPostName] = useState("");
+
+  // Topic of the post
+  const [topic, setTopic] = useState("");
+
+  // Tags
+  const [tags, setTags] = useState("");
+
+  // Is the post mature
+  const [mature, setMature] = useState(false);
 
   // Publishing media
   const [mediaIndex, setMediaIndex] = useState(0);
@@ -102,6 +112,45 @@ export default function UploadPage() {
     setMediaDesc("");
     setFile(null);
     setLinkModal(false);
+    setAlbumDescription("");
+    setAlbumName("");
+  }
+
+  function checkPost() {
+    if (postName !== "") {
+      setStep("createImages");
+    } else {
+      Toast.show({
+        text: "The title of your post can't be empty",
+        buttonText: "Okay",
+        type: 'danger',
+        duration: 5000,
+      })
+    }
+  }
+
+  function checkMedia() {
+    if (media !== null && media.length !== 0) {
+      createAlbum();
+    } else {
+      Toast.show({
+        text: "You need to add at list one media",
+        buttonText: "Okay",
+        type: 'danger',
+        duration: 5000,
+      })
+    }
+  }
+
+  function resetVariables() {
+    setStep("first");
+    setMediaIndex(0);
+    setMediaErrors(0);
+    setMedia(null);
+    setPostName("");
+    setTopic("");
+    setTags("");
+
   }
 
   async function createAlbum() {
@@ -168,6 +217,7 @@ export default function UploadPage() {
             })().then(
               () => {
                 console.log("Fin de création ! index:", mediaIndex);
+                imgurAlbumShare(userdata.acess_token, albumCreate.data.data.id, postName, topic, mature, tags);
               }
             ))
           }
@@ -194,7 +244,7 @@ export default function UploadPage() {
   function mediaPreview() {
     if (media === null)
       return (
-        <Text style={{color: 'rgb(27,183,110)', fontSize: 20, textAlign: 'center', alignSelf: 'center'}}>Add medias to see the media preview here</Text>
+        <Text style={{...styles.purpleText, textAlign: 'center', alignSelf: 'center'}}>Add medias to see the media preview here</Text>
       )
     return (
       media.map((element, index) => {
@@ -205,7 +255,8 @@ export default function UploadPage() {
                 source={{
                   uri: element.type === "link" || element.type === "image" ? element.newMedia : "",
                 }}
-                style={{ height: 300, width: null, flex: 0 }}
+                style={{ height: 300, width: null, flex: 1 }}
+                resizeMode="contain"
               />
             ) : (
               <Video
@@ -216,11 +267,11 @@ export default function UploadPage() {
                 isLooping
                 shouldPlay
                 style={{ width: 355, height: 280 }}
-                resizeMode="cover"
+                resizeMode="contain"
               />
             )}
             <Text
-              style={{backgroundColor: 'white', color: 'black', textAlign: 'center'}}
+              style={{backgroundColor: GENERAL_COLOR, color: BACKGROUND_LIGHT, textAlign: 'center'}}
             >{element.type === "image" || element.type === "url" ? "Image " : "Video "}{index + 1} : {element.desc === "" ? "(Empty description)" : element.desc}</Text>
           </View>
         );
@@ -230,33 +281,36 @@ export default function UploadPage() {
   }
 
   return (
-    <Container style={styles.myBlack}>
+    <Container style={generalStyle.primaryColor}>
       <Modal
         animationType="slide"
         visible={linkModal}
         onRequestClose={() => setLinkModal(false)}>
-          <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
+          <Container style={generalStyle.primaryColor}>
             <View style={{paddingTop: 20}} />
             <Image
               source={{ uri: (link === "" ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517" : link),}}
               style={{ height: 300, width: null, flex: 0 }}
+              resizeMode="contain"
             />
-            <Text style={{fontSize: 20, color: "rgb(27,183,110)", alignSelf: 'center'}}>- Preview of your image -</Text>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a link for your image</Text>
-            <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={link} onChangeText={(text) => setLink(text)} multiline placeholder="Any valid link" />
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
-            <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>- Preview of your image -</Text>
+            <Text style={{paddingTop: 30, ...styles.purpleText, alignSelf: 'center'}}>Enter a link for your image</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} value={link} onChangeText={(text) => setLink(text)} multiline placeholder="Any valid link" />
+            <Text style={{paddingTop: 30, ...styles.purpleText, alignSelf: 'center'}}>Enter a description for your image</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
             <View style={{paddingTop: 60, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
-              <Button transparent onPress={() => closeLinkModal()}>
-                <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: "rgb(246, 43, 33)"}} />
-                  <Text style={{color: "rgb(246, 43, 33)", fontSize: 30, textAlign: 'center'}}>Cancel</Text>
-                </View>
-              </Button>
+              <View style={{paddingRight: 30}}>
+                <Button transparent onPress={() => closeLinkModal()}>
+                  <View style={{alignItems: 'center'}}>
+                    <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: TEXT_COLOR}} />
+                    <Text style={{...styles.blackText, fontSize: 30, textAlign: 'center'}}>Cancel</Text>
+                  </View>
+                </Button>
+              </View>
               <Button transparent onPress={() => addMedia("link", link, mediaDesc)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
-                  <Text style={{color: "rgb(27,183,110)", fontSize: 30, textAlign: 'center'}}>Add</Text>
+                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: GENERAL_COLOR}} />
+                  <Text style={{...styles.purpleText, fontSize: 30, textAlign: 'center'}}>Add</Text>
                 </View>
               </Button>
             </View>
@@ -266,12 +320,13 @@ export default function UploadPage() {
         animationType="slide"
         visible={filesModal}
         onRequestClose={() => setFilesModal(false)}>
-          <Container style={{backgroundColor: 'rgb(30, 30, 30)'}}>
+          <Container style={generalStyle.primaryColor}>
             <View style={{paddingTop: 20}} />
             {file === null ?
               <Image
                 source={{ uri: (link === "" ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517" : link),}}
                 style={{ height: 300, width: null, flex: 0 }}
+                resizeMode="contain"
               />
             : []}
             {file !== null && file.type === "video" ?
@@ -282,7 +337,7 @@ export default function UploadPage() {
                 volume={0.5}
                 isLooping
                 shouldPlay
-                resizeMode="cover"
+                resizeMode="contain"
               />
               : file !== null ?
               <Image
@@ -290,39 +345,42 @@ export default function UploadPage() {
                 style={{ height: 300, width: null, flex: 0 }}
               />
             : []}
-            <Text style={{fontSize: 20, color: "rgb(27,183,110)", alignSelf: 'center'}}>- Preview of your media -</Text>
-            <Button success style={{alignSelf: 'center'}} onPress={() => {pickImage()}}>
-              <Text style={{color: "white", fontSize: 20, alignSelf: 'center', fontWeight: "bold"}}>Pick new media</Text>
+            <Text style={{...styles.purpleText, alignSelf: 'center', paddingBottom: 20}}>- Preview of your media -</Text>
+            <Button transparent color={GENERAL_COLOR} style={{alignSelf: 'center'}} onPress={() => {pickImage()}}>
+              <Icon name="ios-folder" style={{fontSize: 40, color: GENERAL_COLOR}} />
             </Button>
-            <Text style={{paddingTop: 30, color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Enter a description for your image</Text>
-            <Input style={{color: "white", flex: 0, alignSelf: 'center'}} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Open files</Text>
+            <Text style={{paddingTop: 30, ...styles.purpleText, alignSelf: 'center'}}>Enter a description for your image</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} value={mediaDesc} onChangeText={(text) => setMediaDesc(text)} multiline placeholder="You can also leave this empty" />
             <View style={{paddingTop: 60, display: 'flex', flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around'}}>
-              <Button transparent onPress={() => {setFilesModal(false); setFile(null); setMediaDesc("");}}>
-                <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: "rgb(246, 43, 33)"}} />
-                  <Text style={{color: "rgb(246, 43, 33)", fontSize: 30, textAlign: 'center'}}>Cancel</Text>
-                </View>
-              </Button>
+              <View style={{paddingRight: 30}}>
+                <Button transparent onPress={() => {setFilesModal(false); setFile(null); setMediaDesc("");}}>
+                  <View style={{alignItems: 'center'}}>
+                    <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 50, color: TEXT_COLOR}} />
+                    <Text style={{...styles.blackText, fontSize: 30, textAlign: 'center'}}>Cancel</Text>
+                  </View>
+                </Button>
+              </View>
               <Button transparent onPress={() => addMedia(file.type, file.uri, mediaDesc, file.base64)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
-                  <Text style={{color: "rgb(27,183,110)", fontSize: 30, textAlign: 'center'}}>Add</Text>
+                  <Icon name="ios-add-circle-outline" style={{fontSize: 50, color: GENERAL_COLOR}} />
+                  <Text style={{...styles.purpleText, fontSize: 30, textAlign: 'center'}}>Add</Text>
                 </View>
               </Button>
             </View>
           </Container>
         </Modal>
-      <Header rounded androidStatusBarColor='black' style={{backgroundColor: 'black'}}>
-        <Text style={{marginTop: 17, color: 'rgb(27,183,110)', fontSize: 20}}>Upload</Text>
+      <Header rounded androidStatusBarColor={GENERAL_COLOR} style={generalStyle.primaryHeader}>
+        <Text style={{marginTop: 17, color: BACKGROUND_LIGHT}}>Upload</Text>
       </Header>
       {step === "first" ?
-        <Container style={styles.myBlack}>
-          <Container style={{...styles.myBlackPadding, alignItems: "center", justifyContent: 'center'}}>
+        <Container style={generalStyle.primaryColor}>
+          <Container style={{...generalStyle.primaryColor, alignItems: "center", justifyContent: 'center'}}>
             <Button transparent onPress={() => setStep("create")}>
               <Grid>
                 <Col style={{alignItems: 'center'}}>
-                  <Icon name="albums" style={{fontSize: 50, color: "rgb(27,183,110)"}} />
-                  <Text style={{color: "rgb(27,183,110)", fontSize: 30}}>Create an album</Text>
+                  <Icon name="albums" style={{fontSize: 50, color: GENERAL_COLOR}} />
+                  <Text style={{color: GENERAL_COLOR, fontSize: 30}}>Post an album</Text>
                 </Col>
               </Grid>
             </Button>
@@ -330,47 +388,78 @@ export default function UploadPage() {
         </Container>
       : []}
       {step === "create" ?
-        <View style={styles.myBlack}>
-          <Text style={{color: "rgb(27,183,110)", fontSize: 30, alignSelf: 'center', paddingVertical: 50}}>Create an album</Text>
-          <View>
-            <Text style={{color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>First of all a name</Text>
-            <Input style={{color: "white", flex: 0, alignSelf: 'center'}} onChangeText={(text) => setAlbumName(text)} placeholder="Name of your album" />
+        <View style={generalStyle.primaryColor}>
+          <View style={{paddingVertical: 10}}>
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Title of your post</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} onChangeText={(text) => setPostName(text)} placeholder="Look at my wonderful cats" />
           </View>
-          <View style={{paddingVertical: 70}}>
-            <Text style={{color: "rgb(27,183,110)", fontSize: 20, alignSelf: 'center'}}>Then a description</Text>
-            <Input style={{color: "white", flex: 0, alignSelf: 'center'}} onChangeText={(text) => setAlbumDescription(text)} multiline placeholder="Description of your album" />
+          <View>
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Topic</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} onChangeText={(text) => setTopic(text)} placeholder="Memes" />
+          </View>
+          <View>
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Name of your album</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} onChangeText={(text) => setAlbumName(text)} placeholder="Cat playing League of Legends" />
+          </View>
+          <View style={{paddingVertical: 10}}>
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Then a description</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center'}} placeholderTextColor={"#cdcdcd"} onChangeText={(text) => setAlbumDescription(text)} multiline placeholder="Description of your album" />
+          </View>
+          <View>
+            <Text
+              style={{
+                ...styles.purpleText,
+                justifyContent: "center",
+                alignSelf: "center",
+                paddingBottom: 10,
+              }}
+            >
+              Is your post mature ?
+            </Text>
+            <Switch
+              style={{ alignSelf: "center" }}
+              trackColor={{ false: TEXT_COLOR, true: GENERAL_COLOR }}
+              thumbColor={mature ? GENERAL_COLOR : TEXT_COLOR}
+              ios_backgroundColor={GENERAL_COLOR}
+              onValueChange={() => setMature(!mature)}
+              value={mature}
+            />
+          </View>
+          <View style={{paddingVertical: 10}}>
+            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Enter tags separated with a comma</Text>
+            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center', maxHeight: 200}} placeholderTextColor={"#cdcdcd"} onChangeText={(text) => setTags(text)} multiline placeholder="cat,lol,games,memes,jojo" />
           </View>
           <View style={{paddingVertical: 80, display: 'flex', flexDirection: 'row', alignSelf: 'center'}}>
             <Button transparent onPress={() => {setStep("first")}}>
-              <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 80, color: "rgb(221,220,220)"}} />
+              <Icon name="ios-arrow-dropleft-circle" style={{fontSize: 80, color: TEXT_COLOR}} />
             </Button>
-            <Button transparent onPress={() => {setStep("createImages")}}>
-              <Icon name="ios-arrow-dropright-circle" style={{fontSize: 80, color: "rgb(27,183,110)"}} />
+            <Button transparent onPress={() => {checkPost()}}>
+              <Icon name="ios-arrow-dropright-circle" style={{fontSize: 80, color: GENERAL_COLOR}} />
             </Button>
           </View>
         </View>
       : []}
       {step === "createImages" ?
         <View>
-          <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Album preview</Text>
+          <Text style={{...styles.purpleText, fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Album preview</Text>
           <ScrollView style={{height: 300}}>
             {mediaPreview(media)}
           </ScrollView>
-          <Text style={{color: "rgb(27,183,110)", fontSize: 15, alignSelf: 'center', paddingVertical: 20}}>- {media === null ? '0' : media.length} media to publish -</Text>
+          <Text style={{...styles.purpleText, fontSize: 15, alignSelf: 'center', paddingVertical: 20}}>- {media === null ? '0' : media.length} media to publish -</Text>
           <View style={{paddingTop: 10, display: 'flex', flexDirection: 'row', alignSelf: 'center', alignItems: "center", justifyContent: 'center'}}>
             <View style={{marginRight: 15}}>
               <Button transparent onPress={() => openLinkModal()}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-link" style={{fontSize: 40, color: "rgb(27,183,110)"}} />
-                  <Text style={{color: "rgb(27,183,110)", fontSize: 20, textAlign: 'center'}}>Add with link</Text>
+                  <Icon name="ios-link" style={{fontSize: 40, color: GENERAL_COLOR}} />
+                  <Text style={{...styles.purpleText, textAlign: 'center'}}>Add with link</Text>
                 </View>
               </Button>
             </View>
             <View style={{marginLeft: 15}}>
               <Button transparent onPress={() => setFilesModal(true)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-folder" style={{fontSize: 40, color: "rgb(27,183,110)"}} />
-                  <Text style={{color: "rgb(27,183,110)", fontSize: 20, textAlign: 'center'}}>Add from files</Text>
+                  <Icon name="ios-folder" style={{fontSize: 40, color: GENERAL_COLOR}} />
+                  <Text style={{...styles.purpleText, fontSize: 20, textAlign: 'center'}}>Add from files</Text>
                 </View>
               </Button>
             </View>
@@ -379,24 +468,24 @@ export default function UploadPage() {
             <View style={{marginRight: 15}}>
               <Button transparent onPress={() => {setStep("create")}}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-return-left" style={{fontSize: 35, color: "rgb(221,220,220)"}} />
-                  <Text style={{color: "rgb(221,220,220)", fontSize: 15, textAlign: 'center'}}>Cancel</Text>
+                  <Icon name="ios-return-left" style={{fontSize: 35, color: TEXT_COLOR}} />
+                  <Text style={{...styles.blackText, fontSize: 15, textAlign: 'center'}}>Cancel</Text>
                 </View>
               </Button>
             </View>
             <View style={{marginLeft: 15, marginRight: 15}}>
               <Button transparent onPress={() => setMedia(null)}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-trash" style={{fontSize: 35, color: "rgb(236,38,19)"}} />
-                  <Text style={{color: "rgb(236,38,19)", fontSize: 15, textAlign: 'center'}}>Erase medias</Text>
+                  <Icon name="ios-trash" style={{fontSize: 35, color: GENERAL_COLOR}} />
+                  <Text style={{...styles.purpleText, fontSize: 15, textAlign: 'center'}}>Erase medias</Text>
                 </View>
               </Button>
             </View>
             <View style={{marginLeft: 15}}>
-              <Button transparent onPress={() => createAlbum()}>
+              <Button transparent onPress={() => checkMedia()}>
                 <View style={{alignItems: 'center'}}>
-                  <Icon name="ios-add-circle" style={{fontSize: 35, color: 'rgb(27,183,110)'}} />
-                  <Text style={{color: 'rgb(27,183,110)', fontSize: 15, textAlign: 'center'}}>Publish</Text>
+                  <Icon name="ios-add-circle" style={{fontSize: 35, color: GENERAL_COLOR}} />
+                  <Text style={{...styles.purpleText, fontSize: 15, textAlign: 'center'}}>Publish</Text>
                 </View>
               </Button>
             </View>
@@ -407,14 +496,14 @@ export default function UploadPage() {
         <View style={{alignItems: 'center'}}>
           {creatingStep === "album" ?
             <View style={{alignItems: "center", paddingVertical: 180}}>
-              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Creating your album</Text>
-              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>This might take some time</Text>
-              <Spinner color="green" style={{paddingVertical: 20}} />
+              <Text style={{color: GENERAL_COLOR, fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Creating your album</Text>
+              <Text style={{color: GENERAL_COLOR, fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>This might take some time</Text>
+              <Spinner color={GENERAL_COLOR} style={{paddingVertical: 20}} />
               <View style={{alignSelf: 'center', paddingVertical: 50}}>
                 <Button transparent onPress={() => {setStep("createImages")}}>
                   <View style={{alignItems: 'center'}}>
-                    <Icon name="ios-return-left" style={{fontSize: 35, color: "rgb(221,220,220)"}} />
-                    <Text style={{color: "rgb(221,220,220)", fontSize: 15, textAlign: 'center'}}>Cancel</Text>
+                    <Icon name="ios-return-left" style={{fontSize: 35, color: TEXT_COLOR}} />
+                    <Text style={{...styles.blackText, fontSize: 15, textAlign: 'center'}}>Cancel</Text>
                   </View>
                 </Button>
               </View>
@@ -422,16 +511,17 @@ export default function UploadPage() {
           : []}
           {creatingStep === "images" ?
             <View style={{alignItems: "center", paddingVertical: 180}}>
-              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Adding medias to album</Text>
-              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Media published {mediaIndex + " / " + media.length}</Text>
-              <Text style={{color: "rgb(27,183,110)", fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Medias not published : {mediaErrors}</Text>
-              <Spinner color="green" style={{paddingVertical: 20}} />
-              <Button transparent onPress={() => {setStep("first"); setMediaIndex(0); setMediaErrors(0)}}>
-                  <View style={{alignItems: 'center'}}>
-                    <Icon name="ios-return-left" style={{fontSize: 35, color: "rgb(221,220,220)"}} />
-                    <Text style={{color: "rgb(221,220,220)", fontSize: 15, textAlign: 'center'}}>Cancel</Text>
-                  </View>
+              <Text style={{color: GENERAL_COLOR, fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Posting your album</Text>
+              <Text style={{color: GENERAL_COLOR, fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Media published {mediaIndex + " / " + media.length}</Text>
+              <Text style={{color: GENERAL_COLOR, fontSize: 25, alignSelf: 'center', paddingVertical: 20}}>Medias not published : {mediaErrors}</Text>
+              <View style={{alignItems: "center", justifyContent: "center", paddingTop: 15}}>
+                <Button transparent onPress={() => {resetVariables()}}>
+                    <View style={{alignItems: 'center'}}>
+                      <Icon name="ios-return-left" style={{fontSize: 50, color: TEXT_COLOR}} />
+                      <Text style={{color: TEXT_COLOR, fontSize: 20, textAlign: 'center'}}>Go back</Text>
+                    </View>
                 </Button>
+              </View>
             </View>
           : []}
         </View>
@@ -441,48 +531,12 @@ export default function UploadPage() {
 }
 
 const styles = StyleSheet.create({
-  myTop: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    alignContent: "flex-start",
-    backgroundColor: "#566573",
-    width: "100%",
-    height: "45%",
+  purpleText: {
+    color: GENERAL_COLOR,
+    fontSize: 20,
   },
-  scrolLeft: {
-    textAlign: "center",
-    height: 20,
-    width: 175,
+  blackText: {
+    color: TEXT_COLOR,
+    fontSize: 20,
   },
-  myPickerGreen:{
-    color: 'rgb(27,183,110)',
-    width: undefined
-  },
-  myGreen:{
-    backgroundColor: 'rgb(27,183,110)'
-  },
-  myBlack: {
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)'
-  },
-  myBlackPadding: {
-    backgroundColor: 'rgb(18,18,18)',
-    color: 'rgb(27,183,110)',
-    paddingVertical: 150,
-  },
-  myBar: {
-    marginLeft: 80,
-    marginTop: 60,
-    width: 200,
-    height: 40,
-    borderColor: "black",
-    backgroundColor: "#808B96",
-    borderTopLeftRadius: 7,
-    borderTopRightRadius: 7,
-    borderBottomRightRadius: 7,
-    borderBottomLeftRadius: 7,
-    borderWidth: 1,
-    alignSelf: "center",
-  }
 });

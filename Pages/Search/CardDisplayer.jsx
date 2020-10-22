@@ -331,9 +331,7 @@ export default function CardDisplayer(props) {
  */
 export const renderPicture = ({ item }) => {
   const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count, description } = item;
-
-  //console.log(item.images);
-
+  
   return (
     <CardDisplayer
       title={title}
@@ -410,8 +408,3 @@ const styles = StyleSheet.create({
     color : "red"
   }
 });
-
-// title = titre
-// ups = upvotes
-// views = nb vues
-// downs = downvotes
