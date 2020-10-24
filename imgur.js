@@ -315,13 +315,7 @@ export async function imgurImageUpload(acessToken, media, mediaType, album, titl
     if (mediaType === "image") formdata.append("type", "base64");
     if (mediaType === "video") {
         formdata.append("type", "file");
-        const file = await FileSystem.readAsStringAsync(media, {
-            encoding: FileSystem.EncodingType.UTF8,
-        }).catch(
-            err => {console.log(err)}
-        ).then(
-            value => {formdata.append("video", `${value}`); console.log("---------->", value);}
-        );
+        formdata.append("video", media);
     }
     if (mediaType === "image" || mediaType === "url") formdata.append("image", `${media}`);
     if (album) formdata.append("album", `${album}`);
@@ -504,4 +498,36 @@ export async function imgurCommentVote(acessToken, id, vote = "up") {
     const data = await rep.json();
     console.log(JSON.stringify(rep), JSON.stringify(data));
     return (rep);
+}
+
+/* POST Comment Creation */
+/**
+ * Vote for a comment
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} image_id - The ID of the image or album in the gallery that you wish to comment on
+ * @param {string} comment - The comment text, this is what will be displayed
+ * @param {string} parent_id - The ID of the parent comment, this is an alternative method to create a reply.
+ */
+export async function imgurCommentCreate(acessToken, image_id, comment, parent_id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (image_id) formdata.append("image_id", `${image_id}`);
+    if (comment) formdata.append("comment", `${comment}`);
+    if (parent_id) formdata.append("parent_id", `${parent_id}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+    }
+
+    console.log("POST Comment Creation");
+    const rep = await fetch(`https://api.imgur.com/3/comment`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return ({rep, data});
 }

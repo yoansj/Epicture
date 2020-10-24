@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView} from 'react-native';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Spinner, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
+import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView, RefreshControl} from 'react-native';
+import { Container, Header, Spinner, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, View, Toast } from 'native-base';
 import { Video } from 'expo-av';
 
-import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom, imgurCommentVote } from '../../imgur';
+import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom, imgurCommentVote, imgurCommentCreate } from '../../imgur';
 import { getUserData } from '../Authentification/AuthPage';
 import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, TEXT_COLOR, BACKGROUND_COLOR } from "../../Colors";
 
@@ -28,25 +28,42 @@ export default function CardDisplayer(props) {
   const [showModal, setShowModal] = useState(false);
   // data form the post
   const [postData, setPostData] = useState(null);
-
-  const [isLoading, setIsLoading] = useState(false);
+  // to know if data is loading
+  const [refreshing, setRefreshing] = useState(false);
+  // new comment being written
+  const [comment, setComment] = useState("");
   // comment from the post
-  const[postCom, setPostCom] = useState(null);
+  const [postCom, setPostCom] = useState(null);
+  // is posting comment
+  const [posting, setPosting] = useState(false);
+  // comment post worked
+  const [commentWorked, setCommentWorked] = useState(null);
 
-  function getPostData(id) {
-    getUserData().then((value) => {
-      imgurAlbum(value.acess_token, id).then((value) =>
-        {setPostData(value.data);}
+  const [commentModal, setCommentModal] = useState(false);
+
+  function getPost(id) {
+    getUserData().then((user) => {
+      imgurAlbum(user.acess_token, id).then((value) =>
+        {
+          setPostData(value.data);
+          imgurGetCom(user.acess_token, id).then((com) =>
+            {setPostCom(com.data); setRefreshing(false)}
+          );
+        }
       );
     });
   }
 
-  function getPostCom(id) {
-    getUserData().then((value) => {
-      imgurGetCom(value.acess_token, id).then((value) =>
-        {setPostCom(value.data);}
-      );
-    });
+  function refreshModal() {
+    setRefreshing(true);
+    getPost(props.id);
+  }
+
+  function openModal() {
+    setPlaying(false);
+    setShowModal(true);
+    setRefreshing(true);
+    getPost(props.id)
   }
 
   function doVote(user_vote) {
@@ -69,8 +86,22 @@ export default function CardDisplayer(props) {
     );
   }
 
+  function postComment() {
+    setPosting(true);
+    getUserData().then((value) =>
+      imgurCommentCreate(value.acess_token, props.id, comment, null).then((value) => {
+        setPosting(false);
+        if (value.data.success) {
+          setCommentWorked(true);
+        } else {
+          setCommentWorked(false);
+        }
+      })
+    );
+  }
+
   function ImagesDisplayer() {
-    if (postData && postData.images && isLoading === false) {
+    if (postData && postData.images && !refreshing) {
       return (
         postData.images.map((img, index) => {
 
@@ -110,17 +141,18 @@ export default function CardDisplayer(props) {
     } else {
       return (
         <View>
-          <Spinner color={GENERAL_COLOR} />
         </View>
       )
     }
   }
 
   /**
-   * Display comment
+   * This component is used to display the comments of a post
+   * It is rendered inside a modal and inside a ScrollView
    */
   function CommentDisplayer() {
-    if (postCom) {
+
+    if (postCom && !refreshing) {
       return (
         <View style={{paddingTop: 30}}>
           <View style={{...generalStyle.contentMiddle, backgroundColor: BACKGROUND_LIGHT, flexDirection: "row"}}>
@@ -129,6 +161,11 @@ export default function CardDisplayer(props) {
               Comment section
             </Text>
             <Icon fontSize={20} name="chatbubbles" style={{...generalStyle.primaryColor, marginLeft: 25}} />
+          </View>
+          <View style={{margin: 10}}>
+            <Button onPress={() => setCommentModal(true)} style={{alignSelf: "center", backgroundColor: GENERAL_COLOR}} rounded color={GENERAL_COLOR}>
+              <Text>Add comment</Text>
+            </Button>
           </View>
           {postCom.map((comment, index) => {
 
@@ -192,7 +229,6 @@ export default function CardDisplayer(props) {
     } else {
       return (
         <View>
-          <Spinner color={GENERAL_COLOR} />
         </View>
       );
     }
@@ -224,13 +260,64 @@ export default function CardDisplayer(props) {
               {props.title}
             </Text>
           </Header>
-          <ScrollView>
+          <ScrollView refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={() => refreshModal()} />
+          }>
             {props.description ? <Text style={{ marginTop: 17, color: GENERAL_COLOR }}>
               {props.description}
             </Text> : []}
             <ImagesDisplayer />
-            <CommentDisplayer/>
+            <CommentDisplayer />
           </ScrollView>
+          <Modal
+            animationType="slide"
+            transparent
+            visible={commentModal}
+            onRequestClose={() => setCommentModal(false)}>
+            <Header
+              rounded
+              androidStatusBarColor={BACKGROUND_COLOR}
+              style={{ backgroundColor: GENERAL_COLOR }}
+            >
+              <Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>
+                Add comment
+              </Text>
+            </Header>
+              <Container style={{ backgroundColor: BACKGROUND_LIGHT, paddingTop: 20 }}>
+                <Input
+                  multiline
+                  placeholder="Add your comment about cats"
+                  placeholderTextColor={"#cdcdcd"}
+                  onChangeText={(text) => setComment(text)}
+                  style={{margin: 10, borderColor: GENERAL_COLOR, borderWidth: 1, borderRadius: 10, maxHeight: 500}}
+                  />
+                <Button onPress={() => postComment()} style={{alignSelf: "center", backgroundColor: GENERAL_COLOR, margin: 20}} rounded>
+                  {posting === false && commentWorked === null ?
+                  <Text>Post comment</Text>
+                  : posting === true ?
+                  <Spinner style={{width: 100}} color={TEXT_COLOR} />
+                  : []
+                  }
+                  {commentWorked === true ?
+                    <Icon style={{ color: "#2ECC71", fontSize: 40}}
+                      icon
+                      active
+                      name="checkmark-circle"
+                    />
+                    : commentWorked === false ?
+                    <Icon style={{ color: TEXT_COLOR, fontSize: 40}}
+                    icon
+                    active
+                    name="alert"
+                    />
+                    : []
+                  }
+                </Button>
+                <Button onPress={() => {setCommentModal(false); setCommentWorked(null); setPosting(false)}} style={{alignSelf: "center", backgroundColor: TEXT_COLOR,}} rounded>
+                  <Text>Cancel</Text>
+                </Button>
+              </Container>
+            </Modal>
         </Container>
       </Modal>
       <CardItem listItemPadding={0} style={generalStyle.primaryColor}>
@@ -276,11 +363,7 @@ export default function CardDisplayer(props) {
           </Button>
         ) : (
           <Button
-            onPress={() => {
-              setShowModal(true);
-              getPostData(props.id);
-              getPostCom(props.id);
-            }}
+            onPress={() => {openModal()}}
             transparent
             style={{ width: 355, height: 280 }}
           >
@@ -337,12 +420,7 @@ export default function CardDisplayer(props) {
         <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
           <Button
             transparent
-            onPress={() => {
-              setPlaying(false);
-              setShowModal(true);
-              getPostData(props.id);
-              getPostCom(props.id);
-            }}
+            onPress={() => {openModal()}}
           >
             <Icon name="chatbubbles" style={{ color: purleFont }} />
             <Text style={{ color: greyFont }}>{props.comment_count}</Text>
