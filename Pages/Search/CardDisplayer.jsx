@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView, RefreshControl} from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView, RefreshControl, Pressable} from 'react-native';
 import { Container, Header, Spinner, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, View, Toast } from 'native-base';
 import { Video } from 'expo-av';
 
@@ -234,6 +234,67 @@ export default function CardDisplayer(props) {
     }
   }
 
+  function frontCardDisplay() {
+    if (props.images && props.images[0].type === "video/mp4" && !props.nsfw) {
+      return (
+          <Button
+            onPress={() => setPlaying(!playing)}
+            transparent
+            style={{ width: 355, height: 280 }}
+          >
+            <Container style={{ width: 355, height: undefined }}>
+              <Video
+                source={{ uri: props.images[0].link }}
+                rate={1.0}
+                volume={playing ? 1.0 : 0.0}
+                isLooping
+                shouldPlay={playing}
+                style={{ width: 355, height: 280 }}
+                resizeMode="contain"
+              />
+            </Container>
+          </Button>
+      )
+    } else if (props.images && props.images[0].type === "video/mp4" && props.nsfw) {
+      return (
+        <Pressable onPress={() => openModal()}>
+          <View style={{ width: 355, height: 280, backgroundColor: "#dfdfdf" , alignItems: "center", justifyContent: 'center'}}>
+            <Text
+              style={{
+                color: GENERAL_COLOR,
+                justifyContent: "center",
+                alignSelf: "center",
+                textAlign: "center",
+                fontSize: 30
+              }}
+            >
+              This video is mature touch to see it
+            </Text>
+          </View>
+        </Pressable>
+      );
+    } else {
+      return (
+        <Button
+        onPress={() => {openModal()}}
+        transparent
+        style={{ width: 355, height: 280 }}
+      >
+        <Container style={{ width: 200, height: undefined, flex: 1 }}>
+          <Image
+            source={{
+              uri: props.image,
+            }}
+            style={{ height: 200, flex: 1}}
+            resizeMode="contain"
+            blurRadius={(props.nsfw ? 5 : 0)}
+          />
+        </Container>
+      </Button>
+      )
+    }
+  }
+
   return (
     <Card style={props.style}>
       <Modal
@@ -339,45 +400,16 @@ export default function CardDisplayer(props) {
             ) : (
               []
             )}
+            {
+              props.nsfw ?
+                <Icon active name="alert" style={{ color: purleFont }} />
+              : []
+            }
           </Content>
         </Right>
       </CardItem>
       <CardItem cardBody>
-        {props.images && props.images[0].type === "video/mp4" ? (
-          <Button
-            onPress={() => setPlaying(!playing)}
-            transparent
-            style={{ width: 355, height: 280 }}
-          >
-            <Container style={{ width: 355, height: undefined }}>
-              <Video
-                source={{ uri: props.images[0].link }}
-                rate={1.0}
-                volume={playing ? 1.0 : 0.0}
-                isLooping
-                shouldPlay={playing}
-                style={{ width: 355, height: 280 }}
-                resizeMode="contain"
-              />
-            </Container>
-          </Button>
-        ) : (
-          <Button
-            onPress={() => {openModal()}}
-            transparent
-            style={{ width: 355, height: 280 }}
-          >
-            <Container style={{ width: 200, height: undefined, flex: 1 }}>
-              <Image
-                source={{
-                  uri: props.image,
-                }}
-                style={{ height: 200, flex: 1 }}
-                resizeMode="contain"
-              />
-            </Container>
-          </Button>
-        )}
+        {frontCardDisplay()}
       </CardItem>
       <CardItem style={generalStyle.primaryColor}>
         <Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
@@ -441,7 +473,7 @@ export default function CardDisplayer(props) {
  * @param {*} item
  */
 export const renderPicture = ({ item }) => {
-  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count, description } = item;
+  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count, description, nsfw } = item;
   
   return (
     <CardDisplayer
@@ -459,6 +491,7 @@ export const renderPicture = ({ item }) => {
       images_count={images_count}
       description={description}
       key={id}
+      nsfw={nsfw}
     />
   );
 }
@@ -472,16 +505,16 @@ export function RenderCards(props) {
       </Container>
     )
   } else {
-  return (
-    <SafeAreaView>
-      <FlatList
-        refreshing={(props.refreshing ? props.refreshing : false)}
-        onRefresh={() => {props.onRefresh()}}
-        data={props.data}
-        renderItem={renderPicture}
-      />
-    </SafeAreaView>
-  );
+    return (
+      <SafeAreaView>
+        <FlatList
+          refreshing={(props.refreshing ? props.refreshing : false)}
+          onRefresh={() => {props.onRefresh()}}
+          data={props.data}
+          renderItem={renderPicture}
+        />
+      </SafeAreaView>
+    );
   }
 }
 
