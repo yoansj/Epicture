@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Pages/Search/CardDisplayer.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Pages/Search/CardDisplayer.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from 'react';
+import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView, RefreshControl, Pressable} from 'react-native';
+import { Container, Header, Spinner, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
+import { Video } from 'expo-av';
+
+import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom, imgurCommentVote, imgurCommentCreate } from '../../imgur';
+import { getUserData } from '../Authentification/AuthPage';
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, TEXT_COLOR, BACKGROUND_COLOR } from "../../Colors";
+
+const purleFont = "#7E78d2";
+const greyFont = "#0C0C0C";
+
+/**
+ * CardDisplayer component to display Images, Profiles and Galleries
+ * @param {} props
+ * @example
+ * return (&lt;CardDisplayer title={title} author={account_url} ups={ups} views={views} image={images ? images[0].link : link} id={id} key={id} />); 
+ */
+export default function CardDisplayer(props) {
+
+  // vote (upvote or downvote)
+  const [vote, setVote] = useState(props.vote);
+  // favorite (know if user has favorited post)
+  const [favorite, setFavorite] = useState(props.favorite);
+  // is video playing
+  const [playing, setPlaying] = useState(false);
+   // is modal shown
+  const [showModal, setShowModal] = useState(false);
+  // data form the post
+  const [postData, setPostData] = useState(null);
+  // to know if data is loading
+  const [refreshing, setRefreshing] = useState(false);
+  // new comment being written
+  const [comment, setComment] = useState("");
+  // comment from the post
+  const [postCom, setPostCom] = useState(null);
+  // is posting comment
+  const [posting, setPosting] = useState(false);
+  // comment post worked
+  const [commentWorked, setCommentWorked] = useState(null);
+
+  const [commentModal, setCommentModal] = useState(false);
+
+  function getPost(id) {
+    getUserData().then((user) => {
+      imgurAlbum(user.acess_token, id).then((value) =>
+        {
+          setPostData(value.data);
+          imgurGetCom(user.acess_token, id).then((com) =>
+            {setPostCom(com.data); setRefreshing(false)}
+          );
+        }
+      );
+    });
+  }
+
+  function refreshModal() {
+    setRefreshing(true);
+    getPost(props.id);
+  }
+
+  function openModal() {
+    setPlaying(false);
+    setShowModal(true);
+    setRefreshing(true);
+    getPost(props.id)
+  }
+
+  function doVote(user_vote) {
+    getUserData().then((value) => {
+      console.log("DEBUG:", props.id, user_vote, vote);
+      if (vote === user_vote) {
+        imgurAlbumVote(value.acess_token, props.id, "veto").then(value => {console.log("Veto worked !"); setVote(null)})
+      } else {
+        imgurAlbumVote(value.acess_token, props.id, user_vote).then(value => {console.log(`Vote ${user_vote} worked !`); setVote(user_vote)})
+      }
+    });
+  }
+
+  function doFavorite() {
+    getUserData().then((value) =>
+      imgurAlbumFavorite(value.acess_token, props.id).then((value) => {
+        setFavorite(!favorite);
+        console.log("Favorite worked !");
+      })
+    );
+  }
+
+  function postComment() {
+    setPosting(true);
+    getUserData().then((value) =>
+      imgurCommentCreate(value.acess_token, props.id, comment, null).then((value) => {
+        setPosting(false);
+        if (value.data.success) {
+          setCommentWorked(true);
+        } else {
+          setCommentWorked(false);
+        }
+      })
+    );
+  }
+
+  function ImagesDisplayer() {
+    if (postData &amp;&amp; postData.images &amp;&amp; !refreshing) {
+      return (
+        postData.images.map((img, index) => {
+
+          const [videoPlaying, setVideoPlaying] = useState(false);
+
+          return (
+          &lt;View key={index}>
+            {img.type === "video/mp4" ?
+            &lt;Button
+            onPress={() => setVideoPlaying(!videoPlaying)}
+            transparent
+            style={{ width: 355, height: 280 }}
+            >
+              &lt;Container style={{ width: 355, height: undefined }}>
+                &lt;Video
+                  source={{ uri: img.link }}
+                  rate={1.0}
+                  volume={videoPlaying ? 1.0 : 0.0}
+                  isLooping
+                  shouldPlay={videoPlaying}
+                  style={{ width: 355, height: 280 }}
+                  resizeMode="contain"
+                />
+              &lt;/Container>
+            &lt;/Button>
+            :
+            &lt;Image
+              source={{ uri: img.link }}
+              style={{ height: 400, flex: 1, marginTop: 40}}
+              resizeMode="contain"
+            />
+            }
+            &lt;Text style={{textAlign: "center", color: GENERAL_COLOR}}>{img.title ? img.title + "\n" : ""}{img.description}&lt;/Text>
+          &lt;/View>)
+        })
+      )
+    } else {
+      return (
+        &lt;View>
+        &lt;/View>
+      )
+    }
+  }
+
+  /**
+   * This component is used to display the comments of a post
+   * It is rendered inside a modal and inside a ScrollView
+   */
+  function CommentDisplayer() {
+
+    if (postCom &amp;&amp; !refreshing) {
+      return (
+        &lt;View style={{paddingTop: 30}}>
+          &lt;View style={{...generalStyle.contentMiddle, backgroundColor: BACKGROUND_LIGHT, flexDirection: "row"}}>
+            &lt;Icon fontSize={20} name="chatbubbles" style={{...generalStyle.primaryColor, marginRight: 25}} />
+            &lt;Text style={{...generalStyle.primaryColor, fontSize: 25}}>
+              Comment section
+            &lt;/Text>
+            &lt;Icon fontSize={20} name="chatbubbles" style={{...generalStyle.primaryColor, marginLeft: 25}} />
+          &lt;/View>
+          &lt;View style={{margin: 10}}>
+            &lt;Button onPress={() => setCommentModal(true)} style={{alignSelf: "center", backgroundColor: GENERAL_COLOR}} rounded color={GENERAL_COLOR}>
+              &lt;Text>Add comment&lt;/Text>
+            &lt;/Button>
+          &lt;/View>
+          {postCom.map((comment, index) => {
+
+            const [commentVote, setCommentVote] = useState(comment.vote);
+
+            function doVoteComment(user_vote) {
+              getUserData().then((value) => {
+                console.log("DEBUG:", props.id, user_vote, vote);
+                if (vote === user_vote) {
+                  imgurCommentVote(value.acess_token, comment.id, "veto").then(value => {console.log("Veto worked !"); setCommentVote(null)})
+                } else {
+                  imgurCommentVote(value.acess_token, comment.id, user_vote).then(value => {console.log(`Vote ${user_vote} worked !`); setCommentVote(user_vote)})
+                }
+              });
+            }
+
+            return (
+              &lt;Card key={index}>
+                &lt;CardItem>
+                  &lt;Text style={styles.myAuth}>{comment.author} :&lt;/Text>
+                &lt;/CardItem>
+                &lt;CardItem cardBody>
+                  &lt;Text style={{...styles.myCom, marginLeft: 15}}>{comment.comment}&lt;/Text>
+                &lt;/CardItem>
+                &lt;CardItem>
+                  &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+                    &lt;Button transparent onPress={() => doVoteComment("up")}>
+                      &lt;Icon
+                        active
+                        name="thumbs-up"
+                        style={{ color: commentVote === "up" ? "#2ECC71" : purleFont, fontSize: 25}}
+                      />
+                      &lt;Text
+                        style={{ color: commentVote === "up" ? "#2ECC71" : greyFont }}
+                      >
+                        {comment.ups}
+                      &lt;/Text>
+                    &lt;/Button>
+                  &lt;/Left>
+                  &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+                    &lt;Button transparent onPress={() => doVoteComment("down")}>
+                      &lt;Icon
+                        style={{ color: commentVote=== "down" ? "#2ECC71" : purleFont, fontSize: 25 }}
+                        icon
+                        active
+                        name="thumbs-down"
+                      />
+                      &lt;Text
+                        style={{ color: commentVote === "down" ? "#2ECC71" : greyFont }}
+                      >
+                        {comment.downs}
+                      &lt;/Text>
+                    &lt;/Button>
+                  &lt;/Left>
+                &lt;/CardItem>
+              &lt;/Card>
+            );
+          })}
+        &lt;/View>
+      );
+    } else {
+      return (
+        &lt;View>
+        &lt;/View>
+      );
+    }
+  }
+
+  function frontCardDisplay() {
+    if (props.images &amp;&amp; props.images[0].type === "video/mp4" &amp;&amp; !props.nsfw) {
+      return (
+          &lt;Button
+            onPress={() => setPlaying(!playing)}
+            transparent
+            style={{ width: 355, height: 280 }}
+          >
+            &lt;Container style={{ width: 355, height: undefined }}>
+              &lt;Video
+                source={{ uri: props.images[0].link }}
+                rate={1.0}
+                volume={playing ? 1.0 : 0.0}
+                isLooping
+                shouldPlay={playing}
+                style={{ width: 355, height: 280 }}
+                resizeMode="contain"
+              />
+            &lt;/Container>
+          &lt;/Button>
+      )
+    } else if (props.images &amp;&amp; props.images[0].type === "video/mp4" &amp;&amp; props.nsfw) {
+      return (
+        &lt;Pressable onPress={() => openModal()}>
+          &lt;View style={{ width: 355, height: 280, backgroundColor: "#dfdfdf" , alignItems: "center", justifyContent: 'center'}}>
+            &lt;Text
+              style={{
+                color: GENERAL_COLOR,
+                justifyContent: "center",
+                alignSelf: "center",
+                textAlign: "center",
+                fontSize: 30
+              }}
+            >
+              This video is mature touch to see it
+            &lt;/Text>
+          &lt;/View>
+        &lt;/Pressable>
+      );
+    } else {
+      return (
+        &lt;Button
+        onPress={() => {openModal()}}
+        transparent
+        style={{ width: 355, height: 280 }}
+      >
+        &lt;Container style={{ width: 200, height: undefined, flex: 1 }}>
+          &lt;Image
+            source={{
+              uri: props.image,
+            }}
+            style={{ height: 200, flex: 1}}
+            resizeMode="contain"
+            blurRadius={(props.nsfw ? 5 : 0)}
+          />
+        &lt;/Container>
+      &lt;/Button>
+      )
+    }
+  }
+
+  return (
+    &lt;Card style={props.style}>
+      &lt;Modal
+        animationType="slide"
+        transparent
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        &lt;Container style={{ backgroundColor: BACKGROUND_LIGHT }}>
+          &lt;Header
+            rounded
+            androidStatusBarColor={BACKGROUND_COLOR}
+            style={{ backgroundColor: GENERAL_COLOR }}
+          >
+            &lt;Button transparent onPress={() => setShowModal(false)}>
+              &lt;Text style={{ textAlign: "center" }}>
+                &lt;Icon
+                  style={{ color: BACKGROUND_COLOR }}
+                  name="arrow-dropleft-circle"
+                />
+              &lt;/Text>
+            &lt;/Button>
+            &lt;Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>
+              {props.title}
+            &lt;/Text>
+          &lt;/Header>
+          &lt;ScrollView refreshControl={
+            &lt;RefreshControl refreshing={refreshing} colors={['#7E78d2']} onRefresh={() => refreshModal()} />
+          }>
+            {props.description ? &lt;Text style={{ marginTop: 17, color: GENERAL_COLOR }}>
+              {props.description}
+            &lt;/Text> : []}
+            &lt;ImagesDisplayer />
+            &lt;CommentDisplayer />
+          &lt;/ScrollView>
+          &lt;Modal
+            animationType="slide"
+            transparent
+            visible={commentModal}
+            onRequestClose={() => setCommentModal(false)}>
+            &lt;Header
+              rounded
+              androidStatusBarColor={BACKGROUND_COLOR}
+              style={{ backgroundColor: GENERAL_COLOR }}
+            >
+              &lt;Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>
+                Add comment
+              &lt;/Text>
+            &lt;/Header>
+              &lt;Container style={{ backgroundColor: BACKGROUND_LIGHT, paddingTop: 20 }}>
+                &lt;Input
+                  multiline
+                  placeholder="Add your comment about cats"
+                  placeholderTextColor={"#cdcdcd"}
+                  onChangeText={(text) => setComment(text)}
+                  style={{margin: 10, borderColor: GENERAL_COLOR, borderWidth: 1, borderRadius: 10, maxHeight: 500}}
+                  />
+                &lt;Button onPress={() => postComment()} style={{alignSelf: "center", backgroundColor: GENERAL_COLOR, margin: 20}} rounded>
+                  {posting === false &amp;&amp; commentWorked === null ?
+                  &lt;Text>Post comment&lt;/Text>
+                  : posting === true ?
+                  &lt;Spinner style={{width: 100}} color={TEXT_COLOR} />
+                  : []
+                  }
+                  {commentWorked === true ?
+                    &lt;Icon style={{ color: "#2ECC71", fontSize: 40}}
+                      icon
+                      active
+                      name="checkmark-circle"
+                    />
+                    : commentWorked === false ?
+                    &lt;Icon style={{ color: TEXT_COLOR, fontSize: 40}}
+                    icon
+                    active
+                    name="alert"
+                    />
+                    : []
+                  }
+                &lt;/Button>
+                &lt;Button onPress={() => {setCommentModal(false); setCommentWorked(null); setPosting(false)}} style={{alignSelf: "center", backgroundColor: TEXT_COLOR,}} rounded>
+                  &lt;Text>Cancel&lt;/Text>
+                &lt;/Button>
+              &lt;/Container>
+            &lt;/Modal>
+        &lt;/Container>
+      &lt;/Modal>
+      &lt;CardItem listItemPadding={0} style={generalStyle.primaryColor}>
+        &lt;Left>
+          &lt;Body>
+            &lt;Text style={{ color: purleFont }}>{props.title}&lt;/Text>
+            &lt;Text note style={{color: TEXT_COLOR}}>{props.author}&lt;/Text>
+          &lt;/Body>
+        &lt;/Left>
+        &lt;Right>
+          &lt;Content>
+            {props.images_count > 1 ? (
+              &lt;Icon active name="albums" style={{ color: purleFont }} />
+            ) : (
+              []
+            )}
+            {props.images &amp;&amp; props.images[0].type === "video/mp4" ? (
+              &lt;Icon active name="videocam" style={{ color: purleFont }} />
+            ) : (
+              []
+            )}
+            {
+              props.nsfw ?
+                &lt;Icon active name="alert" style={{ color: purleFont }} />
+              : []
+            }
+          &lt;/Content>
+        &lt;/Right>
+      &lt;/CardItem>
+      &lt;CardItem cardBody>
+        {frontCardDisplay()}
+      &lt;/CardItem>
+      &lt;CardItem style={generalStyle.primaryColor}>
+        &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+          &lt;Button onPress={() => doVote("up")} transparent>
+            &lt;Icon
+              active
+              name="thumbs-up"
+              style={{ color: vote === "up" ? "#2ECC71" : purleFont }}
+            />
+            &lt;Text style={{ color: vote === "up" ? "#2ECC71" : greyFont }}>
+              {props.ups}
+            &lt;/Text>
+          &lt;/Button>
+        &lt;/Left>
+        &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+          &lt;Button onPress={() => doVote("down")} transparent>
+            &lt;Icon
+              style={{ color: vote === "down" ? "#2ECC71" : purleFont }}
+              icon
+              active
+              name="thumbs-down"
+            />
+            &lt;Text style={{ color: vote === "down" ? "#2ECC71" : greyFont }}>
+              {props.downs}
+            &lt;/Text>
+          &lt;/Button>
+        &lt;/Left>
+        &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+        &lt;Content>
+          &lt;Button transparent onPress={() => doFavorite()}>
+            &lt;Icon
+              style={{ fontSize: 25, color: purleFont }}
+              icon
+              active
+              name={favorite === false ? "md-heart-empty" : "md-heart"}
+            />
+          &lt;/Button>
+        &lt;/Content>
+        &lt;/Left>
+        &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+          &lt;Button
+            transparent
+            onPress={() => {openModal()}}
+          >
+            &lt;Icon name="chatbubbles" style={{ color: purleFont }} />
+            &lt;Text style={{ color: greyFont }}>{props.comment_count}&lt;/Text>
+          &lt;/Button>
+        &lt;/Left>
+        &lt;Left style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+          &lt;Icon active name="eye" style={{ color: purleFont }} />
+          &lt;Text style={{ color: greyFont, fontSize: 15 }}>{props.views}&lt;/Text>
+        &lt;/Left>
+      &lt;/CardItem>
+    &lt;/Card>
+  );
+}
+
+/**
+ * This function is used by the renderCards FlatList component
+ * 
+ * @param {*} item
+ */
+export const renderPicture = ({ item }) => {
+  const { title, account_url, ups, views, downs, link, images, id, comment_count, vote, favorite, images_count, description, nsfw } = item;
+  
+  return (
+    &lt;CardDisplayer
+      title={title}
+      author={account_url}
+      ups={ups}
+      views={views}
+      downs={downs}
+      comment_count={comment_count}
+      image={images ? images[0].link : link}
+      images={item.images}
+      id={id}
+      vote={vote}
+      favorite={favorite}
+      images_count={images_count}
+      description={description}
+      key={id}
+      nsfw={nsfw}
+    />
+  );
+}
+
+export function RenderCards(props) {
+  if (props.data === null || props.data.length === 0) {
+    return (
+      &lt;Container style={styles.myMiddle}>
+        &lt;Icon style={generalStyle.primaryColor} name="flask" />
+        &lt;Text style={generalStyle.primaryColor}>What are you looking for ?&lt;/Text>
+      &lt;/Container>
+    )
+  } else {
+    return (
+      &lt;SafeAreaView>
+        &lt;FlatList
+          data={props.data}
+          renderItem={renderPicture}
+          refreshControl={
+            &lt;RefreshControl refreshing={(props.refreshing ? props.refreshing : false)}
+            colors={['#7E78d2']}   onRefresh={() => {props.onRefresh()}}/>
+          }
+        />
+      &lt;/SafeAreaView>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  myMiddle: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F9F9F1",
+  },
+  myBlackText: {
+    flex: 1,
+    textAlign: "center",
+    backgroundColor: 'rgb(18,18,18)',
+    color: GENERAL_COLOR
+  },
+  myAuth: {
+    flex: 1,
+    color: '#7E78d2'
+  },
+  myCom: {
+    flex: 1,
+    color: '#0C0C0C'
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+    color : "red"
+  }
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

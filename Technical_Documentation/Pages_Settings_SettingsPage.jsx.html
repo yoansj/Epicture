@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Pages/Settings/SettingsPage.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Pages/Settings/SettingsPage.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useCallback } from 'react';
+import { View, Text, Pressable, Button, Switch } from "react-native";
+import { Container, Header, Spinner, Input, Toast } from "native-base";
+import { getUserData } from '../Authentification/AuthPage';
+import { imgurAccountChangeSettings, imgurAccountSettings, imgurProfileBase } from '../../imgur';
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, BACKGROUND_COLOR } from "../../Colors";
+import { useFocusEffect } from '@react-navigation/native';
+
+function SettingsDisplayer(props) {
+  const [newBio, setNewBio] = useState(props.bio);
+  const [publicImages, setPublicImages] = useState(props.publicImages);
+  const [messaging, setMessaging] = useState(props.messaging_enabled);
+  const [albumPrivacy, setAlbumPrivacy] = useState(props.album_privacy);
+  const [username, setUsername] = useState(props.username);
+  const [mature, setMature] = useState(props.show_mature);
+  const [newsletter, setNewsletter] = useState(props.newsletter);
+
+  function confirmChanges() {
+    let alphanum = /^[a-z0-9]+$/i;
+
+    if (alphanum.exec(username) != null &amp;&amp; username.length >= 4 &amp;&amp; username.length &lt;= 63) {
+      getUserData().then((value) => {
+        imgurAccountChangeSettings(
+          value.acess_token,
+          newBio,
+          publicImages,
+          messaging,
+          albumPrivacy,
+          username,
+          mature,
+          newsletter
+        ).then((rep) => {
+          if (rep.data) {
+            Toast.show({
+              text: "Settings changed succesfully",
+              buttonText: "Cool",
+              type: "success",
+              duration: 5000,
+            })
+          } else {
+            Toast.show({
+              text: "Couldn't change your settings",
+              buttonText: "Okay",
+              type: 'danger',
+              duration: 5000,
+            })
+          }
+        });
+      });
+    } else {
+      Toast.show({
+        text: "Invalid username",
+        buttonText: "Okay",
+        type: 'danger',
+        duration: 5000,
+      })
+    }
+  }
+
+  return (
+    &lt;Container style={generalStyle.primaryColor}>
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          justifyContent: "center",
+          alignSelf: "center",
+          paddingBottom: 10,
+        }}
+      >
+        Change your bio
+      &lt;/Text>
+      &lt;Input
+        style={{
+          color: GENERAL_COLOR,
+          flex: 0,
+          alignSelf: "center",
+          textAlign: "center",
+          maxHeight: 100,
+          borderRightWidth: 1,
+          borderLeftWidth: 1,
+          borderColor: GENERAL_COLOR,
+        }}
+        defaultValue={newBio}
+        onChangeText={(text) => setNewBio(text)}
+        multiline
+        placeholder="What can you say about you ?"
+      />
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          justifyContent: "center",
+          alignSelf: "center",
+          paddingBottom: 10,
+        }}
+      >
+        Your images are {publicImages ? "public" : "private"} by default
+      &lt;/Text>
+      &lt;Switch
+        style={{ alignSelf: "center" }}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={publicImages ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={() => setPublicImages(!publicImages)}
+        value={publicImages}
+      />
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          justifyContent: "center",
+          alignSelf: "center",
+          paddingBottom: 10,
+        }}
+      >
+        Allow private messages ?
+      &lt;/Text>
+      &lt;Switch
+        style={{ alignSelf: "center" }}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={messaging ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={() => setMessaging(!messaging)}
+        value={messaging}
+      />
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          marginBottom: 8,
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        Default privacy level of the albums created
+      &lt;/Text>
+      &lt;View style={{ flexDirection: "row", justifyContent: "center" }}>
+        &lt;Pressable
+          style={{ paddingRight: 20 }}
+          onPress={() => setAlbumPrivacy("hidden")}
+        >
+          &lt;Text
+            style={{
+              color:
+                albumPrivacy === "hidden"
+                  ? generalStyle.primarySetting.backgroundColor
+                  : "#0C0C0C",
+              fontSize: 20,
+            }}
+          >
+            Hidden
+          &lt;/Text>
+        &lt;/Pressable>
+        &lt;Pressable
+          style={{ paddingRight: 20, paddingLeft: 20 }}
+          onPress={() => setAlbumPrivacy("public")}
+        >
+          &lt;Text
+            style={{
+              color:
+                albumPrivacy === "public"
+                  ? generalStyle.primarySetting.backgroundColor
+                  : "#0C0C0C",
+              fontSize: 20,
+            }}
+          >
+            Public
+          &lt;/Text>
+        &lt;/Pressable>
+        &lt;Pressable
+          style={{ paddingLeft: 20 }}
+          onPress={() => setAlbumPrivacy("secret")}
+        >
+          &lt;Text
+            style={{
+              color:
+                albumPrivacy === "secret"
+                  ? generalStyle.primarySetting.backgroundColor
+                  : "#0C0C0C",
+              fontSize: 20,
+            }}
+          >
+            Secret
+          &lt;/Text>
+        &lt;/Pressable>
+      &lt;/View>
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          justifyContent: "center",
+          alignSelf: "center",
+          paddingBottom: 10,
+        }}
+      >
+        Your username
+      &lt;/Text>
+      &lt;Input
+        style={{
+          color: generalStyle.primarySetting.backgroundColor,
+          flex: 0,
+          alignSelf: "center",
+          textAlign: "center",
+        }}
+        defaultValue={username}
+        onChangeText={(text) => setUsername(text)}
+        placeholder="between 4 and 63 alphanumeric characters please"
+      />
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          justifyContent: "center",
+          alignSelf: "center",
+          paddingBottom: 10,
+        }}
+      >
+        Show mature content ?
+      &lt;/Text>
+      &lt;Switch
+        style={{ alignSelf: "center" }}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={mature ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={() => setMature(!mature)}
+        value={mature}
+      />
+      &lt;Text
+        style={{
+          color: "#0C0C0C",
+          marginTop: 17,
+          justifyContent: "center",
+          alignSelf: "center",
+          paddingBottom: 10,
+        }}
+      >
+        Subscribe to imgur email newsletter ?
+      &lt;/Text>
+      &lt;Switch
+        style={{ alignSelf: "center" }}
+        trackColor={{ false: "#0C0C0C", true: generalStyle.primarySetting.backgroundColor }}
+        thumbColor={newsletter ? generalStyle.primarySetting.backgroundColor : "#0C0C0C"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={() => setNewsletter(!newsletter)}
+        value={newsletter}
+      />
+      &lt;View
+        style={{
+          paddingTop: 10,
+          position: "absolute",
+          bottom: 30,
+          alignSelf: "center",
+        }}
+      >
+        &lt;Button
+          color= {generalStyle.primarySetting.backgroundColor}
+          title="Confirm changes"
+          onPress={() => {
+            confirmChanges();
+          }}
+        />
+      &lt;/View>
+    &lt;/Container>
+  );
+}
+
+/**
+ * This component displays the settings page
+ * It displays a screen so that the logged in user can see
+ * and change his settings
+ * @see https://apidocs.imgur.com/#a94d108b-d6e3-4e68-9521-47ea79501c85
+ */
+export default function SettingsPage() {
+
+  // Know if page is loading
+  const [loading, setLoading] = useState(true);
+  // Object containing user settings
+  const [settings, setSettings] = useState(null);
+  // Object containing user imgur data
+  const [userData, setUserData] = useState(null);
+
+  useFocusEffect(useCallback(() => {
+    setLoading(true);
+    getUserData().then((value) => {
+      imgurAccountSettings(value.acess_token).then((settings) => {
+        setSettings(settings.data);
+        imgurProfileBase(value.acess_token, "me").then((value) => {
+          setUserData(value.data);
+          setLoading(false);
+        });
+      });
+    });
+  }, []))
+
+  return (
+    &lt;Container style={generalStyle.primaryColor}>
+      &lt;Header
+        rounded
+        androidStatusBarColor={GENERAL_COLOR}
+        style={{ backgroundColor: GENERAL_COLOR }}
+      >
+        &lt;Text style={{ marginTop: 17, color: BACKGROUND_COLOR}}>
+          Settings
+        &lt;/Text>
+      &lt;/Header>
+      {loading === true ? (
+        &lt;View style={{ paddingTop: 250, alignItems: "center" }}>
+          &lt;Spinner color={GENERAL_COLOR} size={"large"} />
+          &lt;Text style={{...generalStyle.primaryWhite, backgroundColor: BACKGROUND_LIGHT}}>Loading your settings&lt;/Text>
+        &lt;/View>
+      ) : (
+        &lt;SettingsDisplayer
+          bio={userData.bio}
+          publicImages={settings.public_images}
+          messaging={settings.messaging_enabled}
+          album_privacy={settings.album_privacy}
+          username={settings.account_url}
+          show_mature={settings.show_mature}
+          newsletter={settings.newsletter_subscribed}
+        />
+      )}
+    &lt;/Container>
+  );
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

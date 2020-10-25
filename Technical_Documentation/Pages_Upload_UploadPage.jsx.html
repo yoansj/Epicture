@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Pages/Upload/UploadPage.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Pages/Upload/UploadPage.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  Switch,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { Camera } from "expo-camera";
+import { Video } from "expo-av";
+import {
+  Container,
+  Input,
+  Spinner,
+  Header,
+  Button,
+  Icon,
+  Toast,
+} from "native-base";
+import { Col, Grid } from "react-native-easy-grid";
+
+import { getUserData } from "../Authentification/AuthPage";
+import {
+  imgurAlbumCreate,
+  imgurAlbumShare,
+  imgurImageUpload,
+} from "../../imgur";
+import {
+  BACKGROUND_LIGHT,
+  generalStyle,
+  GENERAL_COLOR,
+  TEXT_COLOR,
+} from "../../Colors";
+
+/**
+ * The Upload Page lets the user uploads albums to imgur
+ * The page was coded with a step by step system
+ * The user first enters the infos about his posts and then adds medias to the album
+ */
+export default function UploadPage() {
+  // Defines the step of the upload
+  // - 1 : first
+  // - 2 : create or add
+  // - 3 : createImages or addImages
+  // - 4 : createPublish or publish
+  const [step, setStep] = useState("first");
+
+  // Album name and description
+  const [albumName, setAlbumName] = useState("");
+  const [albumDescription, setAlbumDescription] = useState("");
+  // Media that will be published (array of objects)
+  const [media, setMedia] = useState(null);
+  // Link modal
+  const [linkModal, setLinkModal] = useState(false);
+  // Link image
+  const [link, setLink] = useState("");
+  // Camera modal
+  const [cameraModal, setCameraModal] = useState(false);
+  // Camera opened in modal
+  const [camera, setCamera] = useState(false);
+  // Camera type (front back)
+  const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
+  // Camera flash
+  const [flash, setFlash] = useState(false);
+  // Camera ref used to take pictures
+  const [cameraRef, setCameraRef] = useState(null);
+  // Files modal
+  const [filesModal, setFilesModal] = useState(false);
+  // Chosen file when user hits "Add from file button"
+  const [file, setFile] = useState(null);
+  // New media description
+  const [mediaDesc, setMediaDesc] = useState("");
+  // Know if app has files permission
+  const [permission, setPermission] = useState(false);
+  // Creating step
+  const [creatingStep, setCreatingStep] = useState("album");
+  // Title of the post
+  const [postName, setPostName] = useState("");
+  // Topic of the post
+  const [topic, setTopic] = useState("");
+  // Is the post mature
+  const [mature, setMature] = useState(false);
+  // Publishing media
+  const [mediaIndex, setMediaIndex] = useState(0);
+  // Publishing errors
+  const [mediaErrors, setMediaErrors] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestCameraRollPermissionsAsync();
+        if (status !== "granted") setPermission(false);
+        else setPermission(true);
+      }
+      const { status } = await Camera.requestPermissionsAsync();
+      setPermission(status === "granted");
+    })();
+  }, []);
+
+  function addMedia(type, newMedia, desc, base64) {
+    let tmp = media;
+    if (media === null) tmp = [];
+
+    if (type === "video" || type === "image") {
+      tmp.unshift({ type, newMedia, desc, base64 });
+      setMedia(tmp);
+      setFilesModal(false);
+      setCameraModal(false);
+      setMediaDesc("");
+      setFile(null);
+      setLink("");
+      return;
+    }
+
+    if (newMedia !== "" &amp;&amp; type === "link") {
+      tmp.unshift({ type, newMedia, desc });
+      setMedia(tmp);
+      closeLinkModal();
+    } else {
+      closeLinkModal();
+      Toast.show({
+        text: "Can't add an image with no link",
+        buttonText: "Okay",
+        type: "danger",
+        duration: 5000,
+      });
+    }
+  }
+
+  function openLinkModal() {
+    setLink("");
+    setMediaDesc("");
+    setFile(null);
+    setLinkModal(true);
+  }
+
+  function closeLinkModal() {
+    setLink("");
+    setMediaDesc("");
+    setFile(null);
+    setLinkModal(false);
+    setAlbumDescription("");
+    setAlbumName("");
+  }
+
+  function checkPost() {
+    if (postName !== "") {
+      setStep("createImages");
+    } else {
+      Toast.show({
+        text: "The title of your post can't be empty",
+        buttonText: "Okay",
+        type: "danger",
+        duration: 5000,
+      });
+    }
+  }
+
+  function checkMedia() {
+    if (media !== null &amp;&amp; media.length !== 0) {
+      createAlbum();
+    } else {
+      Toast.show({
+        text: "You need to add at list one media",
+        buttonText: "Okay",
+        type: "danger",
+        duration: 5000,
+      });
+    }
+  }
+
+  function resetVariables() {
+    setStep("first");
+    setMediaIndex(0);
+    setMediaErrors(0);
+    setMedia(null);
+    setPostName("");
+    setTopic("");
+  }
+
+  function takePicture() {
+    if (cameraRef) {
+      cameraRef
+        .takePictureAsync({
+          quality: 0.5,
+          base64: true,
+        })
+        .then((value) => {
+          setFile({ type: "image", uri: value.uri, base64: value.base64 });
+          setLink(value.uri);
+          setCamera(false);
+        });
+    }
+  }
+
+  async function createAlbum() {
+    setStep("createPublish");
+    getUserData().then((userdata) => {
+      imgurAlbumCreate(
+        userdata.acess_token,
+        null,
+        null,
+        albumName,
+        albumDescription,
+        "public",
+        null
+      ).then((albumCreate) =>
+        (async () => {
+          if (albumCreate.rep.success === false) {
+            setStep("createImages");
+            Toast.show({
+              text: "An issue was encountered while creating the album",
+              buttonText: "Okay",
+              type: "danger",
+              duration: 5000,
+            });
+          } else {
+            setCreatingStep("images");
+            await media.forEach((element) =>
+              (async () => {
+                if (element.type === "link") {
+                  await imgurImageUpload(
+                    userdata.acess_token,
+                    element.newMedia,
+                    "url",
+                    albumCreate.data.data.id,
+                    element.desc,
+                    element.desc,
+                    null
+                  ).then((call) => {
+                    if (call.data.success === true) {
+                      setMediaIndex(mediaIndex + 1);
+                      Toast.show({
+                        text: "Uploaded 1 image (link)",
+                        buttonText: "Cool",
+                        type: "success",
+                        duration: 1000,
+                      });
+                    } else {
+                      setMediaErrors(mediaErrors + 1);
+                      Toast.show({
+                        text: "Upload failed for image (link)",
+                        buttonText: "Crap !",
+                        type: "danger",
+                        duration: 1000,
+                      });
+                    }
+                  });
+                }
+                if (element.type === "image") {
+                  await imgurImageUpload(
+                    userdata.acess_token,
+                    element.base64,
+                    "image",
+                    albumCreate.data.data.id,
+                    element.desc,
+                    element.desc,
+                    null
+                  ).then((call) => {
+                    if (call.data.success === true) {
+                      setMediaIndex(mediaIndex + 1);
+                      Toast.show({
+                        text: "Uploaded 1 image",
+                        buttonText: "Cool",
+                        type: "success",
+                        duration: 1000,
+                      });
+                    } else {
+                      setMediaErrors(mediaErrors + 1);
+                      Toast.show({
+                        text: "Upload failed for image",
+                        buttonText: "Crap !",
+                        type: "danger",
+                        duration: 1000,
+                      });
+                    }
+                  });
+                }
+                if (element.type === "video") {
+                  await imgurImageUpload(
+                    userdata.acess_token,
+                    element.newMedia,
+                    "video",
+                    albumCreate.data.data.id,
+                    element.desc,
+                    element.desc,
+                    null
+                  ).then((call) => {
+                    if (call.data.success === true) {
+                      setMediaIndex(mediaIndex + 1);
+                      Toast.show({
+                        text: "Uploaded 1 video",
+                        buttonText: "Cool",
+                        type: "success",
+                        duration: 1000,
+                      });
+                    } else {
+                      setMediaErrors(mediaErrors + 1);
+                      Toast.show({
+                        text: "Upload failed for video",
+                        buttonText: "Crap !",
+                        type: "danger",
+                        duration: 1000,
+                      });
+                    }
+                  });
+                }
+              })().then(() => {
+                imgurAlbumShare(
+                  userdata.acess_token,
+                  albumCreate.data.data.id,
+                  postName,
+                  topic,
+                  mature,
+                  null
+                ).then((call) => {
+                  if (call.data) {
+                    Toast.show({
+                      text: "Album posted succesfully",
+                      buttonText: "Cool",
+                      type: "success",
+                      duration: 5000,
+                    });
+                  } else {
+                    Toast.show({
+                      text: "Failed to post album",
+                      buttonText: "Crap !",
+                      type: "danger",
+                      duration: 5000,
+                    });
+                  }
+                });
+              })
+            );
+          }
+        })()
+      );
+    });
+  }
+
+  async function pickImage() {
+    if (permission === false) {
+      const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+      if (status !== "granted") return;
+      else setPermission(true);
+    }
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      quality: 1,
+      base64: true,
+    });
+    if (!result.cancelled)
+      setFile({ uri: result.uri, type: result.type, base64: result.base64 });
+  }
+
+  function mediaPreview() {
+    if (media === null)
+      return (
+        &lt;Text
+          style={{
+            ...styles.purpleText,
+            textAlign: "center",
+            alignSelf: "center",
+          }}
+        >
+          Add medias to see the media preview here
+        &lt;/Text>
+      );
+    return media.map((element, index) => {
+      return (
+        &lt;View key={index}>
+          {element.type === "link" || element.type === "image" ? (
+            &lt;Image
+              source={{
+                uri:
+                  element.type === "link" || element.type === "image"
+                    ? element.newMedia
+                    : "",
+              }}
+              style={{ height: 300, width: null, flex: 1 }}
+              resizeMode="contain"
+            />
+          ) : (
+            &lt;Video
+              style={{ width: 355, height: 280 }}
+              source={{ uri: element.newMedia }}
+              rate={1.0}
+              volume={0.0}
+              isLooping
+              shouldPlay
+              style={{ width: 355, height: 280 }}
+              resizeMode="contain"
+            />
+          )}
+          &lt;Text
+            style={{
+              backgroundColor: GENERAL_COLOR,
+              color: BACKGROUND_LIGHT,
+              textAlign: "center",
+            }}
+          >
+            {element.type === "image" || element.type === "url"
+              ? "Image "
+              : "Video "}
+            {index + 1} :{" "}
+            {element.desc === "" ? "(Empty description)" : element.desc}
+          &lt;/Text>
+        &lt;/View>
+      );
+    });
+  }
+
+  return (
+    &lt;Container style={generalStyle.primaryColor}>
+      &lt;Modal
+        animationType="slide"
+        visible={linkModal}
+        onRequestClose={() => setLinkModal(false)}
+      >
+        &lt;Container style={generalStyle.primaryColor}>
+          &lt;View style={{ paddingTop: 20 }} />
+          &lt;Image
+            source={{
+              uri:
+                link === ""
+                  ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517"
+                  : link,
+            }}
+            style={{ height: 300, width: null, flex: 0 }}
+            resizeMode="contain"
+          />
+          &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+            - Preview of your image -
+          &lt;/Text>
+          &lt;Text
+            style={{
+              paddingTop: 30,
+              ...styles.purpleText,
+              alignSelf: "center",
+            }}
+          >
+            Enter a link for your image
+          &lt;/Text>
+          &lt;Input
+            style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+            placeholderTextColor={"#cdcdcd"}
+            value={link}
+            onChangeText={(text) => setLink(text)}
+            multiline
+            placeholder="Any valid link"
+          />
+          &lt;Text
+            style={{
+              paddingTop: 30,
+              ...styles.purpleText,
+              alignSelf: "center",
+            }}
+          >
+            Enter a description for your image
+          &lt;/Text>
+          &lt;Input
+            style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+            placeholderTextColor={"#cdcdcd"}
+            value={mediaDesc}
+            onChangeText={(text) => setMediaDesc(text)}
+            multiline
+            placeholder="You can also leave this empty"
+          />
+          &lt;View
+            style={{
+              paddingTop: 60,
+              display: "flex",
+              flexDirection: "row",
+              alignSelf: "center",
+              justifyContent: "space-around",
+            }}
+          >
+            &lt;View style={{ paddingRight: 30 }}>
+              &lt;Button transparent onPress={() => closeLinkModal()}>
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-arrow-dropleft-circle"
+                    style={{ fontSize: 50, color: TEXT_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.blackText,
+                      fontSize: 30,
+                      textAlign: "center",
+                    }}
+                  >
+                    Cancel
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+            &lt;Button
+              transparent
+              onPress={() => addMedia("link", link, mediaDesc)}
+            >
+              &lt;View style={{ alignItems: "center" }}>
+                &lt;Icon
+                  name="ios-add-circle-outline"
+                  style={{ fontSize: 50, color: GENERAL_COLOR }}
+                />
+                &lt;Text
+                  style={{
+                    ...styles.purpleText,
+                    fontSize: 30,
+                    textAlign: "center",
+                  }}
+                >
+                  Add
+                &lt;/Text>
+              &lt;/View>
+            &lt;/Button>
+          &lt;/View>
+        &lt;/Container>
+      &lt;/Modal>
+      &lt;Modal
+        animationType="slide"
+        visible={filesModal}
+        onRequestClose={() => setFilesModal(false)}
+      >
+        &lt;Container style={generalStyle.primaryColor}>
+          &lt;View style={{ paddingTop: 20 }} />
+          {file === null ? (
+            &lt;Image
+              source={{
+                uri:
+                  link === ""
+                    ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517"
+                    : link,
+              }}
+              style={{ height: 300, width: null, flex: 0 }}
+              resizeMode="contain"
+            />
+          ) : (
+            []
+          )}
+          {file !== null &amp;&amp; file.type === "video" ? (
+            &lt;Video
+              style={{ width: 355, height: 300 }}
+              source={{ uri: file.uri }}
+              rate={1.0}
+              volume={0.5}
+              isLooping
+              shouldPlay
+              resizeMode="contain"
+            />
+          ) : file !== null ? (
+            &lt;Image
+              source={{ uri: file.uri }}
+              style={{ height: 300, width: null, flex: 0 }}
+            />
+          ) : (
+            []
+          )}
+          &lt;Text
+            style={{
+              ...styles.purpleText,
+              alignSelf: "center",
+              paddingBottom: 20,
+            }}
+          >
+            - Preview of your media -
+          &lt;/Text>
+          &lt;Button
+            transparent
+            color={GENERAL_COLOR}
+            style={{ alignSelf: "center" }}
+            onPress={() => {
+              pickImage();
+            }}
+          >
+            &lt;Icon
+              name="ios-folder"
+              style={{ fontSize: 40, color: GENERAL_COLOR }}
+            />
+          &lt;/Button>
+          &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+            Open files
+          &lt;/Text>
+          &lt;Text
+            style={{
+              paddingTop: 30,
+              ...styles.purpleText,
+              alignSelf: "center",
+            }}
+          >
+            Enter a description for your image
+          &lt;/Text>
+          &lt;Input
+            style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+            placeholderTextColor={"#cdcdcd"}
+            value={mediaDesc}
+            onChangeText={(text) => setMediaDesc(text)}
+            multiline
+            placeholder="You can also leave this empty"
+          />
+          &lt;View
+            style={{
+              paddingTop: 60,
+              display: "flex",
+              flexDirection: "row",
+              alignSelf: "center",
+              justifyContent: "space-around",
+            }}
+          >
+            &lt;View style={{ paddingRight: 30 }}>
+              &lt;Button
+                transparent
+                onPress={() => {
+                  setFilesModal(false);
+                  setFile(null);
+                  setMediaDesc("");
+                }}
+              >
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-arrow-dropleft-circle"
+                    style={{ fontSize: 50, color: TEXT_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.blackText,
+                      fontSize: 30,
+                      textAlign: "center",
+                    }}
+                  >
+                    Cancel
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+            &lt;Button
+              transparent
+              onPress={() =>
+                addMedia(file.type, file.uri, mediaDesc, file.base64)
+              }
+            >
+              &lt;View style={{ alignItems: "center" }}>
+                &lt;Icon
+                  name="ios-add-circle-outline"
+                  style={{ fontSize: 50, color: GENERAL_COLOR }}
+                />
+                &lt;Text
+                  style={{
+                    ...styles.purpleText,
+                    fontSize: 30,
+                    textAlign: "center",
+                  }}
+                >
+                  Add
+                &lt;/Text>
+              &lt;/View>
+            &lt;/Button>
+          &lt;/View>
+        &lt;/Container>
+      &lt;/Modal>
+      &lt;Modal
+        animationType="slide"
+        visible={cameraModal}
+        onRequestClose={() => setCameraModal(false)}
+      >
+        {camera === false ? (
+          &lt;Container style={generalStyle.primaryColor}>
+            &lt;View style={{ paddingTop: 20 }} />
+            &lt;Image
+              source={{
+                uri:
+                  link === ""
+                    ? "https://media1.tenor.com/images/817c85b86e9860dbd6d947d69ea2fee7/tenor.gif?itemid=14165517"
+                    : link,
+              }}
+              style={{ height: 300, width: null, flex: 0 }}
+              resizeMode="contain"
+            />
+            &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+              - Preview of your image -
+            &lt;/Text>
+            &lt;Button
+              transparent
+              color={GENERAL_COLOR}
+              style={{ alignSelf: "center" }}
+              onPress={() => {
+                setCamera(true);
+              }}
+            >
+              &lt;Icon
+                name="ios-camera"
+                style={{ fontSize: 40, color: GENERAL_COLOR }}
+              />
+            &lt;/Button>
+            &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+              Open camera
+            &lt;/Text>
+            &lt;Text
+              style={{
+                paddingTop: 30,
+                ...styles.purpleText,
+                alignSelf: "center",
+              }}
+            >
+              Enter a description for your image
+            &lt;/Text>
+            &lt;Input
+              style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+              placeholderTextColor={"#cdcdcd"}
+              value={mediaDesc}
+              onChangeText={(text) => setMediaDesc(text)}
+              multiline
+              placeholder="You can also leave this empty"
+            />
+            &lt;View
+              style={{
+                paddingTop: 60,
+                display: "flex",
+                flexDirection: "row",
+                alignSelf: "center",
+                justifyContent: "space-around",
+              }}
+            >
+              &lt;View style={{ paddingRight: 30 }}>
+                &lt;Button
+                  transparent
+                  onPress={() => {
+                    setCameraModal(false);
+                    setLink("");
+                    setMediaDesc("");
+                    setCamera(false);
+                  }}
+                >
+                  &lt;View style={{ alignItems: "center" }}>
+                    &lt;Icon
+                      name="ios-arrow-dropleft-circle"
+                      style={{ fontSize: 50, color: TEXT_COLOR }}
+                    />
+                    &lt;Text
+                      style={{
+                        ...styles.blackText,
+                        fontSize: 30,
+                        textAlign: "center",
+                      }}
+                    >
+                      Cancel
+                    &lt;/Text>
+                  &lt;/View>
+                &lt;/Button>
+              &lt;/View>
+              &lt;Button
+                transparent
+                onPress={() => {
+                  addMedia(file.type, file.uri, mediaDesc, file.base64);
+                }}
+              >
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-add-circle-outline"
+                    style={{ fontSize: 50, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.purpleText,
+                      fontSize: 30,
+                      textAlign: "center",
+                    }}
+                  >
+                    Add
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+          &lt;/Container>
+        ) : (
+          &lt;Camera
+            style={{ flex: 1 }}
+            ref={(ref) => setCameraRef(ref)}
+            type={cameraType}
+            flashMode={
+              flash
+                ? Camera.Constants.FlashMode.on
+                : Camera.Constants.FlashMode.off
+            }
+          >
+            &lt;View
+              style={{
+                flex: 1,
+                backgroundColor: "transparent",
+                flexDirection: "row",
+              }}
+            >
+              &lt;View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignSelf: "flex-end",
+                  flex: 1,
+                  height: 60,
+                  backgroundColor: BACKGROUND_LIGHT,
+                }}
+              >
+                &lt;Button
+                  style={{
+                    alignSelf: "flex-start",
+                    marginTop: 10,
+                    marginLeft: 10,
+                    marginRight: 10,
+                  }}
+                  transparent
+                  onPress={() => setCamera(false)}
+                >
+                  &lt;Icon
+                    name="ios-arrow-dropleft-circle"
+                    style={{ fontSize: 45, color: TEXT_COLOR }}
+                  />
+                &lt;/Button>
+                &lt;Button
+                  style={{
+                    alignSelf: "center",
+                    marginTop: 5,
+                    marginLeft: 10,
+                    marginRight: 10,
+                  }}
+                  transparent
+                  onPress={() =>
+                    setCameraType(
+                      cameraType === Camera.Constants.Type.back
+                        ? Camera.Constants.Type.front
+                        : Camera.Constants.Type.back
+                    )
+                  }
+                >
+                  &lt;Icon
+                    name="ios-reverse-camera"
+                    style={{ fontSize: 50, color: GENERAL_COLOR }}
+                  />
+                &lt;/Button>
+                &lt;Button
+                  style={{
+                    alignSelf: "center",
+                    marginTop: 5,
+                    marginLeft: 10,
+                    marginRight: 10,
+                  }}
+                  transparent
+                  onPress={() => takePicture()}
+                >
+                  &lt;Icon
+                    name="ios-camera"
+                    style={{ fontSize: 50, color: GENERAL_COLOR }}
+                  />
+                &lt;/Button>
+                &lt;Button
+                  style={{
+                    alignSelf: "center",
+                    marginTop: 5,
+                    marginLeft: 10,
+                    marginRight: 10,
+                  }}
+                  transparent
+                  onPress={() => setFlash(!flash)}
+                >
+                  &lt;Icon
+                    name="ios-flash"
+                    style={{
+                      fontSize: 40,
+                      color: flash ? GENERAL_COLOR : TEXT_COLOR,
+                    }}
+                  />
+                &lt;/Button>
+              &lt;/View>
+            &lt;/View>
+          &lt;/Camera>
+        )}
+      &lt;/Modal>
+      &lt;Header
+        rounded
+        androidStatusBarColor={GENERAL_COLOR}
+        style={generalStyle.primaryHeader}
+      >
+        &lt;Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>Upload&lt;/Text>
+      &lt;/Header>
+      {step === "first" ? (
+        &lt;Container style={generalStyle.primaryColor}>
+          &lt;Container
+            style={{
+              ...generalStyle.primaryColor,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            &lt;Button transparent onPress={() => setStep("create")}>
+              &lt;Grid>
+                &lt;Col style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="albums"
+                    style={{ fontSize: 50, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text style={{ color: GENERAL_COLOR, fontSize: 30 }}>
+                    Post an album
+                  &lt;/Text>
+                &lt;/Col>
+              &lt;/Grid>
+            &lt;/Button>
+          &lt;/Container>
+        &lt;/Container>
+      ) : (
+        []
+      )}
+      {step === "create" ? (
+        &lt;View style={generalStyle.primaryColor}>
+          &lt;View style={{ paddingVertical: 10 }}>
+            &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+              Title of your post
+            &lt;/Text>
+            &lt;Input
+              style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+              placeholderTextColor={"#cdcdcd"}
+              onChangeText={(text) => setPostName(text)}
+              placeholder="Look at my wonderful cats"
+            />
+          &lt;/View>
+          &lt;View>
+            &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+              Topic
+            &lt;/Text>
+            &lt;Input
+              style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+              placeholderTextColor={"#cdcdcd"}
+              onChangeText={(text) => setTopic(text)}
+              placeholder="Memes"
+            />
+          &lt;/View>
+          &lt;View>
+            &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+              Name of your album
+            &lt;/Text>
+            &lt;Input
+              style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+              placeholderTextColor={"#cdcdcd"}
+              onChangeText={(text) => setAlbumName(text)}
+              placeholder="Cat playing League of Legends"
+            />
+          &lt;/View>
+          &lt;View style={{ paddingVertical: 10 }}>
+            &lt;Text style={{ ...styles.purpleText, alignSelf: "center" }}>
+              Then a description
+            &lt;/Text>
+            &lt;Input
+              style={{ color: TEXT_COLOR, flex: 0, alignSelf: "center" }}
+              placeholderTextColor={"#cdcdcd"}
+              onChangeText={(text) => setAlbumDescription(text)}
+              multiline
+              placeholder="Description of your album"
+            />
+          &lt;/View>
+          &lt;View>
+            &lt;Text
+              style={{
+                ...styles.purpleText,
+                justifyContent: "center",
+                alignSelf: "center",
+                paddingBottom: 10,
+              }}
+            >
+              Is your post mature ?
+            &lt;/Text>
+            &lt;Switch
+              style={{ alignSelf: "center" }}
+              trackColor={{ false: TEXT_COLOR, true: GENERAL_COLOR }}
+              thumbColor={mature ? GENERAL_COLOR : TEXT_COLOR}
+              ios_backgroundColor={GENERAL_COLOR}
+              onValueChange={() => setMature(!mature)}
+              value={mature}
+            />
+          &lt;/View>
+          &lt;View
+            style={{
+              paddingVertical: 80,
+              display: "flex",
+              flexDirection: "row",
+              alignSelf: "center",
+            }}
+          >
+            &lt;Button
+              transparent
+              onPress={() => {
+                setStep("first");
+              }}
+            >
+              &lt;Icon
+                name="ios-arrow-dropleft-circle"
+                style={{ fontSize: 80, color: TEXT_COLOR }}
+              />
+            &lt;/Button>
+            &lt;Button
+              transparent
+              onPress={() => {
+                checkPost();
+              }}
+            >
+              &lt;Icon
+                name="ios-arrow-dropright-circle"
+                style={{ fontSize: 80, color: GENERAL_COLOR }}
+              />
+            &lt;/Button>
+          &lt;/View>
+        &lt;/View>
+      ) : (
+        []
+      )}
+      {step === "createImages" ? (
+        &lt;View>
+          &lt;Text
+            style={{
+              ...styles.purpleText,
+              fontSize: 25,
+              alignSelf: "center",
+              paddingVertical: 20,
+            }}
+          >
+            Album preview
+          &lt;/Text>
+          &lt;ScrollView style={{ height: 300 }}>{mediaPreview(media)}&lt;/ScrollView>
+          &lt;Text
+            style={{
+              ...styles.purpleText,
+              fontSize: 15,
+              alignSelf: "center",
+              paddingVertical: 20,
+            }}
+          >
+            - {media === null ? "0" : media.length} media to publish -
+          &lt;/Text>
+          &lt;View
+            style={{
+              paddingTop: 10,
+              display: "flex",
+              flexDirection: "row",
+              alignSelf: "center",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            &lt;View style={{ marginRight: 15 }}>
+              &lt;Button transparent onPress={() => openLinkModal()}>
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-link"
+                    style={{ fontSize: 40, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.purpleText,
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    Add with link
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+            &lt;View style={{ marginRight: 9, marginLeft: 9 }}>
+              &lt;Button transparent onPress={() => setCameraModal(true)}>
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-camera"
+                    style={{ fontSize: 40, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.purpleText,
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    Use Camera
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+            &lt;View style={{ marginLeft: 15 }}>
+              &lt;Button transparent onPress={() => setFilesModal(true)}>
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-folder"
+                    style={{ fontSize: 40, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.purpleText,
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    Add from files
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+          &lt;/View>
+          &lt;View
+            style={{
+              paddingTop: 30,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            &lt;View style={{ marginRight: 15 }}>
+              &lt;Button
+                transparent
+                onPress={() => {
+                  setStep("create");
+                }}
+              >
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-return-left"
+                    style={{ fontSize: 35, color: TEXT_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.blackText,
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    Cancel
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+            &lt;View style={{ marginLeft: 15, marginRight: 15 }}>
+              &lt;Button transparent onPress={() => setMedia(null)}>
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-trash"
+                    style={{ fontSize: 35, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.purpleText,
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    Erase medias
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+            &lt;View style={{ marginLeft: 15 }}>
+              &lt;Button transparent onPress={() => checkMedia()}>
+                &lt;View style={{ alignItems: "center" }}>
+                  &lt;Icon
+                    name="ios-add-circle"
+                    style={{ fontSize: 35, color: GENERAL_COLOR }}
+                  />
+                  &lt;Text
+                    style={{
+                      ...styles.purpleText,
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    Publish
+                  &lt;/Text>
+                &lt;/View>
+              &lt;/Button>
+            &lt;/View>
+          &lt;/View>
+        &lt;/View>
+      ) : (
+        []
+      )}
+      {step === "createPublish" ? (
+        &lt;View style={{ alignItems: "center" }}>
+          {creatingStep === "album" ? (
+            &lt;View style={{ alignItems: "center", paddingVertical: 180 }}>
+              &lt;Text
+                style={{
+                  color: GENERAL_COLOR,
+                  fontSize: 25,
+                  alignSelf: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                Creating your album
+              &lt;/Text>
+              &lt;Text
+                style={{
+                  color: GENERAL_COLOR,
+                  fontSize: 25,
+                  alignSelf: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                This might take some time
+              &lt;/Text>
+              &lt;Spinner color={GENERAL_COLOR} style={{ paddingVertical: 20 }} />
+              &lt;View style={{ alignSelf: "center", paddingVertical: 50 }}>
+                &lt;Button
+                  transparent
+                  onPress={() => {
+                    setStep("createImages");
+                  }}
+                >
+                  &lt;View style={{ alignItems: "center" }}>
+                    &lt;Icon
+                      name="ios-return-left"
+                      style={{ fontSize: 35, color: TEXT_COLOR }}
+                    />
+                    &lt;Text
+                      style={{
+                        ...styles.blackText,
+                        fontSize: 15,
+                        textAlign: "center",
+                      }}
+                    >
+                      Cancel
+                    &lt;/Text>
+                  &lt;/View>
+                &lt;/Button>
+              &lt;/View>
+            &lt;/View>
+          ) : (
+            []
+          )}
+          {creatingStep === "images" ? (
+            &lt;View style={{ alignItems: "center", paddingVertical: 180 }}>
+              &lt;Text
+                style={{
+                  color: GENERAL_COLOR,
+                  fontSize: 25,
+                  alignSelf: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                Posting your album
+              &lt;/Text>
+              &lt;Text
+                style={{
+                  color: GENERAL_COLOR,
+                  fontSize: 25,
+                  alignSelf: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                Media published {mediaIndex + " / " + media.length}
+              &lt;/Text>
+              &lt;Text
+                style={{
+                  color: GENERAL_COLOR,
+                  fontSize: 25,
+                  alignSelf: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                Medias not published : {mediaErrors}
+              &lt;/Text>
+              &lt;View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingTop: 15,
+                }}
+              >
+                &lt;Button
+                  transparent
+                  onPress={() => {
+                    resetVariables();
+                  }}
+                >
+                  &lt;View style={{ alignItems: "center" }}>
+                    &lt;Icon
+                      name="ios-return-left"
+                      style={{ fontSize: 50, color: TEXT_COLOR }}
+                    />
+                    &lt;Text
+                      style={{
+                        color: TEXT_COLOR,
+                        fontSize: 20,
+                        textAlign: "center",
+                      }}
+                    >
+                      Go back
+                    &lt;/Text>
+                  &lt;/View>
+                &lt;/Button>
+              &lt;/View>
+            &lt;/View>
+          ) : (
+            []
+          )}
+        &lt;/View>
+      ) : (
+        []
+      )}
+    &lt;/Container>
+  );
+}
+
+const styles = StyleSheet.create({
+  purpleText: {
+    color: GENERAL_COLOR,
+    fontSize: 20,
+  },
+  blackText: {
+    color: TEXT_COLOR,
+    fontSize: 20,
+  },
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

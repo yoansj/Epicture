@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Pages/Authentification/AuthPage.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Pages/Authentification/AuthPage.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from "react";
+
+import { WebView } from "react-native-webview";
+import AsyncStorage from '@react-native-community/async-storage';
+
+import { CLIENT_ID } from "../../imgur.js";
+
+/**
+ * This function is used to save the user data when
+ * the user connects to the application
+ * It is called mainly by the AuthPage function
+ * @param {object} value - Json serializeable object
+ */
+export const saveUserData = async (value) => {
+  try {
+    const jsonValue = JSON.stringify(value)
+    await AsyncStorage.setItem('user_data', jsonValue)
+  } catch (e) {
+    console.error("Error encountered while saving user data");
+  }
+}
+
+/**
+ * This function is used to get the user data that was saved
+ * when user logged in the app
+ * The user data can be "null" when his data was erased
+ * Most of the time its data is an object :
+ * @example
+ *   {
+      acess_token: string,
+      expiration_token: number,
+      refresh_token: string,
+      username: string,
+      id: string,
+      date: Date
+    }
+ */
+export const getUserData = async () => {
+try {
+  const jsonValue = await AsyncStorage.getItem('user_data')
+  if (jsonValue === "null") return (jsonValue);
+  return jsonValue != null ? JSON.parse(jsonValue) : null;
+} catch(e) {
+  console.error("Error encountered while reading user data");
+}
+}
+
+/**
+ * This function wipes user data, it is mainly used
+ * to disconnect the user from the app
+ */
+export const eraseUserData = async () => {
+  try {
+    await AsyncStorage.setItem('user_data', "null")
+  } catch (e) {
+    console.error("Error encountered while saving user data");
+  }
+}
+
+/**
+ * This component renders the authorisation page
+ * This page mainly displays a WebView for the user to connect
+ * This page is displayed as long as the user is not connected
+ * once the user connects, he can access the application
+ * @param {*} props 
+ */
+function AuthPage(props) {
+
+  async function getToken(navState) {
+    const url = await navState.url + '&amp;'; // Add &amp; to the url so that the last regex doesnt fail
+
+    if (
+      url.search("state=93") !== -1 &amp;&amp;
+      url !==
+        `https://api.imgur.com/oauth2/authorize?client_id=${CLIENT_ID}&amp;response_type=token&amp;state=93`
+    ) {
+
+      // if added so that expo doesnt generate warning beacause url is null
+      if (url !== null &amp;&amp; url !== undefined) {
+        let acess_token_re = /access_token=(.*?)&amp;/;
+        let expiration_re = /expires_in=(.*?)&amp;/;
+        let refresh_token_re = /refresh_token=(.*?)&amp;/;
+        let username_re = /account_username=(.*?)&amp;/;
+        let id_re = /account_id=(.*?)&amp;/;
+
+        let userData = {
+          acess_token: acess_token_re.exec(url)[1],
+          expiration_token: expiration_re.exec(url)[1],
+          refresh_token: refresh_token_re.exec(url)[1],
+          username: username_re.exec(url)[1],
+          id: id_re.exec(url)[1],
+          date: new Date().toJSON()
+        };
+        
+        saveUserData(userData).then(value => props.setAuth());
+    }
+    }
+  }
+
+  return (
+    &lt;WebView
+      incognito
+      onNavigationStateChange={(navState) => getToken(navState)}
+      source={{
+        uri: `https://api.imgur.com/oauth2/authorize?client_id=${CLIENT_ID}&amp;response_type=token&amp;state=93`,
+      }}
+    />
+  );
+}
+
+export default AuthPage;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

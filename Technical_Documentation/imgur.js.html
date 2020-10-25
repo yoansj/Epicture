@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: imgur.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: imgur.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>export const CLIENT_ID = "350a4b0450465d9"
+export const CLIENT_SECRET = "3cd9f8af74e1c40abbf9abbb5da334fefcdd075b"
+export const REFRESH = "fecba479d2891084b4426d0fc9594c17b37f60f3"
+
+
+/* GET Gallery Search */
+/**
+ * Search the gallery with a given query string.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} sort -how so sort search
+ * @param {string} window - Change the date range of the request
+ * @param {number} page - the data paging number
+ * @param {string} text - searching parameter
+ */
+export async function imgurSearch(acessToken, sort = 'time', window = 'all', page = 0, text = "cats") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log(`GET Gallery Search Page: ${page}`);
+    const rep = await fetch(`https://api.imgur.com/3/gallery/search/${sort}/` + ((sort === "top") ? `${window}/` : "") + `?q=${encodeURI(text)}&amp;page=${page}`, requestOptions).catch
+    (value => {console.log("GET Gallery Search Error : ", value)})
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep));
+    //console.log(JSON.stringify(data));
+    return (data);
+}
+
+/* GET Account Favorites */
+/**
+ * Returns the users favorited images, only accessible if you're logged in as the user.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} username - user's name you're looking for
+ * @param {number} page - allows you to set the page number so you don't have to retrieve all the data at once
+ * @param {string} sort -how so sort search
+ */
+export async function imgurFavorites(acessToken, username, page = 0, sort = "newest") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("GET Account Favorites");
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}/favorites/${page}/${sort}`, requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep));
+    return (data);
+}
+
+/* GET Gallery */
+/**
+ * Getting the gallery of imgur api
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} section - top, hot or user parameter
+ * @param {string} sort  - sorting filter
+ * @param {string} window - Change the date range of the request (day, week, ...)
+ * @param {boolean} showViral - showing or not by viral
+ * @param {number} page - Page of the search
+ */
+export async function imgurGallery(acessToken, section = 'hot', sort = 'viral', window = 'day', showViral = 'true', page = 0) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("GET Gallery");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/${section}/` + (section === "user" ? `${sort}/` : '') +
+    (section === "top" ? `${window}/` : '') + `showViral=${showViral}&amp;albumPreviews=true&amp;page=${page}&amp;perPage=100`, requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(data));
+    return (data);
+}
+
+/* GET Album Fav */
+/**
+ *  Listing the favorites of a user
+ * @param {string} accessToken - a user's token giving by the api
+ * @param {string} username - user's name you're looking for
+ */
+export async function imgurGetAlbumFav(accessToken, username) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET album fav");
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}/gallery_favorites`, requestOptions)
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep),JSON.stringify(data), "get album");
+    return (data);
+}
+
+/* GET Gallery Album */
+/**
+ * Get additional information about an album in the gallery.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} id - the id of the user in imgur
+ */
+export async function imgurGalleryGetAlbum(acessToken, id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET Gallery Album");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/album/${id}`,requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep),JSON.stringify(data), "get album");
+    return (data);
+}
+
+/* GET account submissions */
+/**
+ * Return the images a user has submitted to the gallery.
+ * @param {string} acessToken - a user's token giving by the api
+ */
+export async function imgurAccountSubmission(acessToken) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    const rep = await fetch(`https://api.imgur.com/3/account/me/submissions`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep),JSON.stringify(data), "account sub");
+    return (data);
+}
+
+/* GET image from id */
+/**
+ * Returns an array of Image IDs that are associated with the account.
+ * @param {string} accessToken - a user's token giving by the api
+ * @param {string} imageHash - image you are looking for
+ */
+export async function imgurGetImageId(accessToken, imageHash) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+    };
+
+    const rep = await fetch(`https://api.imgur.com/3/image/${imageHash}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep),JSON.stringify(data), "image's info");
+    return (data);
+}
+
+/* POST Album / Image Voting */
+/**
+ * Vote for an image
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {number} id - the id of the user in imgur
+ * @param {string} vote - can be 'up' or 'down'
+ */
+export async function imgurAlbumVote(acessToken, id, vote = "up") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("POST Album / Image Voting");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/${id}/vote/${vote}`, requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (rep);
+}
+
+/* GET ACCOUNT BASE */
+/**
+ * Get account base
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} username - the name of the user in imgur
+ */
+export async function imgurProfileBase(acessToken, username = "Mamouki", returnRep) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET ACCOUNT BASE");
+    const rep = await fetch(`https://api.imgur.com/3/account/${username}`, requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(rep));
+    if (returnRep) return (rep);
+    return (data)
+}
+
+/* POST Favorite Album */
+/**
+ * Favorite an album with a given ID
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {number} id  - the id of the user in imgur
+ */
+export async function imgurAlbumFavorite(acessToken, id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("POST Favorite Album");
+    const rep = await fetch(`https://api.imgur.com/3/album/${id}/favorite`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (data);
+}
+
+/* GET Album */
+/**
+ * Get all the albums associated with the account.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {number} id - the id of the user in imgur
+ */
+export async function imgurAlbum(acessToken, id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+    };
+
+    console.log("GET Album");
+    const rep = await fetch(`https://api.imgur.com/3/album/${id}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (data);
+}
+
+/* GET Album / Image Comments */
+/**
+ * Get comments on an image or album in the gallery.
+ * @param {string} accessToken - a user's token giving by the api
+ * @param {string} postId - unique id of the image or album
+ */
+export async function imgurGetCom(accessToken, postId) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("GET Post comment :");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/${postId}/comments`, requestOptions);
+    const data = await rep.json();
+    return (data);
+}
+
+/* POST Image Upload */
+/**
+ * Upload a new image or video.
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {*} media - Media that will be sent
+ * @param {string} mediaType - Can be url or base64
+ * @param {string} album - Album in which the media will be published
+ * @param {string} title - Title of the post
+ * @param {string} description - Description of the post
+ * @param {number} disable_audio - Set to 1 to disable the audio of the video
+ */
+export async function imgurImageUpload(acessToken, media, mediaType, album, title, description, disable_audio) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (mediaType === "url") formdata.append("type", "url");
+    if (mediaType === "image") formdata.append("type", "base64");
+    if (mediaType === "video") {
+        formdata.append("type", "file");
+        formdata.append("video", media);
+    }
+    if (mediaType === "image" || mediaType === "url") formdata.append("image", `${media}`);
+    if (album) formdata.append("album", `${album}`);
+    if (title) formdata.append("title", `${title}`);
+    if (description) formdata.append("description", `${description}`);
+    if (disable_audio) formdata.append("disable_audio", 1);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow",
+    };
+
+    console.log("POST Image Upload");
+    const rep = await fetch("https://api.imgur.com/3/image", requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    console.log("Image upload ended");
+    return ({rep, data});
+}
+
+//POST Album Creation
+/**
+ * Create a new album
+ * @param {string} acessToken - A user's token giving by the api
+ * @param {Array} ids - The image ids that you want to be included in the album
+ * @param {*} deleteHashes - The deletehashes of the images that you want to be included in the album
+ * @param {*} title - The title of the album
+ * @param {*} description - The description of the album
+ * @param {*} privacy - Sets the privacy level of the album. Values are : public | hidden | secret. Defaults to user's privacy settings for logged in users.
+ * @param {*} cover - The ID of an image that you want to be the cover of the album
+ * @see https://apidocs.imgur.com/#3606f862-8281-48f1-b0f7-49a5f77da0e1
+ */
+export async function imgurAlbumCreate(acessToken, ids, deleteHashes, title, description, privacy, cover) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (ids) formdata.append("ids[]", ids);
+    if (deleteHashes) formdata.append("deletehashes[]", deleteHashes);
+    formdata.append("title", title);
+    formdata.append("description", description);
+    formdata.append("privacy", privacy);
+    if (cover) formdata.append("cover", cover);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow",
+    };
+
+    console.log("POST Album Creation");
+    const rep = await fetch("https://api.imgur.com/3/album", requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(data), JSON.stringify(rep));
+    return ({rep, data});
+}
+
+// GET Account Settings
+/**
+ * Returns the account settings, only accessible if you're logged in as the user.
+ * @param {string} acessToken - A user's token giving by the api
+ * @see https://apidocs.imgur.com/#a94d108b-d6e3-4e68-9521-47ea79501c85
+ */
+export async function imgurAccountSettings(acessToken) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("GET Account Settings");
+    const rep = await fetch("https://api.imgur.com/3/account/me/settings", requestOptions);
+    const data = await rep.json();
+    //console.log(JSON.stringify(data), JSON.stringify(rep));
+    return (data);
+}
+
+//POST Change Account Settings
+/**
+ * Updates the account settings for a given user, the user must be logged in.
+ * @param {string} acessToken - A user's token giving by the api
+ * @param {string} bio - The biography of the user, is displayed in the gallery profile page.
+ * @param {string} public_images - Set the users images to private or public by default
+ * @param {string} messaging_enabled - true | false - Allows the user to enable / disable private messages
+ * @param {string} album_privacy - public | hidden | secret - Sets the default privacy level of albums the users creates
+ * @param {string} username - A valid Imgur username (between 4 and 63 alphanumeric characters has to be checked before calling this function)
+ * @param {string} show_mature - true | false - Toggle display of mature images in gallery list endpoints.
+ * @param {string} newsletter_subscribed - true | false - Toggle subscription to email newsletter.
+ * @see https://apidocs.imgur.com/#a94d108b-d6e3-4e68-9521-47ea79501c85
+ */
+export async function imgurAccountChangeSettings(acessToken, bio, public_images, messaging_enabled, album_privacy, username, show_mature, newsletter_subscribed) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (bio) formdata.append("bio", bio);
+    if (public_images) formdata.append("public_images", public_images);
+    if (messaging_enabled) formdata.append("messaging_enabled", messaging_enabled);
+    if (album_privacy) formdata.append("album_privacy", album_privacy);
+    if (username) formdata.append("username", username);
+    if (show_mature) formdata.append("show_mature", show_mature);
+    if (newsletter_subscribed) formdata.append("newsletter_subscribed", newsletter_subscribed);
+
+    var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("POST Change Account Settings");
+    const rep = await fetch("https://api.imgur.com/3/account/me/settings", requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(data));
+    return (data);
+}
+
+/**
+ * Share an Album or Image to the Gallery
+ * @param {string} acessToken - A user's token giving by the api
+ * @param {string} albumHash - Album to share
+ * @param {string} title - Title of the post
+ * @param {string} topic - Topic name
+ * @param {number} mature - If the post is mature, set this value to 1.
+ * @param {string} tags - The name of the tags you wish to associate with a post.
+ */
+export async function imgurAlbumShare(acessToken, albumHash, title, topic, mature, tags) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (title) formdata.append("title", title);
+    if (topic) formdata.append("topic", topic);
+    formdata.append("terms", "1");
+    if (mature) formdata.append("mature", mature);
+    if (tags) formdata.append("tags", `tags=${tags}`);
+
+    var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    console.log("POST Share with Community Album");
+    const rep = await fetch(`https://api.imgur.com/3/gallery/album/${albumHash}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(data));
+    return (data);
+}
+
+/* POST Vote / Comment Voting */
+/**
+ * Vote for a comment
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} id - Comment id
+ * @param {string} vote - can be 'up' or 'down' or 'veto'
+ */
+export async function imgurCommentVote(acessToken, id, vote = "up") {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    console.log("POST Vote / Comment Voting");
+    const rep = await fetch(`https://api.imgur.com/3/comment/${id}/vote/${vote}`, requestOptions);
+    const data = await rep.json();
+    console.log(JSON.stringify(rep), JSON.stringify(data));
+    return (rep);
+}
+
+/* POST Comment Creation */
+/**
+ * Vote for a comment
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} image_id - The ID of the image or album in the gallery that you wish to comment on
+ * @param {string} comment - The comment text, this is what will be displayed
+ * @param {string} parent_id - The ID of the parent comment, this is an alternative method to create a reply.
+ */
+export async function imgurCommentCreate(acessToken, image_id, comment, parent_id) {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (image_id) formdata.append("image_id", `${image_id}`);
+    if (comment) formdata.append("comment", `${comment}`);
+    if (parent_id) formdata.append("parent_id", `${parent_id}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+    }
+
+    console.log("POST Comment Creation");
+    const rep = await fetch(`https://api.imgur.com/3/comment`, requestOptions);
+    const data = await rep.json();
+    return ({rep, data});
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

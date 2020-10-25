@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>Epicture</h1>
+<p>The goal of this project is to make a Imgur client in a mobile aplication using their API</p>
+<p>The project’s functionalities asked by the school are set out as follows:</p>
+<ul>
+<li>Imgur <a href="https://apidocs.imgur.com/">API</a> implementation</li>
+<li>Authenticate to the Imgur platform</li>
+<li>Display the photos put online by the user connected</li>
+<li>Search for photos on the plateform</li>
+<li>Upload photos to the plateform</li>
+<li>Manage your favorites</li>
+<li>Filter the displayed photos</li>
+</ul>
+<h2>Authors</h2>
+<p>Project realise by Yoan Saint-Juste and Matthieu Kozicki. (3nd year in Epitech-Paris Promo - 2023)</p>
+<h2>Installation</h2>
+<p>Requires : npm, react, react-native &amp; expo </br>
+Clone the repository</p>
+<pre class="prettyprint source lang-bash"><code>git clone  git@github.com:EpitechIT2020/B-DEV-501-PAR-5-1-epicture-yoan.saint-juste.git
+</code></pre>
+<h2>API Wrapper</h2>
+<p><a href="https://apidocs.imgur.com/">You can read about the Imgur API here.</a>
+During this project we tried to make a little wrapper for the imgur API.
+The imgur.js file holds many of the function used to make calls to the API</p>
+<h5>Example</h5>
+<pre class="prettyprint source lang-javascript"><code>/* POST Comment Creation */
+/**
+ * Vote for a comment
+ * @param {string} acessToken - a user's token giving by the api
+ * @param {string} image_id - The ID of the image or album in the gallery that you wish to comment on
+ * @param {string} comment - The comment text, this is what will be displayed
+ * @param {string} parent_id - The ID of the parent comment, this is an alternative method to create a reply.
+ */
+export async function imgurCommentCreate(acessToken, image_id, comment, parent_id) {
+    var myHeaders = new Headers();
+    myHeaders.append(&quot;Authorization&quot;, `Bearer ${acessToken}`);
+
+    var formdata = new FormData();
+
+    if (image_id) formdata.append(&quot;image_id&quot;, `${image_id}`);
+    if (comment) formdata.append(&quot;comment&quot;, `${comment}`);
+    if (parent_id) formdata.append(&quot;parent_id&quot;, `${parent_id}`);
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+    }
+
+    console.log(&quot;POST Comment Creation&quot;);
+    const rep = await fetch(`https://api.imgur.com/3/comment`, requestOptions);
+    const data = await rep.json();
+    return ({rep, data});
+}
+</code></pre>
+<h2>Usage</h2>
+<pre class="prettyprint source lang-bash"><code>npm install https://github.com/user/repo/blob/branch/other_file.md
+npm start
+</code></pre>
+<p>Scan the QR-code and you are good to go !</p>
+<h2>Functionalities</h2>
+<ul>
+<li>Search for any post on imgur (filter with parameters)</li>
+<li>Upvote/downvote album</li>
+<li>Manage your favorites</li>
+<li>See comments and upvote/downvote</li>
+<li>See favorites of user connected</li>
+<li>See profil information (profil pic, name, internet point, ...)</li>
+<li>Modify profile information</li>
+<li>Post an album using a link, a file or camera</li>
+<li>Post a comment</li>
+</ul>
+<h2>Git</h2>
+<p>Norm of commit used : [BRANCH][ACTION with verbs] Commit description</p>
+<h5>Example of commits used</h5>
+<table>
+<thead>
+<tr>
+<th>[BRANCH]</th>
+<th>[ACTION]</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[TEST]</td>
+<td>[ADD]</td>
+<td>Image display for search page</td>
+</tr>
+<tr>
+<td>[TEST]</td>
+<td>[MOD]</td>
+<td>file</td>
+</tr>
+<tr>
+<td>[TEST]</td>
+<td>[FIXED]</td>
+<td>an issue</td>
+</tr>
+<tr>
+<td>[MASTER]</td>
+<td>[INIT]</td>
+<td>Branch test</td>
+</tr>
+</tbody>
+</table>
+<h5>Commits from <code>git shortlog</code></h5>
+<pre class="prettyprint source lang-bash"><code> [TEST][ADD] Image display for search page
+ [TEST][ADD] Styles.js file with colors
+ [TEST][FIXED] Issue in settings and added videos in CardDisplayer Modal
+</code></pre>
+<h2>Architecture</h2>
+<p>A folder 'Pages' contain each page of the project.
+Each page directory contains a .jsx file with its main component.
+For example the Favorites page contains a FavoritesPage.jsx file with a <code>FavoritesPage()</code> function.</p>
+<pre class="prettyprint source lang-bash"><code>.
+├── Pages
+│   ├── Authentification
+│   │   └── AuthPage.jsx
+│   ├── Favorites
+│   │   └── FavoritesPage.jsx
+│   ├── Profile
+│   │   └── ProfilePage.jsx
+│   ├── Search
+│   │   ├── CardDisplayer.jsx
+│   │   └── SearchPage.jsx
+│   ├── Settings
+│   │   └── SettingsPage.jsx
+│   └── Upload
+│       └── UploadPage.jsx
+
+</code></pre>
+<pre class="prettyprint source lang-jsx"><code>/**
+ * This component is used to render the favorites page
+ * The favorite page mainly reuses the &lt;RenderCards /> component with different data
+ */
+export default function FavoritesPage() {
+  // Data from the imgur api
+  const [userData, setUserData] = useState(null);
+  // Switches to true and false to refresh the page
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    getUserData().then((value) => {
+      setUserData(value);
+      imgurGetAlbumFav(value.acess_token, value.username).then((value) => {
+        setUserData(value.data);
+        setRefresh(false);
+      });
+    });
+  }, [refresh]);
+
+  return (
+    &lt;Container style={generalStyle.primaryColor}>
+      &lt;Header rounded androidStatusBarColor={GENERAL_COLOR} style={{backgroundColor: GENERAL_COLOR}}>
+        &lt;Text style={{marginTop: 17, color: BACKGROUND_LIGHT}}>Favorites &lt;/Text>
+      &lt;/Header>
+      &lt;RenderCards data={userData} refreshing={refresh} onRefresh={() => setRefresh(true)}/>
+    &lt;/Container>
+  );
+}
+</code></pre>
+<p>For this project we mainly used react functionnal components.</p>
+<p>The App.js represents the root of the project it checks if the user is logged in the application and then chooses to display either a WebView to force the user to connect to Imgur or the whole application.</p>
+<pre class="prettyprint source lang-javascript"><code>  render() {
+    if (this.state.loading) {
+      return (
+        &lt;Root>
+          &lt;AppLoading />
+        &lt;/Root>
+      );
+    }
+    if (!this.state.isAuth) {
+      return (
+        &lt;Root>
+          &lt;Auth setAuth={this.setAuth.bind(this)} />
+        &lt;/Root>
+      );
+    }
+    if (this.state.isAuth) {
+      return (
+        &lt;Root>
+          &lt;AppContainer disconnect={this.disconnect.bind(this)} />
+        &lt;/Root>
+      );
+    }
+  }
+</code></pre>
+<p>The pages and the Tab Bar are written in the AppContainer.jsx file, it is this file that handles the rendering of all the pages of the application. It uses react-navigation.</p>
+<pre class="prettyprint source lang-jsx"><code>&lt;Tab.Screen name=&quot;Upload&quot; component={UploadPage} />
+&lt;Tab.Screen name=&quot;Favorites&quot; component={FavoritesPage} />
+&lt;Tab.Screen name=&quot;Search&quot; component={SearchPage} />
+&lt;Tab.Screen name=&quot;Profile&quot; component={ProfilePage} initialParams={{disconnect: props.disconnect}} />
+&lt;Tab.Screen name=&quot;Settings&quot; component={SettingsPage} />
+</code></pre>
+<h2>Styles and colors</h2>
+<p>The main styles and colors used in the application are stored in a file called Colors.js</p>
+<pre class="prettyprint source lang-javascript"><code>import { StyleSheet} from &quot;react-native&quot;;
+
+export const BACKGROUND_COLOR = &quot;#EBEBEC&quot; //blanc cassé
+
+export const BACKGROUND_LIGHT = &quot;#F9F9F1&quot; //blanc
+
+export const GENERAL_COLOR = &quot;#7E78d2&quot; // voilet
+
+export const TEXT_COLOR = &quot;#0C0C0C&quot; // gris-noir
+
+export const generalStyle = StyleSheet.create({
+contentMiddle: {
+  flex: 1,
+  alignItems: &quot;center&quot;,
+  justifyContent: &quot;center&quot;,
+  backgroundColor: BACKGROUND_COLOR,
+},
+primaryColor: {
+  backgroundColor: BACKGROUND_LIGHT,
+  color: GENERAL_COLOR
+},
+primaryWhite: {
+  backgroundColor: BACKGROUND_COLOR,
+  color: GENERAL_COLOR
+},
+primarySetting: {
+	backgroundColor:GENERAL_COLOR
+},
+primaryHeader: {
+	backgroundColor: GENERAL_COLOR,
+	color: BACKGROUND_LIGHT
+}
+});
+</code></pre></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

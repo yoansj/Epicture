@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Pages/Search/SearchPage.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Pages/Search/SearchPage.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState , useEffect} from "react";
+import { StyleSheet, View } from "react-native";
+import { Col, Grid } from "react-native-easy-grid";
+import {
+  Picker,
+  Item,
+  Icon,
+  Button,
+  Text,
+  Input,
+  Container,
+  Header,
+} from "native-base";
+import { RenderCards } from "./CardDisplayer";
+import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
+import { getUserData } from "../Authentification/AuthPage";
+import { generalStyle, GENERAL_COLOR } from "../../Colors";
+
+/**
+ * The SearchPage component renders a search page for the user
+ * The user can change the Picker to search for Pictures, Albums, Users or see his own posts
+ */
+export default function SearchPage() {
+
+  // Can be pictures || albums
+  const [searchPicker, setSearchPicker] = useState("pictures");
+  // Can be time || viral || top || random
+  const [sortPicker, setSortPicker] = useState("time");
+  // Can be day || week || month || year || all
+  const [windowPicker, setwindowPicker] = useState("all");
+  // Can be hot || top || user
+  const [sectionPicker, setSectionPicker] = useState("hot");
+  // Data from imgur API
+  const [imgurData, setImgurData] = useState(null);
+  // Search string
+  const [text, setText] = useState("");
+  // Refresh
+  const [refresh, setRefresh] = useState(false);
+  const [firstSearch, setFirstSearch] = useState(false);
+
+
+  useEffect(() => {
+    if (searchPicker === "myPost") {
+      getUserData().then((value) => {
+        console.log(value);
+        imgurAccountSubmission(value.acess_token).then((value) => {
+          setImgurData(value.data);
+          setRefresh(false);
+        });
+      });
+    }
+    if (searchPicker === "pictures") {
+      getUserData().then((value) => {
+        imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
+          (value) => {
+            setImgurData(value.data);
+            setRefresh(false);
+          }
+        );
+      });
+    }
+    if (searchPicker === "albums") {
+      getUserData().then((value) => {
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", 0).then(
+          (value) => {
+            setImgurData(value.data);
+            setRefresh(false);
+          }
+        );
+      });
+    }
+    if (firstSearch === false) {
+      getUserData().then((value) => {
+        imgurGallery(value.acess_token, "hot", "top", "all", "true").then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+      setFirstSearch(true);
+    }
+  }, [searchPicker, sortPicker, windowPicker, sectionPicker, refresh]);
+
+    /**
+   * Function called when the user searches
+   * Takes a text param which is the query searched by the user
+   * The result of the search is stored in the imgurData state
+   * @param {*} text
+   * @example doSearch("cats") 
+   */
+  function doSearch(text) {
+    if (searchPicker === "pictures") {
+      getUserData().then((value) => {
+        imgurSearch(value.acess_token, sortPicker, windowPicker, 0, text).then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+    }
+    if (searchPicker === "albums") {
+      getUserData().then((value) => {
+        imgurGallery(value.acess_token, sectionPicker, sortPicker, windowPicker, "true", 0).then(
+          (value) => {
+            setImgurData(value.data);
+          }
+        );
+      });
+    }
+  }
+
+  return (
+    &lt;Container style={generalStyle.primaryWhite}>
+      &lt;Header
+        androidStatusBarColor={GENERAL_COLOR}
+        style={{
+          flexDirection: "column",
+          height: 100,
+          backgroundColor: GENERAL_COLOR,
+        }}
+        searchBar
+        rounded
+      >
+        &lt;Item style={{...styles.myBar, marginTop: 10}}>
+          &lt;Icon name="ios-search" />
+          &lt;Input
+            placeholder={"Search"}
+            value={text}
+            onChangeText={(txt) => setText(txt)}
+            onSubmitEditing={() => doSearch(text)}
+          />
+        &lt;/Item>
+        &lt;Button transparent>
+          &lt;Text>Search&lt;/Text>
+        &lt;/Button>
+        &lt;Grid>
+          &lt;Col style={{ height: 50 }}>
+            &lt;Picker
+              mode="dropdown"
+              style={styles.myPickerGreen}
+              selectedValue={searchPicker}
+              onValueChange={(value) => {
+                setSearchPicker(value);
+              }}
+              placeholder="Search"
+              textStyle={{fontSize: 5}}
+            >
+              &lt;Picker.Item label="Pictures" value="pictures" />
+              &lt;Picker.Item label="Albums" value="albums" />
+              &lt;Picker.Item label="My posts" value="myPost" />
+            &lt;/Picker>
+          &lt;/Col>
+          {searchPicker === "albums" ? (
+            &lt;Col>
+              &lt;Picker
+                mode="dropdown"
+                style={styles.myPickerGreen}
+                selectedValue={sectionPicker}
+                onValueChange={(value) => {
+                  setSectionPicker(value);
+                }}
+              >
+                &lt;Picker.Item label="Hot" value="hot" />
+                &lt;Picker.Item label="Top" value="top" />
+                &lt;Picker.Item label="User" value="user" />
+              &lt;/Picker>
+            &lt;/Col>
+          ) : (
+            []
+          )}
+          {searchPicker === "pictures" || searchPicker === "albums" ? (
+            &lt;Col>
+              &lt;Picker
+                mode="dropdown"
+                style={styles.myPickerGreen}
+                selectedValue={sortPicker}
+                onValueChange={(value) => {
+                  setSortPicker(value);
+                }}
+              >
+                &lt;Picker.Item label="Most Viral" value="viral" />
+                &lt;Picker.Item label="By date" value="time" />
+                &lt;Picker.Item label="Hightest Scoring" value="top" />
+                &lt;Picker.Item label="Random" value="random" />
+              &lt;/Picker>
+            &lt;/Col>
+          ) : (
+            []
+          )}
+          {sortPicker === "top" &amp;&amp; (searchPicker === "pictures" || searchPicker === "albums") ? (
+            &lt;Col style={{ height: 50 }}>
+              &lt;Picker
+                mode="dropdown"
+                style={styles.myPickerGreen}
+                selectedValue={windowPicker}
+                onValueChange={(value) => {
+                  setwindowPicker(value);
+                }}
+              >
+                &lt;Picker.Item label="Day" value="day" />
+                &lt;Picker.Item label="Week" value="week" />
+                &lt;Picker.Item label="Month" value="month" />
+                &lt;Picker.Item label="Year" value="year" />
+                &lt;Picker.Item label="All Time" value="all" />
+              &lt;/Picker>
+            &lt;/Col>
+          ) : (
+            []
+          )}
+        &lt;/Grid>
+      &lt;/Header>
+      &lt;RenderCards data={imgurData} refreshing={refresh} onRefresh={() => {setRefresh(true)}}  />
+    &lt;/Container>
+  );
+}
+
+
+const styles = StyleSheet.create({
+  myTop: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    alignContent: "flex-start",
+    backgroundColor: "#566573",
+    width: "100%",
+    height: "45%",
+  },
+  scrolLeft: {
+    textAlign: "center",
+    height: 20,
+    width: 175,
+  },
+  myPickerGreen:{
+    color: '#0C0C0C',
+    width: undefined
+  },
+  myBar:{
+    backgroundColor: '#F9F9F1'
+  }
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

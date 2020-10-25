@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: AppContainer.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: AppContainer.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from "react";
+
+import {
+  NavigationContainer,
+} from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import SearchPage from "./Pages/Search/SearchPage.jsx";
+import FavoritesPage from "./Pages/Favorites/FavoritesPage.jsx";
+import UploadPage from "./Pages/Upload/UploadPage.jsx";
+import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
+
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import ProfilePage from "./Pages/Profile/ProfilePage.jsx";
+import { BACKGROUND_COLOR, GENERAL_COLOR } from "./Colors.js";
+
+const Tab = createBottomTabNavigator();
+
+const TabBarTheme = {
+  colors: {
+    primary: GENERAL_COLOR,
+    background: BACKGROUND_COLOR,
+    card: BACKGROUND_COLOR,
+    text: GENERAL_COLOR,
+    border: GENERAL_COLOR,
+    notification: GENERAL_COLOR,
+  },
+};
+
+/**
+ * The App Container component is displayed once the user is logged into the application
+ * It displays a Tab Navigator containing all the pages of the application
+ * It's this component that calls each Component representing the Pages
+ * Takes a disconnect props that is a function that is called to disconnect the user
+ * @param {*} props 
+ */
+export default function AppContainer(props) {
+  return (
+    &lt;NavigationContainer theme={TabBarTheme}>
+      &lt;Tab.Navigator
+        initialRouteName="Search"
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            if (route.name === "Search") {
+              return &lt;Ionicons name="ios-search" size={size} color={color} />;
+            } else if (route.name === "Profile") {
+              return (
+                &lt;MaterialCommunityIcons
+                  name="face-profile"
+                  size={size}
+                  color={color}
+                />
+              );
+            } else if (route.name === "Favorites") {
+              if (focused)
+                return (
+                  &lt;MaterialIcons name="favorite" size={size} color={color} />
+                );
+              else
+                return (
+                  &lt;MaterialIcons
+                    name="favorite-border"
+                    size={size}
+                    color={color}
+                  />
+                );
+            } else if (route.name === "Upload") {
+              if (focused)
+                return (
+                  &lt;Ionicons name="ios-add-circle" size={size} color={color} />
+                );
+              else
+                return (
+                  &lt;Ionicons
+                    name="ios-add-circle-outline"
+                    size={size}
+                    color={color}
+                  />
+                );
+            } else if (route.name === "Settings") {
+              return (
+                &lt;Ionicons name="ios-cog" size={size} color={color} />
+              )
+            }
+          },
+        })}
+      >
+        &lt;Tab.Screen name="Upload" component={UploadPage} />
+        &lt;Tab.Screen name="Favorites" component={FavoritesPage} />
+        &lt;Tab.Screen name="Search" component={SearchPage} />
+        &lt;Tab.Screen name="Profile" component={ProfilePage} initialParams={{disconnect: props.disconnect}} />
+        &lt;Tab.Screen name="Settings" component={SettingsPage} />
+      &lt;/Tab.Navigator>
+    &lt;/NavigationContainer>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

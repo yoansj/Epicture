@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Pages/Profile/ProfilePage.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Pages/Profile/ProfilePage.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useCallback } from "react";
+import { Text, Button, Image, StyleSheet, View } from "react-native";
+import { eraseUserData, getUserData } from "../Authentification/AuthPage";
+import { imgurProfileBase } from "../../imgur";
+import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
+import { useFocusEffect } from "@react-navigation/native";
+import {
+  BACKGROUND_LIGHT,
+  GENERAL_COLOR,
+  TEXT_COLOR,
+  generalStyle,
+} from "../../Colors";
+
+/**
+ * The ProfileDisplayer component displays a imgur profile
+ * Props list
+ * @param {boolean} loading - Bool to show a loading spinner
+ * @param {boolean} showHeader - Bool to display a header on top of the component
+ * @param {boolean} renderDisconnect - Bool to render a disconnect button
+ * @param {object} userData - Object that contains all the user data (Comes from imgurProfileBase function)
+ * @param {function} disconnect - Function to call when disconnecting
+ * @example
+ * &lt;ProfileDisplayer loading={loading} showHeader={true} userdata={userProfil} renderDisconnect={true} />
+ */
+function ProfileDisplayer(props) {
+  return (
+    &lt;Container style={styles.Containers}>
+      {props.showHeader ? (
+        &lt;Header
+          rounded
+          androidStatusBarColor={GENERAL_COLOR}
+          style={generalStyle.primaryHeader}
+        >
+          &lt;Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>
+            Profile
+          &lt;/Text>
+        &lt;/Header>
+      ) : (
+        []
+      )}
+      {props.loading === false ? (
+        &lt;Image
+          source={{
+            uri: props.userdata.cover,
+          }}
+          style={{ height: 160, width: null }}
+        />
+      ) : (
+        []
+      )}
+      {props.loading === false ? (
+        &lt;Thumbnail
+          source={{
+            uri: props.userdata.avatar,
+          }}
+          style={{
+            height: 60,
+            width: 60,
+            marginTop: -60,
+            alignSelf: "center",
+          }}
+        />
+      ) : (
+        []
+      )}
+      {props.loading ? (
+        &lt;View style={{ paddingTop: 250, alignItems: "center" }}>
+          &lt;Spinner color={GENERAL_COLOR} size={"large"} />
+          &lt;Text style={{ color: GENERAL_COLOR }}>Loading Profile&lt;/Text>
+        &lt;/View>
+      ) : (
+        []
+      )}
+      &lt;Grid style={styles.PageContent}>
+        &lt;Text style={{ ...styles.FieldText, paddingTop: 15 }}>
+          {props.loading === false ? "Names" : ""}
+        &lt;/Text>
+        &lt;Text style={styles.InfoText}>
+          {props.loading === false ? props.userdata.url : ""}
+        &lt;/Text>
+        &lt;Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "About" : ""}
+        &lt;/Text>
+        &lt;Text style={{ ...styles.InfoText, textAlign: "center" }}>
+          {props.loading === false &amp;&amp; props.userdata.bio !== ""
+            ? decodeURI(props.userdata.bio)
+            : props.loading === true
+            ? ""
+            : "Empty bio :("}
+        &lt;/Text>
+        &lt;Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "Joined" : ""}
+        &lt;/Text>
+        &lt;Text style={styles.InfoText}>
+          {props.loading === false
+            ? new Date(props.userdata.created * 1000).toDateString()
+            : ""}
+        &lt;/Text>
+        &lt;Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "Internet Points" : ""}
+        &lt;/Text>
+        &lt;Text style={styles.InfoText}>
+          {props.loading === false ? props.userdata.reputation : ""}
+        &lt;/Text>
+        &lt;Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "Notoriety" : ""}
+        &lt;/Text>
+        &lt;Text style={styles.InfoText}>
+          {props.loading === false ? props.userdata.reputation_name : ""}
+        &lt;/Text>
+      &lt;/Grid>
+      {props.renderDisconnect ? (
+        &lt;View
+          style={{
+            paddingTop: 10,
+            position: "absolute",
+            bottom: 30,
+            alignSelf: "center",
+          }}
+        >
+          &lt;Button
+            color={GENERAL_COLOR}
+            title="Disconnect"
+            onPress={() => eraseUserData().then(props.disconnect())}
+          />
+        &lt;/View>
+      ) : (
+        []
+      )}
+    &lt;/Container>
+  );
+}
+
+/**
+ * ProfilePage component that uses a ProfileDisplayer component to
+ * render the currently connected user profile
+ * @param {object} route - @see https://reactnavigation.org/docs/params/
+ */
+export default function ProfilePage({ route }) {
+  const { disconnect } = route.params;
+
+  // User data
+  const [userProfil, setProfile] = useState("EMPTY");
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      getUserData().then((value) => {
+        imgurProfileBase(value.acess_token, "me").then((value) => {
+          setProfile(value.data);
+          setLoading(false);
+        });
+      });
+    }, [])
+  );
+
+  return (
+    &lt;ProfileDisplayer
+      loading={loading}
+      showHeader={true}
+      userdata={userProfil}
+      renderDisconnect={true}
+      disconnect={disconnect}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  PageContent: {
+    alignItems: "center",
+    flexDirection: "column",
+    backgroundColor: BACKGROUND_LIGHT,
+  },
+  Containers: {
+    backgroundColor: BACKGROUND_LIGHT,
+    color: BACKGROUND_LIGHT,
+  },
+  FieldText: {
+    color: TEXT_COLOR,
+  },
+  InfoText: {
+    color: GENERAL_COLOR,
+  },
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AuthPage">AuthPage</a></li><li><a href="global.html#eraseUserData">eraseUserData</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#imgurAccountChangeSettings">imgurAccountChangeSettings</a></li><li><a href="global.html#imgurAccountSettings">imgurAccountSettings</a></li><li><a href="global.html#imgurAccountSubmission">imgurAccountSubmission</a></li><li><a href="global.html#imgurAlbum">imgurAlbum</a></li><li><a href="global.html#imgurAlbumCreate">imgurAlbumCreate</a></li><li><a href="global.html#imgurAlbumFavorite">imgurAlbumFavorite</a></li><li><a href="global.html#imgurAlbumShare">imgurAlbumShare</a></li><li><a href="global.html#imgurAlbumVote">imgurAlbumVote</a></li><li><a href="global.html#imgurCommentCreate">imgurCommentCreate</a></li><li><a href="global.html#imgurCommentVote">imgurCommentVote</a></li><li><a href="global.html#imgurFavorites">imgurFavorites</a></li><li><a href="global.html#imgurGallery">imgurGallery</a></li><li><a href="global.html#imgurGalleryGetAlbum">imgurGalleryGetAlbum</a></li><li><a href="global.html#imgurGetAlbumFav">imgurGetAlbumFav</a></li><li><a href="global.html#imgurGetCom">imgurGetCom</a></li><li><a href="global.html#imgurGetImageId">imgurGetImageId</a></li><li><a href="global.html#imgurImageUpload">imgurImageUpload</a></li><li><a href="global.html#imgurProfileBase">imgurProfileBase</a></li><li><a href="global.html#imgurSearch">imgurSearch</a></li><li><a href="global.html#ProfileDisplayer">ProfileDisplayer</a></li><li><a href="global.html#renderPicture">renderPicture</a></li><li><a href="global.html#saveUserData">saveUserData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Oct 25 2020 16:59:48 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
