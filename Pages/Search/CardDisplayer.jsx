@@ -322,7 +322,7 @@ export default function CardDisplayer(props) {
             </Text>
           </Header>
           <ScrollView refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => refreshModal()} />
+            <RefreshControl refreshing={refreshing} colors={['#7E78d2']} onRefresh={() => refreshModal()} />
           }>
             {props.description ? <Text style={{ marginTop: 17, color: GENERAL_COLOR }}>
               {props.description}
@@ -508,10 +508,12 @@ export function RenderCards(props) {
     return (
       <SafeAreaView>
         <FlatList
-          refreshing={(props.refreshing ? props.refreshing : false)}
-          onRefresh={() => {props.onRefresh()}}
           data={props.data}
           renderItem={renderPicture}
+          refreshControl={
+            <RefreshControl refreshing={(props.refreshing ? props.refreshing : false)}
+            colors={['#7E78d2']}   onRefresh={() => {props.onRefresh()}}/>
+          }
         />
       </SafeAreaView>
     );
