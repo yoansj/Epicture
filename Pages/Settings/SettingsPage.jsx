@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet, Button, Switch } from "react-native";
 import { Container, Header, Spinner, Input, Toast } from "native-base";
 import { getUserData } from '../Authentification/AuthPage';
 import { imgurAccountChangeSettings, imgurAccountSettings, imgurProfileBase } from '../../imgur';
-import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, BACKGROUND_COLOR, TEXT_COLOR } from "../../Colors";
+import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT, BACKGROUND_COLOR } from "../../Colors";
+import { useFocusEffect } from '@react-navigation/native';
 
 function SettingsDisplayer(props) {
   const [newBio, setNewBio] = useState(props.bio);
@@ -279,7 +280,8 @@ export default function SettingsPage() {
   // Object containing user imgur data
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    setLoading(true);
     getUserData().then((value) => {
       imgurAccountSettings(value.acess_token).then((settings) => {
         setSettings(settings.data);
@@ -289,7 +291,7 @@ export default function SettingsPage() {
         });
       });
     });
-  }, []);
+  }, []))
 
   return (
     <Container style={generalStyle.primaryColor}>

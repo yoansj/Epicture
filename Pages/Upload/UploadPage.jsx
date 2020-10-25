@@ -216,8 +216,15 @@ export default function UploadPage() {
               }
             })().then(
               () => {
-                console.log("Fin de création ! index:", mediaIndex);
-                imgurAlbumShare(userdata.acess_token, albumCreate.data.data.id, postName, topic, mature, tags);
+                imgurAlbumShare(userdata.acess_token, albumCreate.data.data.id, postName, topic, mature, null).then(
+                  call => {
+                    if (call.data.success) {
+                      Toast.show({text: "Album posted succesfully", buttonText: "Cool", type: 'success', duration: 5000});
+                    } else {
+                      Toast.show({text: "Failed to post album", buttonText: "Crap !", type: 'danger', duration: 5000});
+                    }
+                  }
+                  )
               }
             ))
           }
@@ -424,10 +431,6 @@ export default function UploadPage() {
               onValueChange={() => setMature(!mature)}
               value={mature}
             />
-          </View>
-          <View style={{paddingVertical: 10}}>
-            <Text style={{...styles.purpleText, alignSelf: 'center'}}>Enter tags separated with a comma</Text>
-            <Input style={{color: TEXT_COLOR, flex: 0, alignSelf: 'center', maxHeight: 200}} placeholderTextColor={"#cdcdcd"} onChangeText={(text) => setTags(text)} multiline placeholder="cat,lol,games,memes,jojo" />
           </View>
           <View style={{paddingVertical: 80, display: 'flex', flexDirection: 'row', alignSelf: 'center'}}>
             <Button transparent onPress={() => {setStep("first")}}>

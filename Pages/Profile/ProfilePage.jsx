@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { Text, Button, Image, StyleSheet, View } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
+import { useFocusEffect } from '@react-navigation/native';
 import { BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR, generalStyle } from "../../Colors";
 
 /**
@@ -137,13 +138,14 @@ export default function ProfilePage({ route }) {
   const [userProfil, setProfile] = useState("EMPTY");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    setLoading(true);
     getUserData().then((value) => {
       imgurProfileBase(value.acess_token, "me").then((value) =>
         {setProfile(value.data); setLoading(false)}
       );
     });
-  }, []);
+  }, []))
 
   return (
     <ProfileDisplayer

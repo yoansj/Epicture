@@ -1,5 +1,3 @@
-import * as FileSystem from 'expo-file-system';
-
 export const CLIENT_ID = "350a4b0450465d9"
 export const CLIENT_SECRET = "3cd9f8af74e1c40abbf9abbb5da334fefcdd075b"
 export const REFRESH = "fecba479d2891084b4426d0fc9594c17b37f60f3"
