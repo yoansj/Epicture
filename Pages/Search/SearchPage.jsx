@@ -14,7 +14,7 @@ import {
 import { RenderCards } from "./CardDisplayer";
 import { imgurSearch , imgurAccountSubmission, imgurGallery} from "../../imgur";
 import { getUserData } from "../Authentification/AuthPage";
-import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
+import { generalStyle, GENERAL_COLOR } from "../../Colors";
 
 /**
  * The SearchPage component renders a search page for the user
@@ -23,9 +23,9 @@ import { generalStyle, GENERAL_COLOR, BACKGROUND_LIGHT } from "../../Colors";
 export default function SearchPage() {
 
   // Can be pictures || albums
-  const [searchPicker, setSearchPicker] = useState("albums");
+  const [searchPicker, setSearchPicker] = useState("pictures");
   // Can be time || viral || top || random
-  const [sortPicker, setSortPicker] = useState("top");
+  const [sortPicker, setSortPicker] = useState("time");
   // Can be day || week || month || year || all
   const [windowPicker, setwindowPicker] = useState("all");
   // Can be hot || top || user
@@ -41,7 +41,6 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (searchPicker === "myPost") {
-      console.log("eh oh ?")
       getUserData().then((value) => {
         console.log(value);
         imgurAccountSubmission(value.acess_token).then((value) => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, FlatList, SafeAreaView, Image , Modal, ScrollView, RefreshControl, Pressable} from 'react-native';
-import { Container, Header, Spinner, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, View, Toast } from 'native-base';
+import { Container, Header, Spinner, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, View } from 'native-base';
 import { Video } from 'expo-av';
 
 import { imgurAlbum, imgurAlbumVote, imgurAlbumFavorite, imgurGetCom, imgurCommentVote, imgurCommentCreate } from '../../imgur';

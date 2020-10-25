@@ -3,128 +3,133 @@ import { Text, Button, Image, StyleSheet, View } from "react-native";
 import { eraseUserData, getUserData } from "../Authentification/AuthPage";
 import { imgurProfileBase } from "../../imgur";
 import { Container, Header, Grid, Thumbnail, Spinner } from "native-base";
-import { useFocusEffect } from '@react-navigation/native';
-import { BACKGROUND_LIGHT, GENERAL_COLOR, TEXT_COLOR, generalStyle } from "../../Colors";
+import { useFocusEffect } from "@react-navigation/native";
+import {
+  BACKGROUND_LIGHT,
+  GENERAL_COLOR,
+  TEXT_COLOR,
+  generalStyle,
+} from "../../Colors";
 
 /**
-   * The ProfileDisplayer component displays a imgur profile
-   * Props list
-   * @param {boolean} loading - Bool to show a loading spinner
-   * @param {boolean} showHeader - Bool to display a header on top of the component
-   * @param {boolean} renderDisconnect - Bool to render a disconnect button
-   * @param {object} userData - Object that contains all the user data (Comes from imgurProfileBase function)
-   * @param {function} disconnect - Function to call when disconnecting
-   * @example
-   * <ProfileDisplayer loading={loading} showHeader={true} userdata={userProfil} renderDisconnect={true} />
-   */
-  function ProfileDisplayer(props) {
-    return (
-      <Container style={styles.Containers}>
-        {props.showHeader ? (
-          <Header
-            rounded
-            androidStatusBarColor={GENERAL_COLOR}
-            style={generalStyle.primaryHeader}
-          >
-            <Text style={{ marginTop: 17, color: BACKGROUND_LIGHT}}>
-              Profile
-            </Text>
-          </Header>
-        ) : (
-          []
-        )}
-        {props.loading === false ? (
-          <Image
-            source={{
-              uri: props.userdata.cover,
-            }}
-            style={{ height: 160, width: null }}
+ * The ProfileDisplayer component displays a imgur profile
+ * Props list
+ * @param {boolean} loading - Bool to show a loading spinner
+ * @param {boolean} showHeader - Bool to display a header on top of the component
+ * @param {boolean} renderDisconnect - Bool to render a disconnect button
+ * @param {object} userData - Object that contains all the user data (Comes from imgurProfileBase function)
+ * @param {function} disconnect - Function to call when disconnecting
+ * @example
+ * <ProfileDisplayer loading={loading} showHeader={true} userdata={userProfil} renderDisconnect={true} />
+ */
+function ProfileDisplayer(props) {
+  return (
+    <Container style={styles.Containers}>
+      {props.showHeader ? (
+        <Header
+          rounded
+          androidStatusBarColor={GENERAL_COLOR}
+          style={generalStyle.primaryHeader}
+        >
+          <Text style={{ marginTop: 17, color: BACKGROUND_LIGHT }}>
+            Profile
+          </Text>
+        </Header>
+      ) : (
+        []
+      )}
+      {props.loading === false ? (
+        <Image
+          source={{
+            uri: props.userdata.cover,
+          }}
+          style={{ height: 160, width: null }}
+        />
+      ) : (
+        []
+      )}
+      {props.loading === false ? (
+        <Thumbnail
+          source={{
+            uri: props.userdata.avatar,
+          }}
+          style={{
+            height: 60,
+            width: 60,
+            marginTop: -60,
+            alignSelf: "center",
+          }}
+        />
+      ) : (
+        []
+      )}
+      {props.loading ? (
+        <View style={{ paddingTop: 250, alignItems: "center" }}>
+          <Spinner color={GENERAL_COLOR} size={"large"} />
+          <Text style={{ color: GENERAL_COLOR }}>Loading Profile</Text>
+        </View>
+      ) : (
+        []
+      )}
+      <Grid style={styles.PageContent}>
+        <Text style={{ ...styles.FieldText, paddingTop: 15 }}>
+          {props.loading === false ? "Names" : ""}
+        </Text>
+        <Text style={styles.InfoText}>
+          {props.loading === false ? props.userdata.url : ""}
+        </Text>
+        <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "About" : ""}
+        </Text>
+        <Text style={{ ...styles.InfoText, textAlign: "center" }}>
+          {props.loading === false && props.userdata.bio !== ""
+            ? decodeURI(props.userdata.bio)
+            : props.loading === true
+            ? ""
+            : "Empty bio :("}
+        </Text>
+        <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "Joined" : ""}
+        </Text>
+        <Text style={styles.InfoText}>
+          {props.loading === false
+            ? new Date(props.userdata.created * 1000).toDateString()
+            : ""}
+        </Text>
+        <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "Internet Points" : ""}
+        </Text>
+        <Text style={styles.InfoText}>
+          {props.loading === false ? props.userdata.reputation : ""}
+        </Text>
+        <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
+          {props.loading === false ? "Notoriety" : ""}
+        </Text>
+        <Text style={styles.InfoText}>
+          {props.loading === false ? props.userdata.reputation_name : ""}
+        </Text>
+      </Grid>
+      {props.renderDisconnect ? (
+        <View
+          style={{
+            paddingTop: 10,
+            position: "absolute",
+            bottom: 30,
+            alignSelf: "center",
+          }}
+        >
+          <Button
+            color={GENERAL_COLOR}
+            title="Disconnect"
+            onPress={() => eraseUserData().then(props.disconnect())}
           />
-        ) : (
-          []
-        )}
-        {props.loading === false ? (
-          <Thumbnail
-            source={{
-              uri: props.userdata.avatar,
-            }}
-            style={{
-              height: 60,
-              width: 60,
-              marginTop: -60,
-              alignSelf: "center",
-            }}
-          />
-        ) : (
-          []
-        )}
-        {props.loading ? (
-          <View style={{ paddingTop: 250, alignItems: "center" }}>
-            <Spinner color={GENERAL_COLOR} size={"large"} />
-            <Text style={{ color: GENERAL_COLOR }}>Loading Profile</Text>
-          </View>
-        ) : (
-          []
-        )}
-        <Grid style={styles.PageContent}>
-          <Text style={{ ...styles.FieldText, paddingTop: 15 }}>
-            {props.loading === false ? "Names" : ""}
-          </Text>
-          <Text style={styles.InfoText}>
-            {props.loading === false ? props.userdata.url : ""}
-          </Text>
-          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
-            {props.loading === false ? "About" : ""}
-          </Text>
-          <Text style={{ ...styles.InfoText, textAlign: "center" }}>
-            {props.loading === false && props.userdata.bio !== ""
-              ? decodeURI(props.userdata.bio)
-              : props.loading === true
-              ? ""
-              : "Empty bio :("}
-          </Text>
-          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
-            {props.loading === false ? "Joined" : ""}
-          </Text>
-          <Text style={styles.InfoText}>
-            {props.loading === false
-              ? new Date(props.userdata.created * 1000).toDateString()
-              : ""}
-          </Text>
-          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
-            {props.loading === false ? "Internet Points" : ""}
-          </Text>
-          <Text style={styles.InfoText}>
-            {props.loading === false ? props.userdata.reputation : ""}
-          </Text>
-          <Text style={{ ...styles.FieldText, paddingTop: 30 }}>
-            {props.loading === false ? "Notoriety" : ""}
-          </Text>
-          <Text style={styles.InfoText}>
-            {props.loading === false ? props.userdata.reputation_name : ""}
-          </Text>
-        </Grid>
-        {props.renderDisconnect ? (
-          <View
-            style={{
-              paddingTop: 10,
-              position: "absolute",
-              bottom: 30,
-              alignSelf: "center",
-            }}
-          >
-            <Button
-              color={GENERAL_COLOR}
-              title="Disconnect"
-              onPress={() => eraseUserData().then(props.disconnect())}
-            />
-          </View>
-        ) : (
-          []
-        )}
-      </Container>
-    );
-  }
+        </View>
+      ) : (
+        []
+      )}
+    </Container>
+  );
+}
 
 /**
  * ProfilePage component that uses a ProfileDisplayer component to
@@ -138,14 +143,17 @@ export default function ProfilePage({ route }) {
   const [userProfil, setProfile] = useState("EMPTY");
   const [loading, setLoading] = useState(true);
 
-  useFocusEffect(useCallback(() => {
-    setLoading(true);
-    getUserData().then((value) => {
-      imgurProfileBase(value.acess_token, "me").then((value) =>
-        {setProfile(value.data); setLoading(false)}
-      );
-    });
-  }, []))
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      getUserData().then((value) => {
+        imgurProfileBase(value.acess_token, "me").then((value) => {
+          setProfile(value.data);
+          setLoading(false);
+        });
+      });
+    }, [])
+  );
 
   return (
     <ProfileDisplayer

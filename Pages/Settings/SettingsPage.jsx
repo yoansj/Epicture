@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Pressable, StyleSheet, Button, Switch } from "react-native";
+import React, { useState, useCallback } from 'react';
+import { View, Text, Pressable, Button, Switch } from "react-native";
 import { Container, Header, Spinner, Input, Toast } from "native-base";
 import { getUserData } from '../Authentification/AuthPage';
 import { imgurAccountChangeSettings, imgurAccountSettings, imgurProfileBase } from '../../imgur';
@@ -323,32 +323,3 @@ export default function SettingsPage() {
     </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  myMiddle: {
-    alignItems: "center",
-    flexDirection: "column",
-
-    backgroundColor: "rgb(18,18,18)",
-  },
-  myMiddle_info: {
-    paddingTop: -80,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgb(18,18,18)",
-  },
-  myGreen: {
-    backgroundColor: "rgb(27,183,110)",
-  },
-  myBlack: {
-    backgroundColor: "rgb(18,18,18)",
-    color: "rgb(27,183,110)",
-  },
-  myGrey: {
-    color: "#0C0C0C"
-  },
-  myPickerGreen:{
-    color: 'rgb(27,183,110)',
-    width: undefined
-  },
-});

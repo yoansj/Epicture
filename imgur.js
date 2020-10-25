@@ -526,6 +526,5 @@ export async function imgurCommentCreate(acessToken, image_id, comment, parent_i
     console.log("POST Comment Creation");
     const rep = await fetch(`https://api.imgur.com/3/comment`, requestOptions);
     const data = await rep.json();
-    console.log(JSON.stringify(rep), JSON.stringify(data));
     return ({rep, data});
 }
