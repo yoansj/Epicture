@@ -12,6 +12,10 @@ The project’s functionalities asked by the school are set out as follows:
 * Manage your favorites
 * Filter the displayed photos
 
+## Disclaimer for Epitech Students ⚠️
+
+Just a little reminder for Epitech Students, copying code for a project is bad, I will not be responsible for any -42 you could get by copying the code of this repository.
+
 ## Authors
 
 Project realise by Yoan Saint-Juste and Matthieu Kozicki. (3nd year in Epitech-Paris Promo - 2023)
