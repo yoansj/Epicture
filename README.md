@@ -68,7 +68,7 @@ export async function imgurCommentCreate(acessToken, image_id, comment, parent_i
 ## Usage
 
 ```bash
-npm install https://github.com/user/repo/blob/branch/other_file.md
+npm install
 npm start
 ```
 Scan the QR-code and you are good to go !
